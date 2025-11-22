@@ -1,0 +1,360 @@
+import React, { useState, useEffect } from 'react'
+import CalendarModal from './CalendarModal'
+import SearchModal from './SearchModal'
+import { useTheme } from '../providers/ThemeProvider'
+import avatar from '../assets/react.svg'
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom'
+
+const BellBadge = ({ count }) => (
+  <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-semibold rounded-full bg-red-500 text-white">
+    {count}
+  </span>
+)
+
+const IconButton = ({ children, label, className, onClick, showLabel = true }) => (
+  <button
+    type="button"
+    className={className ?? "btn flex-col gap-1 px-3 py-2"}
+    title={label}
+    aria-label={label}
+    onClick={onClick}
+  >
+    {children}
+    {showLabel && (
+      <span className="text-[8px] leading-none opacity-75 font-medium max-[480px]:hidden">{label}</span>
+    )}
+  </button>
+)
+
+export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExpanded }) {
+  const { theme, setTheme } = useTheme()
+  const isLight = theme === 'light'
+  const { t, i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
+  const navigate = useNavigate()
+  
+  // Debug: Check if onMobileToggle is a function
+  console.log('Topbar props:', { onMobileToggle, mobileSidebarOpen, isSidebarExpanded })
+  console.log('onMobileToggle type:', typeof onMobileToggle)
+  
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+  const [isSearchDropdownOpen, setIsSearchDropdownOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchType, setSearchType] = useState('All')
+  const [isTypeMenuOpen, setIsTypeMenuOpen] = useState(false)
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [isExtrasOpen, setIsExtrasOpen] = useState(false)
+  const [profilePreviewOpen, setProfilePreviewOpen] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
+
+  const handleSearch = () => {
+    console.log('Search:', { query: searchQuery, filter: searchType })
+  }
+
+  useEffect(() => {
+    // Don't open extras by default - let user control it
+    // This fixes the toggle functionality
+  }, [])
+
+  const isRtl = isRTL; // Use the reactive isRTL instead of static check
+
+  const [calendarOpen, setCalendarOpen] = useState(false)
+
+  // Notifications: compute unread count from localStorage and listen for updates
+  const getUnreadCount = () => {
+    try {
+      const raw = localStorage.getItem('notificationsData');
+      if (!raw) return 0;
+      const arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) return 0;
+      return arr.filter(n => !n.read && !n.archived).length;
+    } catch {
+      return 0;
+    }
+  };
+
+  useEffect(() => {
+    const update = () => setUnreadCount(getUnreadCount());
+    update();
+
+    window.addEventListener('storage', update);
+    window.addEventListener('notificationsUpdated', update);
+    document.addEventListener('visibilitychange', update);
+
+    return () => {
+      window.removeEventListener('storage', update);
+      window.removeEventListener('notificationsUpdated', update);
+      document.removeEventListener('visibilitychange', update);
+    };
+  }, []);
+
+  // Header buttons unified styles with glass morphism effects
+  const headerBtnBase = 'inline-flex items-center justify-center p-2 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500';
+  const headerBtnTone = isLight 
+    ? 'text-gray-600 hover:text-gray-800 backdrop-blur-md bg-white/20 hover:bg-white/40 border border-white/30 hover:border-white/50 shadow-lg hover:shadow-xl hover:scale-105 hover:-translate-y-0.5' 
+    : 'text-gray-400 hover:text-gray-200 backdrop-blur-md bg-gray-800/20 hover:bg-gray-700/40 border border-gray-600/30 hover:border-gray-500/50 shadow-lg hover:shadow-xl hover:scale-105 hover:-translate-y-0.5';
+  const headerTone = isLight ? 'bg-white border-gray-200' : 'bg-gray-900 border-gray-800';
+  const mobileExtrasBase = 'flex flex-col items-center justify-center gap-1 p-2 rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-400/40';
+  const mobileExtrasSearch = isLight ? 'bg-purple-50 border-purple-200 hover:bg-purple-100 text-purple-700' : 'bg-purple-900/20 border-purple-600 hover:bg-purple-900/30 text-purple-300';
+  const mobileExtrasTasks = isLight ? 'bg-green-50 border-green-200 hover:bg-green-100 text-green-700' : 'bg-green-900/20 border-green-600 hover:bg-green-900/30 text-green-300';
+  const mobileExtrasLang = isLight ? 'bg-orange-50 border-orange-200 hover:bg-orange-100 text-orange-700' : 'bg-orange-900/20 border-orange-600 hover:bg-orange-900/30 text-orange-300';
+
+  const toggleTheme = () => {
+    setTheme(isLight ? 'dark' : 'light');
+  };
+
+  return (
+    <>
+    <header 
+      className={`header-container nova-topbar fixed top-0 z-40 border-b ${headerTone}`}>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 max-[550px]:px-3 max-[320px]:px-2 h-14 max-[320px]:h-12 flex items-center justify-between">
+        {/* Left: mobile toggle button and welcome message */}
+        <div className="flex items-center gap-3 max-[800px]:gap-2 max-[480px]:gap-1 max-[320px]:gap-1">
+          {/* Mobile sidebar toggle button */}
+          <button
+            type="button"
+            onClick={() => {
+              console.log('Mobile toggle button clicked!')
+              console.log('Current mobileSidebarOpen state:', mobileSidebarOpen)
+              console.log('onMobileToggle function check:', typeof onMobileToggle)
+              if (typeof onMobileToggle === 'function') {
+                onMobileToggle()
+              } else {
+                console.error('onMobileToggle is not a function:', onMobileToggle)
+              }
+            }}
+            className={`md:hidden inline-flex items-center justify-center p-1.5 rounded-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              isLight 
+                ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' 
+                : 'text-gray-300 hover:text-white hover:bg-gray-700'
+            }`}
+            aria-label={mobileSidebarOpen ? t('Close menu') : t('Open menu')}
+          >
+            {mobileSidebarOpen ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                className="w-4 h-4 text-red-500"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            ) : (
+              // Hamburger icon when sidebar is closed
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 transition-transform duration-300">
+                <path d="M3 12h18M3 6h18M3 18h18" />
+              </svg>
+            )}
+          </button>
+          {!mobileSidebarOpen && (
+            <span className={`text-sm max-[480px]:text-xs ${isLight ? 'text-gray-700' : 'text-gray-300'}`}>{t('welcome_super_admin')}</span>
+          )}
+        </div>
+
+        {/* Right: actions */}
+        <div className={`flex items-center gap-2 max-[768px]:gap-1.5 max-[480px]:gap-1`}>
+          {/* Desktop Search icon placed first */}
+          <div className="max-[768px]:hidden">
+            <IconButton
+              label={t('Search')}
+              className={`${headerBtnBase} ${headerBtnTone} p-1.5`}
+              onClick={() => setIsSearchDropdownOpen((v) => !v)}
+              aria-expanded={isSearchDropdownOpen}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-4 h-4 max-[480px]:w-3 max-[480px]:h-3">
+                <circle cx="11" cy="11" r="6" />
+                <path d="M21 21l-4.5-4.5" />
+              </svg>
+            </IconButton>
+          </div>
+
+          <div>
+            <IconButton 
+              label={t('Calendar')} 
+              className={`${headerBtnBase} ${headerBtnTone} ${isLight ? '' : 'text-white bg-gray-700/40 hover:bg-gray-600/50 border border-gray-500/50'}`}
+              onClick={() => setCalendarOpen(true)}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5 max-[480px]:w-4 max-[480px]:h-4">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <path d="M3 10h18" />
+                <path d="M8 2v4M16 2v4" />
+              </svg>
+            </IconButton>
+          </div>
+
+          {/* Theme toggle should be the first icon next to Search */}
+          <div className="max-[768px]:hidden">
+            <IconButton label={t('Theme')} className={`${headerBtnBase} ${headerBtnTone}`} onClick={toggleTheme}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5 max-[480px]:w-4 max-[480px]:h-4">
+                <path d="M12 3v1m0 16v1m8-9h-1M4 12H3m15.36-6.36l-.71.71M6.35 17.65l-.71.71m12.01 0l-.71-.71M6.35 6.35l-.71-.71" />
+                <circle cx="12" cy="12" r="5" />
+              </svg>
+            </IconButton>
+          </div>
+
+          <div className="max-[768px]:hidden">
+            <IconButton label={t('Tasks')} className={`${headerBtnBase} ${headerBtnTone}`} onClick={() => navigate('/tasks')}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5">
+                <path d="M9 11l2 2 4-4" />
+                <rect x="3" y="4" width="18" height="16" rx="2" />
+              </svg>
+            </IconButton>
+          </div>
+
+          <div className="relative">
+            <IconButton label={t('Notifications')} className={`${headerBtnBase} ${headerBtnTone}`} onClick={() => navigate('/notifications')}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5 max-[480px]:w-4 max-[480px]:h-4">
+                <path d="M18 8a6 6 0 10-12 0v4l-2 2h16l-2-2V8" />
+                <path d="M13.73 21a2 2 0 01-3.46 0" />
+              </svg>
+            </IconButton>
+            {unreadCount > 0 && <BellBadge count={unreadCount} />}
+          </div>
+
+          {/* Language */}
+          <div className="max-[768px]:hidden">
+            <IconButton label={t('Language')} className={`${headerBtnBase} ${headerBtnTone}`} onClick={() => {
+              const newLang = i18n.language === 'en' ? 'ar' : 'en';
+              i18n.changeLanguage(newLang);
+              try { localStorage.setItem('language', newLang); } catch {}
+            }}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M3 12h18" />
+                <path d="M12 3v18" />
+              </svg>
+            </IconButton>
+          </div>
+
+
+          {/* Profile dropdown */}
+          <div className="relative">
+            <button 
+              onClick={() => setProfilePreviewOpen(!profilePreviewOpen)}
+              className={`flex items-center gap-2 px-3 py-2 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isLight 
+                ? 'backdrop-blur-md bg-white/20 hover:bg-white/40 border border-white/30 hover:border-white/50 shadow-lg hover:shadow-xl hover:scale-105 hover:-translate-y-0.5' 
+                : 'backdrop-blur-md bg-gray-800/20 hover:bg-gray-700/40 border border-gray-600/30 hover:border-gray-500/50 shadow-lg hover:shadow-xl hover:scale-105 hover:-translate-y-0.5'}`}>
+              <img src="https://i.pravatar.cc/150?u=a042581f4e29026024d" alt="User" className="w-8 h-8 rounded-full" />
+              <div className="max-[880px]:hidden text-left">
+                <div className="text-sm font-semibold">{t('Ibrahim')}</div>
+                <div className="text-xs text-[var(--muted-text)]">{t('Admin')}</div>
+              </div>
+            </button>
+            {profilePreviewOpen && (
+              <div className={`absolute top-12 ${isRTL ? 'left-0' : 'right-0'} w-64 backdrop-blur-md ${isLight ? 'bg-white/80' : 'bg-gray-900/80'} border ${isLight ? 'border-white/30' : 'border-gray-600/30'} rounded-xl shadow-2xl z-50`} role="menu" aria-label={t('Profile menu')}>
+                {/* Caret */}
+                <div className={`absolute -top-2 ${isRTL ? 'left-6' : 'right-6'} w-3 h-3 backdrop-blur-md ${isLight ? 'bg-white/80' : 'bg-gray-900/80'} border-t border-l ${isLight ? 'border-white/30' : 'border-gray-600/30'} rotate-45`}></div>
+
+                {/* User header */}
+                <div className="px-4 py-3 flex items-center gap-3">
+                  <img src="https://i.pravatar.cc/150?u=a042581f4e29026024d" alt="User" className="w-10 h-10 rounded-full" />
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold">{t('Ibrahim')}</div>
+                    <div className="text-xs text-[var(--muted-text)]">{t('Admin')}</div>
+                  </div>
+                </div>
+                <div className="h-px bg-[var(--divider)]"></div>
+
+                {/* Menu items */}
+                {/* Change Photo */}
+                <button
+                  onClick={() => console.log('Profile: Change Photo')}
+                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-[var(--content-text)] hover:bg-[var(--table-row-hover)] transition-colors"
+                  role="menuitem"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-4 h-4">
+                    <rect x="3" y="5" width="14" height="12" rx="2" />
+                    <circle cx="10" cy="11" r="3" />
+                    <path d="M17 8l4-2v10l-4-2" />
+                  </svg>
+                  <span>{t('Change Photo')}</span>
+                </button>
+                {/* Edit Information */}
+                <button
+                  onClick={() => console.log('Profile: Edit Information')}
+                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-[var(--content-text)] hover:bg-[var(--table-row-hover)] transition-colors"
+                  role="menuitem"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-4 h-4">
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4 12.5-12.5z" />
+                  </svg>
+                  <span>{t('Edit Information')}</span>
+                </button>
+                {/* End menu */}
+              </div>
+            )}
+          </div>
+          {/* Mobile extras toggle */}
+          <div className="md:hidden">
+            <IconButton label={t('More')} className={`${headerBtnBase} ${headerBtnTone}`} onClick={() => setIsExtrasOpen(!isExtrasOpen)}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5">
+                <circle cx="12" cy="12" r="1" />
+                <circle cx="19" cy="12" r="1" />
+                <circle cx="5" cy="12" r="1" />
+              </svg>
+            </IconButton>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    {/* Mobile Extras: drawer from bottom */}
+    {isExtrasOpen && (
+      <div className="md:hidden fixed inset-x-0 bottom-0 z-40">
+        <div className={`py-3 px-3 border-t backdrop-blur-sm ${headerTone}`}>
+          <div className="grid grid-cols-4 gap-3">
+            <IconButton
+              label={t('Search')}
+              className={`${mobileExtrasBase} ${mobileExtrasSearch} p-1.5`}
+              onClick={() => setIsSearchDropdownOpen((v) => !v)}
+              aria-expanded={isSearchDropdownOpen}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-4 h-4">
+                <circle cx="11" cy="11" r="6" />
+                <path d="M21 21l-4.5-4.5" />
+              </svg>
+            </IconButton>
+            <IconButton label={t('Tasks')} className={`${mobileExtrasBase} ${mobileExtrasTasks}`} onClick={() => { setIsExtrasOpen(false); navigate('/tasks'); }}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5">
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                <path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2" />
+              </svg>
+            </IconButton>
+            <IconButton label={t('Language')} className={`${mobileExtrasBase} ${mobileExtrasLang}`} onClick={() => {
+              const newLang = i18n.language === 'en' ? 'ar' : 'en';
+              i18n.changeLanguage(newLang);
+              try { localStorage.setItem('language', newLang); } catch {}
+            }}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M3 12h18" />
+                <path d="M12 3v18" />
+              </svg>
+            </IconButton>
+            <IconButton label={t('Theme')} className={`${mobileExtrasBase} ${isLight ? 'bg-gray-100 border-gray-200 text-gray-600' : 'bg-gray-800 border-gray-700 text-gray-300'}`} onClick={toggleTheme}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5">
+                <path d="M12 3v1m0 16v1m8-9h-1M4 12H3m15.36-6.36l-.71.71M6.35 17.65l-.71.71m12.01 0l-.71-.71M6.35 6.35l-.71-.71" />
+                <circle cx="12" cy="12" r="5" />
+              </svg>
+            </IconButton>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* Calendar modal */}
+    {calendarOpen && <CalendarModal open={calendarOpen} onClose={() => setCalendarOpen(false)} />}
+
+    {/* Search modal */}
+    {isSearchDropdownOpen && (
+      <SearchModal onClose={() => setIsSearchDropdownOpen(false)} />
+    )}
+
+    </>
+  );
+}
