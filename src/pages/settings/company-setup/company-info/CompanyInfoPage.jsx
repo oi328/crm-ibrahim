@@ -11,7 +11,7 @@ export default function CompanyInfoPage() {
 
   return (
     <Layout>
-      <div className="company-setup-page p-4">
+      <div className="company-setup-page p-3 sm:p-4">
         <PageHeader title="Company Information" description="Set basic details and logo" />
         <Card>
           <CompanyInfoForm initial={companySetup.companyInfo} onChange={updateCompanyInfo} />

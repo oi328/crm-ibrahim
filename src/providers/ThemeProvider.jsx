@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
+import { palette, fonts } from '../theme.js'
 
 const ThemeContext = createContext({ theme: 'dark', setTheme: () => {} })
 
@@ -59,7 +60,7 @@ export const ThemeProvider = ({ children }) => {
   }, [])
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme, palette, fonts }}>
       {children}
     </ThemeContext.Provider>
   )

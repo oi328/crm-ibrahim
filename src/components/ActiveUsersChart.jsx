@@ -7,14 +7,38 @@ import {
   RiUserStarLine,
   RiUserSettingsLine
 } from 'react-icons/ri'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 export default function ActiveUsersChart({ users = [] }) {
   const { t, i18n } = useTranslation()
   const lang = i18n.language || 'en'
   const [refreshing, setRefreshing] = useState(false)
-  const VISIBLE_USERS_COUNT = 6
-  const ITEM_HEIGHT = 72 // approx item height in px
+  const VISIBLE_USERS_COUNT = 3
+  const ITEM_HEIGHT = 60
+  const SCROLLBAR_CSS = `
+    .scrollbar-thin-blue { scrollbar-width: thin; scrollbar-color: #2563eb transparent; }
+    .scrollbar-thin-blue::-webkit-scrollbar { width: 8px; }
+    .scrollbar-thin-blue::-webkit-scrollbar-track { background: transparent; }
+    .scrollbar-thin-blue::-webkit-scrollbar-thumb { background-color: #2563eb; border-radius: 9999px; }
+    .scrollbar-thin-blue:hover::-webkit-scrollbar-thumb { background-color: #1d4ed8; }
+  `
+
+  const cardRef = useRef(null)
+  const headerRef = useRef(null)
+  const footerRef = useRef(null)
+  const [contentMaxH, setContentMaxH] = useState(null)
+  useEffect(() => {
+    const measure = () => {
+      const cardH = cardRef.current?.clientHeight || 0
+      const headH = headerRef.current?.clientHeight || 0
+      const footH = footerRef.current?.clientHeight || 0
+      const calc = Math.max(cardH - headH - footH, 0)
+      setContentMaxH(calc || null)
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [])
 
   const defaultUsers = [
     { 
@@ -157,16 +181,19 @@ export default function ActiveUsersChart({ users = [] }) {
   const totalCount = dataUsers.length
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-full flex flex-col">
+    <div ref={cardRef} className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-full flex flex-col">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-4 text-white flex-shrink-0">
+      <div ref={headerRef} className="bg-gradient-to-r from-blue-500 to-purple-600 p-3 text-white flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-white/20 rounded-lg">
               <RiUserStarLine className="text-2xl" />
             </div>
             <div>
-              <h3 className="text-xl font-bold">{t('Active Users')}</h3>
+              <div className={`flex items-center ${lang === 'ar' ? 'flex-row-reverse' : ''} gap-2`}>
+                <span aria-hidden className="inline-block w-1 h-4 rounded bg-white/80"></span>
+                <h3 className="text-lg font-bold">{t('Active Users')}</h3>
+              </div>
               <p className="text-blue-100 text-sm">
                 {activeCount} {lang === 'ar' ? 'نشط من' : 'active of'} {totalCount} {lang === 'ar' ? 'مستخدمين' : 'users'}
               </p>
@@ -185,44 +212,51 @@ export default function ActiveUsersChart({ users = [] }) {
       </div>
 
       {/* Content */}
+      <style>{SCROLLBAR_CSS}</style>
       <div className="flex-1 overflow-hidden">
-          <div className="h-full overflow-y-auto custom-scrollbar" style={{ maxHeight: VISIBLE_USERS_COUNT * ITEM_HEIGHT }}>
+          <div className="h-full overflow-y-auto overflow-x-hidden scrollbar-thin-blue" style={{ maxHeight: (Array.isArray(dataUsers) && dataUsers.length <= 3) ? (Math.min(dataUsers.length, 3) * ITEM_HEIGHT) : (contentMaxH || (VISIBLE_USERS_COUNT * ITEM_HEIGHT)) }}>
             <div className="p-2 space-y-2">
               {dataUsers.map((u, idx) => (
                 <div 
                   key={idx} 
-                  className="group flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 hover:shadow-md hover:scale-[1.02]"
+                  className="grid grid-cols-[auto,1fr,auto] items-center gap-2 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200/60 dark:border-gray-600/50"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
                     <div className="relative">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg">
+                      <div className="w-9 h-9 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg">
                         {u.avatar || u.name.charAt(0)}
                       </div>
                       <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white dark:border-gray-700 ${u.active ? 'bg-emerald-500' : 'bg-red-500'}`}>
                         <RiCircleFill className="w-full h-full" />
                       </div>
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-gray-800 dark:text-gray-200">{u.name}</span>
-                        {u.active && (
-                          <span className="px-2 py-1 bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 text-xs rounded-full font-medium">
-                            {lang === 'ar' ? 'متصل' : 'Online'}
-                          </span>
-                        )}
+                        <span className="font-semibold text-gray-800 dark:text-gray-200 truncate max-w-[14rem]">{u.name}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                         <RiUserSettingsLine className="text-xs" />
-                        <span>{u.role}</span>
+                        <span className="truncate max-w-[14rem]">{u.role}</span>
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                    <div className="flex items-center gap-2">
+                      {u.active ? (
+                        <span className="px-2 py-1 bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 text-xs rounded-full font-medium">
+                          {lang === 'ar' ? 'متصل' : 'Online'}
+                        </span>
+                      ) : (
+                        <span className="px-2 py-1 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 text-xs rounded-full font-medium">
+                          {lang === 'ar' ? 'أوفلاين' : 'Offline'}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300 mt-0.5">
                       <RiTimeLine className="text-xs" />
                       <span>{formatHM(u.lastSeen)}</span>
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
                       {formatRelative(u.lastSeen)}
                     </div>
                   </div>
@@ -233,7 +267,7 @@ export default function ActiveUsersChart({ users = [] }) {
       </div>
 
       {/* Footer Stats */}
-      <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 border-t border-gray-200 dark:border-gray-600 flex-shrink-0">
+      <div ref={footerRef} className="bg-gray-50 dark:bg-gray-700 px-3 py-2 border-t border-gray-200 dark:border-gray-600 flex-shrink-0">
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">

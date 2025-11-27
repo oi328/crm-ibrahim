@@ -12,7 +12,7 @@ export default function SubscriptionPage() {
 
   return (
     <Layout>
-      <div className="company-setup-page p-4">
+      <div className="company-setup-page p-3 sm:p-4">
         <PageHeader title="Subscription" description="View plan and available modules" />
         <Card>
           <SubscriptionCard subscription={companySetup.subscription} onUpgrade={onUpgrade} />

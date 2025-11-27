@@ -39,6 +39,7 @@ export default function SearchableSelect({
   const [query, setQuery] = useState('')
   const ref = useRef(null)
   const menuRef = useRef(null)
+  const inputRef = useRef(null)
   const [menuStyle, setMenuStyle] = useState({})
   const filtered = useMemo(() => {
     const q = (query || '').toLowerCase()
@@ -85,6 +86,16 @@ export default function SearchableSelect({
     }
   }, [open])
 
+  useEffect(() => {
+    if (open && inputRef.current) {
+      try {
+        inputRef.current.focus({ preventScroll: true })
+      } catch {
+        inputRef.current.focus()
+      }
+    }
+  }, [open])
+
   return (
     <div ref={ref} className={`relative ${disabled ? 'opacity-60 pointer-events-none' : ''}`}>
       <button
@@ -105,7 +116,7 @@ export default function SearchableSelect({
               placeholder={isArabic ? 'ابحث بالكتابة...' : 'Type to search...'}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              autoFocus
+              ref={inputRef}
             />
           </div>
           <ul role="listbox" className="max-h-44 overflow-auto py-1">

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export default function SearchModal({ onClose }) {
+export default function SearchModal({ onClose, variant = 'modal' }) {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
 
@@ -9,10 +9,73 @@ export default function SearchModal({ onClose }) {
   const [query, setQuery] = useState('');
 
   const applySearch = () => {
-    // حالياً سنكتفي بعرض القيم في الـ console، ويمكن لاحقاً ربطها بالتطبيق
-    console.log('Global Search:', { filterField, query });
+    try {
+      const payload = { filterField, query, ts: Date.now() };
+      localStorage.setItem('globalSearch', JSON.stringify(payload));
+      window.dispatchEvent(new CustomEvent('globalSearch', { detail: payload }));
+    } catch {}
     onClose && onClose();
   };
+
+  if (variant === 'dropdown') {
+    return (
+      <div
+        className={`dropdown-panel absolute top-12 ${isRTL ? 'left-0' : 'right-0'} w-80 rounded-xl backdrop-blur-md bg-white/90 dark:bg-gray-900/90 border border-gray-200 dark:border-gray-700 shadow-2xl z-50`}
+        role="dialog"
+        aria-label={t('Search')}
+      >
+        <div className="px-4 py-3 space-y-3">
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-gray-700 dark:text-gray-300 min-w-[70px]">
+              {isRTL ? 'الفلتر' : 'Filter'}
+            </label>
+            <div className="relative">
+              <select
+                value={filterField}
+                onChange={(e) => setFilterField(e.target.value)}
+                className={`appearance-none w-56 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 ${isRTL ? 'pl-8' : 'pr-8'}`}
+              >
+                <option value="all">{isRTL ? 'الكل' : 'All'}</option>
+                <option value="lead">{isRTL ? 'الليد' : 'Lead'}</option>
+                <option value="mobile">{isRTL ? 'الموبايل' : 'Mobile'}</option>
+                <option value="comment">{isRTL ? 'تعليق' : 'Comment'}</option>
+                <option value="country">{isRTL ? 'الدولة' : 'Country'}</option>
+              </select>
+              <span className={`pointer-events-none absolute inset-y-0 ${isRTL ? 'left-2' : 'right-2'} flex items-center opacity-60`}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-4 h-4"><path d="M6 9l6 6 6-6" /></svg>
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-gray-700 dark:text-gray-300 min-w-[70px]">
+              {t('Search')}
+            </label>
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={isRTL ? 'اكتب للبحث...' : 'Type to search...'}
+              className="w-56 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+            />
+          </div>
+          <div className="pt-2 flex items-center justify-end gap-2 border-t border-gray-200 dark:border-gray-700">
+            <button
+              onClick={() => { setQuery(''); setFilterField('all'); try { localStorage.removeItem('globalSearch'); window.dispatchEvent(new Event('globalSearchCleared')); } catch {} }}
+              className="text-xs px-3 py-2 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
+            >
+              {isRTL ? 'مسح' : 'Clear'}
+            </button>
+            <button
+              onClick={() => { applySearch(); onClose && onClose(); }}
+              className="text-xs px-3 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white"
+            >
+              {isRTL ? 'بحث' : 'Search'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-[100]" aria-label={t('Search')}>

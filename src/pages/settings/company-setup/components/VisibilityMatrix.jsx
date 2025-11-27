@@ -12,13 +12,13 @@ export default function VisibilityMatrix({ departments = [], visibility = {}, on
   }
 
   return (
-    <div className="overflow-auto">
-      <table className="company-table nova-table w-full text-sm">
+    <div className="overflow-x-auto">
+      <table className="company-table nova-table w-full text-xs sm:text-sm min-w-[720px]">
         <thead>
           <tr>
             <th className="text-left p-2">Department</th>
             {MODULES.map(m => (
-              <th key={m} className="p-2 text-xs font-medium company-setup-desc">{m}</th>
+              <th key={m} className="p-2 text-[10px] sm:text-xs font-medium company-setup-desc">{m}</th>
             ))}
           </tr>
         </thead>

@@ -17,17 +17,17 @@ export const LeadsStatsCard = ({ title, value, change, changeType, icon, color, 
   };
 
   return (
-    <div className={`bg-[var(--panel-bg)] ${compact ? 'p-3' : 'p-4'} rounded-lg shadow-md border border-[var(--panel-border)]`}>
-      <div className={`flex items-center justify-between ${compact ? 'mb-1' : 'mb-2'}`}>
+    <div className={`bg-[var(--panel-bg)] ${compact ? 'p-2' : 'p-4'} rounded-lg shadow-md border border-[var(--panel-border)]`}>
+      <div className={`flex items-center justify-between ${compact ? 'mb-0.5' : 'mb-2'}`}>
         <div className={`rounded-lg ${compact ? 'p-1' : 'p-2'} ${color}`}>
-          <span className={`text-white ${compact ? 'text-base' : 'text-lg'}`}>{icon}</span>
+          <span className={`text-white ${compact ? 'text-sm' : 'text-lg'}`}>{icon}</span>
         </div>
         <div className={`${compact ? 'text-xs' : 'text-sm'} font-medium ${getChangeColor()}`}>
           {getChangeIcon()} {change}
         </div>
       </div>
-      <h4 className={`${compact ? 'text-xs' : 'text-sm'} font-medium text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text ${compact ? 'mb-0.5' : 'mb-1'}`}>{title}</h4>
-      <p className={`${compact ? 'text-xl' : 'text-2xl'} font-bold`}>{value}</p>
+      <h4 className={`${compact ? 'text-xs' : 'text-sm'} font-medium text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text ${compact ? 'mb-0' : 'mb-1'}`}>{title}</h4>
+      <p className={`${compact ? 'text-lg' : 'text-2xl'} font-bold`}>{value}</p>
     </div>
   );
 };

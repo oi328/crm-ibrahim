@@ -19,7 +19,7 @@ export default function SettingsContactInfo() {
   )
   return (
     <Layout title={t('Contact Info Settings')} actions={actions}>
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         <ContactInfoSettings />
       </div>
     </Layout>

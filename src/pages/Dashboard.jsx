@@ -12,6 +12,7 @@ import { DelayLeads } from '../components/DelayLeads';
 import { LeadsAnalysisChart } from '../components/LeadsAnalysisChart';
 import { LeadsStatsCard } from '../components/LeadsStatsCard';
 import { useTheme } from '../providers/ThemeProvider';
+import SearchableSelect from '../components/SearchableSelect'
 import { 
   RiBarChart2Line, 
   RiLineChartLine, 
@@ -26,6 +27,8 @@ export const Dashboard = () => {
   const { theme } = useTheme();
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const [selectedManager, setSelectedManager] = useState('')
+  const [selectedEmployee, setSelectedEmployee] = useState('')
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [isMobileQuick, setIsMobileQuick] = useState(false);
   const [showAllQuick, setShowAllQuick] = useState(false);
@@ -37,6 +40,20 @@ export const Dashboard = () => {
   const [stageDefs, setStageDefs] = useState([]);
   const maxInitialStages = isMobileQuick ? 2 : (isDesktopQuick ? 3 : 2);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // Panel height sync: make Active Users fill height but not exceed Leads Status
+  const leadsPanelRef = useRef(null);
+  const usersPanelRef = useRef(null);
+  const [leadsPanelHeight, setLeadsPanelHeight] = useState(null);
+  useEffect(() => {
+    const measure = () => {
+      if (leadsPanelRef.current) setLeadsPanelHeight(leadsPanelRef.current.clientHeight);
+    };
+    // initial and after layout
+    requestAnimationFrame(measure);
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, []);
 
   // Load pipeline stages with colors/icons from Settings
   const defaultIconForName = (name) => {
@@ -214,12 +231,35 @@ export const Dashboard = () => {
       const saved = localStorage.getItem('leadsData');
       if (!saved) return [];
       const parsed = JSON.parse(saved);
-      return Array.isArray(parsed) ? parsed : [];
+      const arr = Array.isArray(parsed) ? parsed : [];
+      const sel = (selectedEmployee || selectedManager || '').trim()
+      const inRange = (lead) => {
+        if (!dateFrom && !dateTo) return true
+        const baseStr = lead?.lastContact || lead?.createdAt
+        const d = new Date(baseStr)
+        if (isNaN(d)) return true
+        const day = new Date(d.getFullYear(), d.getMonth(), d.getDate())
+        if (dateFrom) {
+          const from = new Date(dateFrom)
+          from.setHours(0,0,0,0)
+          if (day < from) return false
+        }
+        if (dateTo) {
+          const to = new Date(dateTo)
+          to.setHours(0,0,0,0)
+          if (day > to) return false
+        }
+        return true
+      }
+      return arr.filter(l => {
+        const matchesEmp = !sel || ((l.assignedTo || l.employee || '').trim() === sel)
+        return matchesEmp && inRange(l)
+      })
     } catch (e) {
       console.warn('Failed to parse leadsData from localStorage in Dashboard.', e?.message);
       return [];
     }
-  }, [refreshTrigger]);
+  }, [refreshTrigger, selectedEmployee, selectedManager, dateFrom, dateTo]);
 
   // Listen for localStorage changes to refresh data
   useEffect(() => {
@@ -337,8 +377,8 @@ export const Dashboard = () => {
            onMobileToggle={() => setMobileSidebarOpen(!mobileSidebarOpen)}
            mobileSidebarOpen={mobileSidebarOpen}
          />
-      <main className="flex-1 p-4 bg-[var(--content-bg)] text-[var(--content-text)] overflow-x-auto overflow-y-auto">
-          <h1 className="text-2xl font-bold text-primary mb-8">{t('Dashboard')}</h1>
+      <main className="flex-1 p-4 bg-[var(--content-bg)] text-[var(--content-text)] overflow-x-auto overflow-y-auto sidebar-scrollbar">
+          <h1 className="page-title text-2xl font-bold text-primary mb-8">{t('Dashboard')}</h1>
           <section 
             className="p-4 rounded-xl shadow-lg glass-panel w-full mb-8"
           >
@@ -355,7 +395,7 @@ export const Dashboard = () => {
                 </h3>
               </div>
               {/* Reset Button - Moved to top right */}
-              <button className="flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+              <button onClick={() => { setSelectedManager(''); setSelectedEmployee(''); setDateFrom(''); setDateTo(''); }} className="flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
@@ -373,12 +413,16 @@ export const Dashboard = () => {
                   </svg>
                   {t('Manager')}
                 </label>
-                <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-500 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-medium focus:border-blue-500 focus:ring-1 focus:ring-blue-200 dark:focus:ring-blue-400 transition-all duration-200 hover:border-blue-400">
-                  <option value="" className="text-gray-900 dark:text-white">{t('Select Manager')}</option>
-                  <option value="manager1" className="text-gray-900 dark:text-white">Manager 1</option>
-                  <option value="manager2" className="text-gray-900 dark:text-white">Manager 2</option>
-                  <option value="manager3" className="text-gray-900 dark:text-white">Manager 3</option>
-                </select>
+                <SearchableSelect
+                  value={selectedManager}
+                  onChange={setSelectedManager}
+                  placeholder={t('Select Manager')}
+                  className="w-full"
+                >
+                  <option value="Manager 1">Manager 1</option>
+                  <option value="Manager 2">Manager 2</option>
+                  <option value="Manager 3">Manager 3</option>
+                </SearchableSelect>
               </div>
 
               {/* Employees Filter */}
@@ -389,12 +433,16 @@ export const Dashboard = () => {
                   </svg>
                   {t('Employees')}
                 </label>
-                <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-500 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-medium focus:border-blue-500 focus:ring-1 focus:ring-blue-200 dark:focus:ring-blue-400 transition-all duration-200 hover:border-blue-400">
-                  <option value="" className="text-gray-900 dark:text-white">{t('Select Employee')}</option>
-                  <option value="employee1" className="text-gray-900 dark:text-white">Employee 1</option>
-                  <option value="employee2" className="text-gray-900 dark:text-white">Employee 2</option>
-                  <option value="employee3" className="text-gray-900 dark:text-white">Employee 3</option>
-                </select>
+                <SearchableSelect
+                  value={selectedEmployee}
+                  onChange={setSelectedEmployee}
+                  placeholder={t('Select Employee')}
+                  className="w-full"
+                >
+                  <option value="Employee 1">Employee 1</option>
+                  <option value="Employee 2">Employee 2</option>
+                  <option value="Employee 3">Employee 3</option>
+                </SearchableSelect>
               </div>
 
               {/* Date From */}
@@ -548,12 +596,15 @@ export const Dashboard = () => {
           </div>
           <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-12 mt-8">
             <div className="lg:col-span-2">
-              <DelayLeads dateFrom={dateFrom} dateTo={dateTo} />
+              <DelayLeads dateFrom={dateFrom} dateTo={dateTo} selectedEmployee={selectedEmployee || selectedManager} />
             </div>
             <div className="lg:col-span-1">
               <div className="p-4 glass-panel h-full overflow-auto rounded-lg shadow-md">
                 <div className="best-section-wrapper">
-                  <h3 className="text-lg font-semibold text-primary">{t('The Best')}</h3>
+                  <div className={`flex items-center ${i18n.language === 'ar' ? 'flex-row-reverse' : ''} gap-2 mb-3`}>
+                    <span aria-hidden className="inline-block w-1 h-5 rounded bg-blue-500"></span>
+                    <h3 className="text-lg font-semibold text-primary">{t('The Best')}</h3>
+                  </div>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('Your top agents for the number of actions.')}</p>
                   
                   {(() => {
@@ -668,193 +719,36 @@ export const Dashboard = () => {
           {/* Last Comments & Recent Phone Calls (moved up) */}
           <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
             <div className="p-4 glass-panel rounded-lg shadow-md">
-              <h3 className="text-2xl font-bold mb-4 text-primary">{t('Last Comments')}</h3>
-              <Comments />
+              <div className={`flex items-center ${i18n.language === 'ar' ? 'flex-row-reverse' : ''} gap-2 mb-4`}>
+                <span aria-hidden className="inline-block w-1 h-5 rounded bg-blue-500"></span>
+                <h3 className="text-2xl font-bold text-primary">{t('Last Comments')}</h3>
+              </div>
+              <Comments employee={selectedEmployee || selectedManager} dateFrom={dateFrom} dateTo={dateTo} />
             </div>
             <div className="p-4 glass-panel rounded-lg shadow-md">
-              <h3 className="text-2xl font-bold mb-4 text-primary">{t('Recent Phone Calls')}</h3>
-              <RecentPhoneCalls />
+              <div className={`flex items-center ${i18n.language === 'ar' ? 'flex-row-reverse' : ''} gap-2 mb-4`}>
+                <span aria-hidden className="inline-block w-1 h-5 rounded bg-blue-500"></span>
+                <h3 className="text-2xl font-bold text-primary">{t('Recent Phone Calls')}</h3>
+              </div>
+              <RecentPhoneCalls employee={selectedEmployee || selectedManager} dateFrom={dateFrom} dateTo={dateTo} />
             </div>
           </section>
-          {/* Leads Analysis Section (Toolbar style like screenshot) */}
-          <div className="grid grid-cols-1 gap-4 mb-12">
-            <div className="col-span-1 p-4 glass-panel rounded-lg shadow-md">
-              <h3 className="text-2xl font-bold mb-3 text-primary">{t('Leads Analysis')}</h3>
-
-              {/* Top toolbar */}
-              <div className="flex flex-wrap items-center gap-2 mb-3">
-                {/* Measures dropdown */}
-                <div className="relative">
-                  <select
-                    value={selectedMeasure}
-                    onChange={(e) => setSelectedMeasure(e.target.value)}
-                    className="px-3 py-1.5 text-sm border rounded-md bg-gray-50 dark:bg-gray-700 dark:text-gray-100"
-                  >
-                    <option value="Count">{t('Count')}</option>
-                    <option value="Days to Assign">{t('Days to Assign')}</option>
-                    <option value="Days to Close">{t('Days to Close')}</option>
-                    <option value="Days to Convert">{t('Days To Convert')}</option>
-                    <option value="Exceeded Closing Days">{t('Exceeded Closing Days')}</option>
-                    <option value="Expected Revenue">{t('Expected Revenue')}</option>
-                    <option value="Prorated Revenue">{t('Prorated Revenue')}</option>
-                  </select>
-                </div>
-
-                {/* Status dropdown (Active/Inactive/All) */}
-                <div className="relative">
-                  <select
-                    value={activeFilter}
-                    onChange={(e) => setActiveFilter(e.target.value)}
-                    className="px-3 py-1.5 text-sm border rounded-md bg-gray-50 dark:bg-gray-700 dark:text-gray-100"
-                  >
-                    <option value="active">{t('Active')}</option>
-                    <option value="inactive">{t('Inactive')}</option>
-                    <option value="all">{t('All')}</option>
-                  </select>
-                </div>
-
-                {/* Year dropdown (Created on) */}
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-700 dark:text-gray-200">{t('Created on')}:</span>
-                  <select
-                    value={yearFilter}
-                    onChange={(e) => setYearFilter(e.target.value)}
-                    className="px-3 py-1.5 text-sm border rounded-md bg-gray-50 dark:bg-gray-700 dark:text-gray-100"
-                  >
-                    <option value="2025">2025</option>
-                    <option value="2024">2024</option>
-                    <option value="2023">2023</option>
-                  </select>
-                </div>
-
-                {/* Chart type buttons - Enhanced Design */}
-                <div className="flex items-center gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                  {/* Bar Chart Button */}
-                  <button 
-                    onClick={() => setLeadsChartType('bar')} 
-                    className={`
-                      group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out
-                      ${leadsChartType === 'bar' 
-                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25 scale-105' 
-                        : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-600 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-105'
-                      }
-                      border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500
-                    `}
-                    title="رسم بياني عمودي"
-                  >
-                    <RiBarChart2Line className="w-4 h-4" />
-                    {leadsChartType === 'bar' && (
-                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-blue-500 rounded-full"></div>
-                    )}
-                  </button>
-
-                  {/* Stacked Bar Chart Button */}
-                  <button 
-                    onClick={() => setLeadsChartType('stackedBar')} 
-                    className={`
-                      group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out
-                      ${leadsChartType === 'stackedBar' 
-                        ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/25 scale-105' 
-                        : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-gray-600 hover:text-green-600 dark:hover:text-green-400 hover:scale-105'
-                      }
-                      border border-gray-200 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-500
-                    `}
-                    title="رسم بياني عمودي مكدس"
-                  >
-                    <RiStackLine className="w-4 h-4" />
-                    {leadsChartType === 'stackedBar' && (
-                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-green-500 rounded-full"></div>
-                    )}
-                  </button>
-
-                  {/* Line Chart Button */}
-                  <button 
-                    onClick={() => setLeadsChartType('line')} 
-                    className={`
-                      group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out
-                      ${leadsChartType === 'line' 
-                        ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/25 scale-105' 
-                        : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-gray-600 hover:text-purple-600 dark:hover:text-purple-400 hover:scale-105'
-                      }
-                      border border-gray-200 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-500
-                    `}
-                    title="رسم بياني خطي"
-                  >
-                    <RiLineChartLine className="w-4 h-4" />
-                    {leadsChartType === 'line' && (
-                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-purple-500 rounded-full"></div>
-                    )}
-                  </button>
-
-                  {/* Pie Chart Button */}
-                  <button 
-                    onClick={() => setLeadsChartType('pie')} 
-                    className={`
-                      group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out
-                      ${leadsChartType === 'pie' 
-                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/25 scale-105' 
-                        : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-gray-600 hover:text-orange-600 dark:hover:text-orange-400 hover:scale-105'
-                      }
-                      border border-gray-200 dark:border-gray-600 hover:border-orange-300 dark:hover:border-orange-500
-                    `}
-                    title="رسم بياني دائري"
-                  >
-                    <RiPieChartLine className="w-4 h-4" />
-                    {leadsChartType === 'pie' && (
-                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-orange-500 rounded-full"></div>
-                    )}
-                  </button>
-                </div>
-
-                {/* Chart Type Indicator */}
-                <div className="flex items-center justify-center mt-2">
-                  <div className="flex items-center gap-2 px-3 py-1 bg-gray-50 dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700">
-                    <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"></div>
-                    <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
-                      {leadsChartType === 'bar' && 'رسم بياني عمودي'}
-                      {leadsChartType === 'stackedBar' && 'رسم بياني عمودي مكدس'}
-                      {leadsChartType === 'line' && 'رسم بياني خطي'}
-                      {leadsChartType === 'pie' && 'رسم بياني دائري'}
-                    </span>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Removed filter chips row per request */}
-
-              {/* Chart */}
-              <div className="h-auto">
-                <LeadsAnalysisChart 
-                  data={getDisplayChartData()}
-                  chartType={leadsChartType}
-                  filters={{ dataType: 'monthly', status: activeFilter, year: yearFilter }}
-                />
-              </div>
+          {/* Leads Status (3), Active Users (4), Active Campaigns (5) in 12 cols - moved above Leads Analysis */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-10 items-stretch">
+            {/* Active Users (first) */}
+            <div ref={usersPanelRef} className="p-3 glass-panel rounded-lg shadow-md h-full lg:col-span-4" style={leadsPanelHeight ? { maxHeight: `${leadsPanelHeight}px` } : undefined}>
+              <ActiveUsersChart />
             </div>
-          </div>
 
-          
-          {/* Leads Status (3), Active Users (4), Active Campaigns (5) in 12 cols */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-12 items-stretch">
-            {/* Leads Status */}
-            <div className="p-4 glass-panel rounded-lg shadow-md lg:col-span-3 h-full">
-              <h3 className="text-2xl font-bold mb-4 text-primary">{t('Leads Status')}</h3>
-              <div className="flex items-center justify-end gap-2 mb-4">
-                <span className="text-sm font-medium">{t('Year')}:</span>
-                <select 
-                  value={yearFilter}
-                  onChange={(e) => setYearFilter(e.target.value)}
-                  className="input text-sm"
-                >
-                  <option value="2025">2025</option>
-                  <option value="2024">2024</option>
-                  <option value="2023">2023</option>
-                </select>
+            {/* Leads Status (second) */}
+            <div ref={leadsPanelRef} className="p-3 glass-panel rounded-lg shadow-md lg:col-span-3 h-full">
+              <div className={`flex items-center ${i18n.language === 'ar' ? 'flex-row-reverse' : ''} gap-2 mb-2`}>
+                <span aria-hidden className="inline-block w-1 h-4 rounded bg-blue-500"></span>
+                <h3 className="text-lg font-bold text-primary">{t('Leads Status')}</h3>
               </div>
 
               {/* Enhanced Leads Statistics */}
-              <div className="grid grid-cols-1 gap-3 mb-4">
+              <div className="grid grid-cols-1 gap-2 mb-2">
                 <LeadsStatsCard
                   title={t('Total Leads')}
                   value="16,766"
@@ -894,27 +788,143 @@ export const Dashboard = () => {
               </div>
             </div>
 
-            {/* Active Users */}
-            <div className="p-4 glass-panel rounded-lg shadow-md h-full lg:col-span-4">
-              <ActiveUsersChart />
-            </div>
-
             {/* Active Campaigns */}
-            <div className="p-4 glass-panel rounded-lg shadow-md lg:col-span-5 h-full">
-              <ActiveCampaignsCard />
+            <div className="p-3 glass-panel rounded-lg shadow-md lg:col-span-5 h-full">
+              <ActiveCampaignsCard employee={selectedEmployee || selectedManager} dateFrom={dateFrom} dateTo={dateTo} />
             </div>
           </div>
-          
-          {/* Leads Trend Analysis Section removed per request */}
-          
+          {/* Leads Analysis Section (Toolbar style like screenshot) */}
+          <div className="grid grid-cols-1 gap-4 mb-12">
+            <div className="col-span-1 p-4 glass-panel rounded-lg shadow-md">
+              <div className={`flex items-center ${i18n.language === 'ar' ? 'flex-row-reverse' : ''} gap-2 mb-3`}>
+                <span aria-hidden className="inline-block w-1 h-5 rounded bg-blue-500"></span>
+                <h3 className="text-2xl font-bold text-primary">{t('Leads Analysis')}</h3>
+              </div>
+
+              {/* Top toolbar (chart type only) */}
+              <div className="flex flex-wrap items-center gap-2 mb-3 justify-end">
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+                  {leadsChartType === 'bar'
+                    ? (i18n.language === 'ar' ? 'رسم بياني عمودي' : 'Bar Chart')
+                    : leadsChartType === 'stackedBar'
+                      ? (i18n.language === 'ar' ? 'رسم بياني عمودي مكدس' : 'Stacked Bar Chart')
+                      : leadsChartType === 'line'
+                        ? (i18n.language === 'ar' ? 'رسم بياني خطي' : 'Line Chart')
+                        : (i18n.language === 'ar' ? 'رسم بياني دائري' : 'Pie Chart')}
+                </span>
+                {/* Chart type buttons - Enhanced Design */}
+                <div className="flex items-center gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                  {/* Bar Chart Button */}
+                  <button 
+                    onClick={() => setLeadsChartType('bar')} 
+                    className={`
+                      group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out
+                      ${leadsChartType === 'bar' 
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25 scale-105' 
+                        : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-600 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-105'
+                      }
+                      border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500
+                    `}
+                    title={i18n.language === 'ar' ? 'رسم بياني عمودي' : 'Bar Chart'}
+                  >
+                    <RiBarChart2Line className="w-4 h-4" />
+                    {leadsChartType === 'bar' && (
+                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-blue-500 rounded-full"></div>
+                    )}
+                  </button>
+
+                  {/* Stacked Bar Chart Button */}
+                  <button 
+                    onClick={() => setLeadsChartType('stackedBar')} 
+                    className={`
+                      group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out
+                      ${leadsChartType === 'stackedBar' 
+                        ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/25 scale-105' 
+                        : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-gray-600 hover:text-green-600 dark:hover:text-green-400 hover:scale-105'
+                      }
+                      border border-gray-200 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-500
+                    `}
+                    title={i18n.language === 'ar' ? 'رسم بياني عمودي مكدس' : 'Stacked Bar Chart'}
+                  >
+                    <RiStackLine className="w-4 h-4" />
+                    {leadsChartType === 'stackedBar' && (
+                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-green-500 rounded-full"></div>
+                    )}
+                  </button>
+
+                  {/* Line Chart Button */}
+                  <button 
+                    onClick={() => setLeadsChartType('line')} 
+                    className={`
+                      group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out
+                      ${leadsChartType === 'line' 
+                        ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/25 scale-105' 
+                        : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-gray-600 hover:text-purple-600 dark:hover:text-purple-400 hover:scale-105'
+                      }
+                      border border-gray-200 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-500
+                    `}
+                    title={i18n.language === 'ar' ? 'رسم بياني خطي' : 'Line Chart'}
+                  >
+                    <RiLineChartLine className="w-4 h-4" />
+                    {leadsChartType === 'line' && (
+                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-purple-500 rounded-full"></div>
+                    )}
+                  </button>
+
+                  {/* Pie Chart Button */}
+                  <button 
+                    onClick={() => setLeadsChartType('pie')} 
+                    className={`
+                      group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out
+                      ${leadsChartType === 'pie' 
+                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/25 scale-105' 
+                        : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-gray-600 hover:text-orange-600 dark:hover:text-orange-400 hover:scale-105'
+                      }
+                      border border-gray-200 dark:border-gray-600 hover:border-orange-300 dark:hover:border-orange-500
+                    `}
+                    title={i18n.language === 'ar' ? 'رسم بياني دائري' : 'Pie Chart'}
+                  >
+                    <RiPieChartLine className="w-4 h-4" />
+                    {leadsChartType === 'pie' && (
+                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-orange-500 rounded-full"></div>
+                    )}
+                  </button>
+                </div>
+
+                
+
+              </div>
+
+              {/* Removed filter chips row per request */}
+
+              {/* Chart */}
+              <div className="h-auto">
+                <LeadsAnalysisChart 
+                  data={getDisplayChartData()}
+                  chartType={leadsChartType}
+                  filters={{ dataType: 'monthly', status: activeFilter, year: yearFilter, employee: selectedEmployee || selectedManager, dateFrom, dateTo }}
+                />
+              </div>
+          </div>
+          </div>
+
           <section className="grid grid-cols-1 gap-4 mt-4">
             <div className="lg:col-span-3">
               <div className="p-4 glass-panel h-full overflow-auto rounded-lg shadow-md">
-                <h3 className="text-2xl font-bold mb-4 text-primary">{t('Pipeline Analysis')}</h3>
-                <PipelineAnalysis />
+                <div className={`flex items-center ${i18n.language === 'ar' ? 'flex-row-reverse' : ''} gap-2 mb-4`}>
+                  <span aria-hidden className="inline-block w-1 h-5 rounded bg-blue-500"></span>
+                  <h3 className="text-2xl font-bold text-primary">{t('Pipeline Analysis')}</h3>
+                </div>
+                <PipelineAnalysis selectedEmployee={selectedEmployee || selectedManager} dateFrom={dateFrom} dateTo={dateTo} />
               </div>
             </div>
           </section>
+
+          
+          
+          {/* Leads Trend Analysis Section removed per request */}
+          
+          
         </main>
       </div>
     </div>

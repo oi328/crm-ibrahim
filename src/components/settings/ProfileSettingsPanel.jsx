@@ -7,7 +7,7 @@ import 'jspdf-autotable'
 const TabButton = ({ active, onClick, children }) => (
   <button
     onClick={onClick}
-    className={`px-4 py-2 text-sm rounded-t-lg transition-all duration-300 whitespace-nowrap border-b-2 ${
+    className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-t-lg transition-all duration-300 whitespace-nowrap border-b-2 ${
       active
         ? 'border-blue-500 text-blue-600 font-medium bg-white/60 dark:bg-gray-800/60 shadow-sm'
         : 'border-transparent text-gray-700 dark:text-gray-200 hover:text-blue-600 hover:bg-white/40 dark:hover:bg-gray-800/40'
@@ -154,7 +154,7 @@ export default function ProfileSettingsPanel() {
     <div className="rounded-2xl glass-panel w-full overflow-hidden shadow-2xl">
 
       {/* Tabs */}
-      <div className="px-4 pt-3">
+      <div className="px-3 sm:px-4 pt-2 sm:pt-3">
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
           <TabButton active={active==='personal'} onClick={() => setActive('personal')}>{t('Personal Info')}</TabButton>
           <TabButton active={active==='account'} onClick={() => setActive('account')}>{t('Account & Password')}</TabButton>
@@ -165,10 +165,10 @@ export default function ProfileSettingsPanel() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto p-6 space-y-6">
+      <div className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
         {active === 'personal' && (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
                 <label className="text-xs text-[var(--muted-text)]">{t('Full Name')}</label>
                 <div className="flex items-center gap-2 p-2 rounded-lg border bg-white/90 dark:bg-gray-800/80">
@@ -208,12 +208,12 @@ export default function ProfileSettingsPanel() {
 
             <div className="h-px bg-gradient-to-r from-transparent via-white/30 dark:via-gray-700 to-transparent" />
 
-            <div className="flex items-center gap-4">
-              <div className="relative w-24 h-24 rounded-full overflow-hidden ring-2 ring-white/30">
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full overflow-hidden ring-2 ring-white/30">
                 {avatarPreview ? (
                   <img src={avatarPreview} alt="avatar" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-2xl">👤</div>
+                  <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xl sm:text-2xl">👤</div>
                 )}
                 <label className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition flex items-center justify-center text-xs text-white cursor-pointer">
                   {t('Update Photo')}
@@ -282,7 +282,7 @@ export default function ProfileSettingsPanel() {
 
         {active === 'preferences' && (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               <div className="space-y-2">
                 <label className="text-xs text-[var(--muted-text)]">{t('Language')}</label>
                 <select className="w-full px-3 py-2 rounded-lg border bg-white/90 dark:bg-gray-800/80" value={lang} onChange={e=>setLang(e.target.value)}>
@@ -308,7 +308,7 @@ export default function ProfileSettingsPanel() {
                 </select>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               <div className="rounded-xl p-4 border bg-white/60 dark:bg-gray-800/60">
                 <div className="text-sm font-medium mb-2">{t('Live Preview')}</div>
                 <div className={`rounded-lg h-24 flex items-center justify-center ${theme==='Dark'?'bg-gradient-to-r from-gray-800 to-gray-900 text-white':'bg-gradient-to-r from-gray-100 to-white text-gray-800'}`}>
@@ -322,7 +322,7 @@ export default function ProfileSettingsPanel() {
 
         {active === 'log' && (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
               <div className="space-y-1">
                 <label className="text-xs text-[var(--muted-text)]">{t('Start Date')}</label>
                 <input type="date" className="w-full px-3 py-2 rounded-lg border bg-white/90 dark:bg-gray-800/80" value={logFilterStart} onChange={e=>setLogFilterStart(e.target.value)} />
@@ -346,7 +346,7 @@ export default function ProfileSettingsPanel() {
               </div>
             </div>
             <div className="h-2" />
-            <div className="overflow-auto -mx-4">
+            <div className="overflow-auto -mx-2 sm:-mx-4">
               <table className="nova-table w-full text-sm min-w-[600px]">
                 <thead>
                   <tr className="text-left text-gray-600 dark:text-gray-300">
@@ -376,11 +376,11 @@ export default function ProfileSettingsPanel() {
       </div>
 
       {/* Footer */}
-      <div className="px-6 py-4 border-t border-white/20 dark:border-gray-700 flex items-center justify-between">
+      <div className="px-3 sm:px-4 md:px-6 py-4 border-t border-white/20 dark:border-gray-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="text-xs text-[var(--muted-text)]">{t('Last updated: 2 days ago')}</div>
-        <div className="flex items-center gap-2">
-          <button className="px-4 py-2 rounded-lg bg-blue-600 text-white shadow hover:bg-blue-700" onClick={saveChanges}>{t('Save')}</button>
-          <button className="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600" onClick={resetChanges}>{t('Reset')}</button>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <button className="w-full sm:w-auto px-4 py-2 rounded-lg bg-blue-600 text-white shadow hover:bg-blue-700" onClick={saveChanges}>{t('Save')}</button>
+          <button className="w-full sm:w-auto px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600" onClick={resetChanges}>{t('Reset')}</button>
         </div>
       </div>
     </div>

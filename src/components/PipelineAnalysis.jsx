@@ -82,8 +82,9 @@ ChartJS.register(
   Legend
 );
 
-export const PipelineAnalysis = () => {
-  const { t } = useTranslation();
+export const PipelineAnalysis = ({ selectedEmployee, dateFrom, dateTo }) => {
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language || 'en'
 
   // Toolbar state
   const [selectedMeasure, setSelectedMeasure] = useState('count');
@@ -163,7 +164,8 @@ export const PipelineAnalysis = () => {
         item.leadName.toLowerCase().includes(query.toLowerCase());
 
       // Advanced filters
-      const matchesEmployee = !advancedFilters.employee || item.employee === advancedFilters.employee;
+      const mergedEmployee = advancedFilters.employee || selectedEmployee
+      const matchesEmployee = !mergedEmployee || item.employee === mergedEmployee;
       const matchesStage = !advancedFilters.stage || item.stage === advancedFilters.stage;
       const matchesLeadName = !advancedFilters.leadName || 
         item.leadName.toLowerCase().includes(advancedFilters.leadName.toLowerCase());
@@ -173,13 +175,15 @@ export const PipelineAnalysis = () => {
       const matchesValueMax = !advancedFilters.valueMax || item.value <= parseFloat(advancedFilters.valueMax);
       
       // Date range filter (placeholder - would need proper date parsing)
-      const matchesDateFrom = !advancedFilters.dateFrom || item.date >= advancedFilters.dateFrom;
-      const matchesDateTo = !advancedFilters.dateTo || item.date <= advancedFilters.dateTo;
+      const mergedFrom = advancedFilters.dateFrom || dateFrom
+      const mergedTo = advancedFilters.dateTo || dateTo
+      const matchesDateFrom = !mergedFrom || item.date >= mergedFrom;
+      const matchesDateTo = !mergedTo || item.date <= mergedTo;
 
       return matchesBasicSearch && matchesEmployee && matchesStage && matchesLeadName && 
              matchesValueMin && matchesValueMax && matchesDateFrom && matchesDateTo;
     });
-  }, [sampleData, query, advancedFilters]);
+  }, [sampleData, query, advancedFilters, selectedEmployee, dateFrom, dateTo]);
 
   // Aggregate data by stage
   const aggregatedData = useMemo(() => {
@@ -246,6 +250,22 @@ export const PipelineAnalysis = () => {
   // Chart options
   const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
   const tickColor = isDark ? '#e5e7eb' : '#374151';
+  const measureDisplay = selectedMeasure === 'count'
+    ? (lang === 'ar' ? 'عدد العملاء المحتملين' : 'No. of Leads')
+    : selectedMeasure === 'value'
+      ? (lang === 'ar' ? 'قيمة الصفقة' : 'Deal Value')
+      : (lang === 'ar' ? 'الإيراد الموزّع' : 'Prorated Revenue')
+  const aggDisplay = aggregator === 'sum'
+    ? (lang === 'ar' ? 'المجموع' : 'Sum')
+    : aggregator === 'avg'
+      ? (lang === 'ar' ? 'المتوسط' : 'Average')
+      : aggregator === 'min'
+        ? (lang === 'ar' ? 'الأدنى' : 'Minimum')
+        : (lang === 'ar' ? 'الأعلى' : 'Maximum')
+  const xLabelBar = lang === 'ar' ? 'المرحلة' : 'Stage'
+  const yLabelBar = `${measureDisplay} (${aggDisplay})`
+  const xLabelLine = lang === 'ar' ? 'التاريخ' : 'Date'
+  const yLabelLine = measureDisplay
   
   const barOptions = {
     responsive: true,
@@ -255,8 +275,8 @@ export const PipelineAnalysis = () => {
       title: { display: true, text: `${t('Pipeline Analysis')} - ${t(selectedMeasure)} (${t('by Stage')})`, color: tickColor }
     },
     scales: {
-      x: { grid: { display: false }, ticks: { color: tickColor, font: { size: 12 } } },
-      y: { beginAtZero: true, grid: { display: false }, ticks: { color: tickColor, font: { size: 12 } } }
+      x: { grid: { display: false }, ticks: { color: tickColor, font: { size: 12 } }, title: { display: true, text: xLabelBar, color: tickColor } },
+      y: { beginAtZero: true, grid: { display: false }, ticks: { color: tickColor, font: { size: 12 } }, title: { display: true, text: yLabelBar, color: tickColor } }
     }
   };
   
@@ -268,8 +288,8 @@ export const PipelineAnalysis = () => {
       title: { display: true, text: `${t('Pipeline Analysis')} - ${t(selectedMeasure)} (${t('Over Time')})`, color: tickColor }
     },
     scales: {
-      x: { grid: { display: false }, ticks: { color: tickColor, font: { size: 12 } } },
-      y: { grid: { display: false }, ticks: { color: tickColor, font: { size: 12 } } }
+      x: { grid: { display: false }, ticks: { color: tickColor, font: { size: 12 } }, title: { display: true, text: xLabelLine, color: tickColor } },
+      y: { grid: { display: false }, ticks: { color: tickColor, font: { size: 12 } }, title: { display: true, text: yLabelLine, color: tickColor } }
     }
   };
 
@@ -305,121 +325,70 @@ export const PipelineAnalysis = () => {
 
   return (
     <div className="w-full">
-      {/* Toolbar */}
-      <div className="flex flex-col gap-3 mb-4">
-        <div className="flex items-center justify-between gap-3">
-          {/* Left group: Measures + chart type icons */}
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-semibold">{t('Measures')}:</label>
-            <select
-              value={selectedMeasure}
-              onChange={(e) => setSelectedMeasure(e.target.value)}
-              className="px-3 py-2 text-sm rounded-md bg-purple-600 text-white border border-purple-600 hover:bg-purple-700"
-            >
-              <option value="count">{t('Count')}</option>
-              <option value="value">{t('Value')}</option>
-              <option value="prorated">{t('Prorated Revenue')}</option>
-            </select>
-
-            {/* Chart type buttons */}
-            <div className="flex gap-1 ml-3">
+      {/* Toolbar (simplified like Leads Analysis) */}
+      <div className="flex flex-wrap items-center gap-2 mb-3 justify-end">
+        <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+          {chartType === 'bar'
+            ? (lang === 'ar' ? 'رسم بياني عمودي' : 'Bar Chart')
+            : chartType === 'line'
+              ? (lang === 'ar' ? 'رسم بياني خطي' : 'Line Chart')
+              : chartType === 'pie'
+                ? (lang === 'ar' ? 'رسم بياني دائري' : 'Pie Chart')
+                : chartType === 'pivot'
+                  ? (lang === 'ar' ? 'جدول محوري' : 'Pivot Table')
+                  : (lang === 'ar' ? 'قائمة' : 'List')}
+        </span>
+        <div className="flex items-center gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
               <button
                 onClick={() => setChartType('bar')}
                 title={t('Bar')}
                 aria-label={t('Bar')}
-                className={`w-10 h-10 flex items-center justify-center rounded-lg border-2 transition-all duration-200 hover:scale-105 ${chartType === 'bar' ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white border-blue-500 shadow-lg' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-blue-400 hover:text-blue-600'}`}
+                className={`group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out ${chartType === 'bar' ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25 scale-105' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-600 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-105'} border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500`}
+                title={lang === 'ar' ? 'رسم بياني عمودي' : 'Bar Chart'}
               >
-                <RiBarChart2Line className="text-lg" />
+                <RiBarChart2Line className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setChartType('line')}
                 title={t('Line')}
                 aria-label={t('Line')}
-                className={`w-10 h-10 flex items-center justify-center rounded-lg border-2 transition-all duration-200 hover:scale-105 ${chartType === 'line' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white border-green-500 shadow-lg' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-green-400 hover:text-green-600'}`}
+                className={`group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out ${chartType === 'line' ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/25 scale-105' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-gray-600 hover:text-purple-600 dark:hover:text-purple-400 hover:scale-105'} border border-gray-200 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-500`}
+                title={lang === 'ar' ? 'رسم بياني خطي' : 'Line Chart'}
               >
-                <RiLineChartLine className="text-lg" />
+                <RiLineChartLine className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setChartType('pie')}
                 title={t('Pie')}
                 aria-label={t('Pie')}
-                className={`w-10 h-10 flex items-center justify-center rounded-lg border-2 transition-all duration-200 hover:scale-105 ${chartType === 'pie' ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white border-purple-500 shadow-lg' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-purple-400 hover:text-purple-600'}`}
+                className={`group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out ${chartType === 'pie' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/25 scale-105' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-gray-600 hover:text-orange-600 dark:hover:text-orange-400 hover:scale-105'} border border-gray-200 dark:border-gray-600 hover:border-orange-300 dark:hover:border-orange-500`}
+                title={lang === 'ar' ? 'رسم بياني دائري' : 'Pie Chart'}
               >
-                <RiPieChartLine className="text-lg" />
+                <RiPieChartLine className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setChartType('pivot')}
                 title={t('Pivot')}
                 aria-label={t('Pivot')}
-                className={`w-10 h-10 flex items-center justify-center rounded-lg border-2 transition-all duration-200 hover:scale-105 ${chartType === 'pivot' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white border-orange-500 shadow-lg' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-orange-400 hover:text-orange-600'}`}
+                className={`group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out ${chartType === 'pivot' ? 'bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-lg shadow-teal-500/25 scale-105' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-teal-50 dark:hover:bg-gray-600 hover:text-teal-600 dark:hover:text-teal-400 hover:scale-105'} border border-gray-200 dark:border-gray-600 hover:border-teal-300 dark:hover:border-teal-500`}
+                title={lang === 'ar' ? 'جدول محوري' : 'Pivot Table'}
               >
-                <RiTable2 className="text-lg" />
+                <RiTable2 className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setChartType('list')}
                 title={t('List')}
                 aria-label={t('List')}
-                className={`w-10 h-10 flex items-center justify-center rounded-lg border-2 transition-all duration-200 hover:scale-105 ${chartType === 'list' ? 'bg-gradient-to-r from-teal-500 to-teal-600 text-white border-teal-500 shadow-lg' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-teal-400 hover:text-teal-600'}`}
+                className={`group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out ${chartType === 'list' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/25 scale-105' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-gray-600 hover:text-green-600 dark:hover:text-green-400 hover:scale-105'} border border-gray-200 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-500`}
+                title={lang === 'ar' ? 'قائمة' : 'List'}
               >
-                <RiListUnordered className="text-lg" />
+                <RiListUnordered className="w-4 h-4" />
               </button>
             </div>
-          </div>
-
-          {/* Right group: Search + Advanced Search Toggle */}
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <RiSearchLine className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
-              <input
-                type="text"
-                placeholder={t('Search...')}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                className="w-48 pl-10 pr-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              />
-            </div>
-            <button
-              onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
-              className={`p-2.5 rounded-lg border-2 transition-all duration-200 hover:scale-105 ${showAdvancedSearch ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white border-indigo-500 shadow-lg' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-indigo-400 hover:text-indigo-600'}`}
-              title={t('Advanced Search')}
-            >
-              <BiSlider className="text-lg" />
-            </button>
-          </div>
-        </div>
-
-        {/* Secondary controls */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-semibold">{t('Min/Max')}:</label>
-            <select
-              value={aggregator}
-              onChange={(e) => setAggregator(e.target.value)}
-              className="input px-3 py-2 text-sm"
-            >
-              <option value="sum">{t('Sum')}</option>
-              <option value="avg">{t('Average')}</option>
-              <option value="min">{t('Min')}</option>
-              <option value="max">{t('Max')}</option>
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-semibold">{t('Created on')}:</label>
-            <select
-              value={yearFilter}
-              onChange={(e) => setYearFilter(e.target.value)}
-              className="input px-3 py-2 text-sm"
-            >
-              <option value="2025">2025</option>
-              <option value="2024">2024</option>
-              <option value="2023">2023</option>
-            </select>
-          </div>
         </div>
 
         {/* Advanced Search Panel */}
-        {showAdvancedSearch && (
+        {false && (
           <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
@@ -563,7 +532,6 @@ export const PipelineAnalysis = () => {
             </div>
           </div>
         )}
-      </div>
 
       {/* Content */}
       {chartType === 'bar' && (

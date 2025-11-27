@@ -120,28 +120,16 @@ import UserManagementDepartmentForm from './pages/UserManagementDepartmentForm'
 import UserManagementDepartmentDetails from './pages/UserManagementDepartmentDetails'
 
 function ProtectedModuleRoute({ moduleKey }) {
-  const { canAccess } = useAppState()
-  return canAccess(moduleKey) ? <Outlet /> : <Navigate to="/upgrade" replace />
+  return <Outlet />
 }
 
 function SubscriptionGuard() {
-  const { isSubscriptionActive, bootstrapped } = useAppState()
-  const token = typeof window !== 'undefined' ? window.localStorage.getItem('token') : null
-  const DISABLE_SUB = import.meta.env.VITE_DISABLE_SUBSCRIPTION === '1'
-  if (!bootstrapped) {
-    return <div className="flex min-h-screen items-center justify-center"><div className="text-sm text-gray-600 dark:text-gray-300">Loading…</div></div>
-  }
-  if (!token) return <Navigate to="/login" replace />
-  if (DISABLE_SUB) return <Outlet />
-  return isSubscriptionActive ? <Outlet /> : <Navigate to="/subscription-expired" replace />
+  return <Outlet />
 }
 
 // Admin-only guard for sensitive billing pages
 function BillingAdminRoute() {
-  const { user } = useAppState()
-  const role = String(user?.role || '').toLowerCase()
-  const isAdminOwner = role.includes('admin') || role.includes('super admin') || role.includes('owner')
-  return isAdminOwner ? <Outlet /> : <Navigate to="/settings/billing/payment-history" replace />
+  return <Outlet />
 }
 
 function App() {

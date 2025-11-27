@@ -5,9 +5,16 @@ import Topbar from './Topbar'
 import MobileSidebarToggle from './MobileSidebarToggle'
 
 export default function Layout({ children }) {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const isRtl = i18n.language === 'ar'
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+  const SCROLLBAR_CSS = `
+    .scrollbar-thin-blue { scrollbar-width: thin; scrollbar-color: #2563eb transparent; }
+    .scrollbar-thin-blue::-webkit-scrollbar { width: 8px; }
+    .scrollbar-thin-blue::-webkit-scrollbar-track { background: transparent; }
+    .scrollbar-thin-blue::-webkit-scrollbar-thumb { background-color: #2563eb; border-radius: 9999px; }
+    .scrollbar-thin-blue::-webkit-scrollbar-thumb:hover { background-color: #1d4ed8; }
+  `
   // إزالة منطق توسعة/انكماش السايدبار لجعله ثابتًا دائمًا
 
   // قفل تمرير الصفحة عند فتح السايدبار في الموبايل فقط
@@ -44,6 +51,8 @@ export default function Layout({ children }) {
       <div
         className="content-container"
       >
+        <style>{SCROLLBAR_CSS}</style>
+        {/* Welcome moved to header overlay */}
         {/* Topbar */}
         <Topbar 
           onMobileToggle={() => {
@@ -57,10 +66,10 @@ export default function Layout({ children }) {
         />
 
          {/* Main content */}
-         <main className="flex-1 overflow-auto sidebar-scrollbar pt-2 sm:pt-3 lg:pt-4 px-3 sm:px-4 lg:px-6 pb-4 mt-0 ml-0">
-           <div className="w-full">
-             {children}
-           </div>
+         <main className="flex-1 overflow-auto sidebar-scrollbar scrollbar-thin-blue pt-0 px-3 sm:px-4 lg:px-6 pb-4 mt-0 ml-0">
+          <div className="w-full page-title-auto">
+            {children}
+          </div>
          </main>
       </div>
     </div>

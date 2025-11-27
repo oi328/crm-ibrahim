@@ -1,13 +1,40 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { FaWhatsapp, FaEnvelope, FaEye, FaPhone, FaVideo } from 'react-icons/fa';
+import { FaWhatsapp, FaEnvelope, FaEye, FaPhone, FaPlus } from 'react-icons/fa';
+import AddActionModal from './AddActionModal';
 import { useTheme } from '../providers/ThemeProvider';
 import EnhancedLeadDetailsModal from './EnhancedLeadDetailsModal';
 import LeadHoverTooltip from './LeadHoverTooltip';
 
-export const DelayLeads = ({ dateFrom, dateTo }) => {
+export const DelayLeads = ({ dateFrom, dateTo, selectedEmployee }) => {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
+  const MEET_ICON_URL = 'https://img.icons8.com/color/48/google-meet.png'
+  const SCROLLBAR_CSS = `
+    .scrollbar-thin-blue { scrollbar-width: thin; scrollbar-color: #2563eb transparent; }
+    .scrollbar-thin-blue::-webkit-scrollbar { height: 6px; }
+    .scrollbar-thin-blue::-webkit-scrollbar-track { background: transparent; }
+    .scrollbar-thin-blue::-webkit-scrollbar-thumb { background-color: #2563eb; border-radius: 9999px; }
+    .scrollbar-thin-blue:hover::-webkit-scrollbar-thumb { background-color: #1d4ed8; }
+  `
+  const STORAGE_KEY = 'userActionsByDate'
+  const loadActions = () => {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') } catch { return {} }
+  }
+  const saveActions = (obj) => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(obj)) } catch {}
+  }
+  const [showAddActionModal, setShowAddActionModal] = useState(false)
+  const handleSaveAction = (action) => {
+    try {
+      const map = loadActions()
+      const key = action?.date || new Date().toISOString().slice(0,10)
+      const label = (action?.title || '').trim() || (action?.notes ? String(action.notes).slice(0,60) : `${action?.type || 'action'}`)
+      map[key] = [ ...(map[key] || []), label ]
+      saveActions(map)
+    } finally {
+      setShowAddActionModal(false)
+    }
+  }
   const [selectedFilter, setSelectedFilter] = useState(null);
   const [showAllFilters, setShowAllFilters] = useState(false);
   const [showLeadModal, setShowLeadModal] = useState(false);
@@ -20,18 +47,31 @@ export const DelayLeads = ({ dateFrom, dateTo }) => {
   const tooltipRef = useRef(null);
   const activeRowRef = useRef(null);
 
+  useEffect(() => {
+    if (showLeadModal) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return () => { document.body.style.overflow = prev; };
+    }
+  }, [showLeadModal]);
+
   // Load all leads from localStorage (shared with Leads page)
   const allLeadsFromStorage = useMemo(() => {
     try {
       const saved = localStorage.getItem('leadsData');
       if (!saved) return [];
       const parsed = JSON.parse(saved);
-      return Array.isArray(parsed) ? parsed : [];
+      const arr = Array.isArray(parsed) ? parsed : [];
+      if (selectedEmployee) {
+        return arr.filter(l => (l.assignedTo || l.employee || '').trim() === selectedEmployee)
+      }
+      return arr;
     } catch (e) {
       console.warn('Failed to parse leadsData from localStorage in DelayLeads.', e?.message);
       return [];
     }
-  }, []);
+  }, [selectedEmployee]);
 
   // Mock delayed leads for dashboard preview when storage is empty
   const MOCK_LEADS = [
@@ -134,11 +174,37 @@ export const DelayLeads = ({ dateFrom, dateTo }) => {
       // fields used by DelayLeads table rendering
       leadName: l.name,
       mobile: l.phone ? `(${String(l.phone).slice(0, 3)}*****)` : '',
-      stageDate: l.lastContact || l.createdAt,
+      actionDate: l.lastContact || l.createdAt,
       lastComment: l.notes || '',
       category: deriveDelayCategory(l),
     }));
   }, [allLeads]);
+
+  const formatDateSafe = (iso) => {
+    try {
+      const d = new Date(iso)
+      return new Intl.DateTimeFormat(i18n.language === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(d)
+    } catch {
+      return iso || ''
+    }
+  }
+
+  const renderStageBadge = (status) => {
+    const s = String(status || '').toLowerCase()
+    const cls = s === 'new' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200'
+      : s === 'qualified' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-200'
+      : s === 'in-progress' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-200'
+      : s === 'converted' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-200'
+      : s === 'lost' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200'
+      : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200'
+    const label = s === 'new' ? t('New')
+      : s === 'qualified' ? t('Qualified')
+      : s === 'in-progress' ? t('In Progress')
+      : s === 'converted' ? t('Converted')
+      : s === 'lost' ? t('Lost')
+      : (status || '-')
+    return <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded ${cls}`}>{label}</span>
+  }
 
   // Helper: parse and compare dates safely
   const inDateRange = (leadDateStr) => {
@@ -175,7 +241,7 @@ export const DelayLeads = ({ dateFrom, dateTo }) => {
 
   // Filter leads based on selected stage and date range
   const filteredLeads = useMemo(() => {
-    const ranged = delayLeads.filter((lead) => inDateRange(lead.stageDate));
+    const ranged = delayLeads.filter((lead) => inDateRange(lead.actionDate));
     if (selectedFilter) {
       return ranged.filter((lead) => String(lead?.status || '').toLowerCase() === String(selectedFilter).toLowerCase());
     }
@@ -218,7 +284,10 @@ export const DelayLeads = ({ dateFrom, dateTo }) => {
 
   return (
     <div className={`p-4 ${bgColor} h-full overflow-auto rounded-lg shadow-md border ${isLight ? 'border-gray-200' : 'border-gray-700'} ${textColor}`}>
-      <h3 className="text-lg font-semibold mb-2">{t('Delay Leads')}</h3>
+      <div className={`flex items-center ${i18n.language === 'ar' ? 'flex-row-reverse' : ''} gap-2 mb-2`}>
+        <span aria-hidden className="inline-block w-1 h-5 rounded bg-blue-500"></span>
+        <h3 className="text-lg font-semibold">{t('Delay Leads')}</h3>
+      </div>
       
       <div className="flex flex-wrap gap-2 mb-4 text-sm">
         {(() => {
@@ -290,45 +359,66 @@ export const DelayLeads = ({ dateFrom, dateTo }) => {
       </div>
       
       {/* Table container with conditional max height and scrolling */}
-      <div className={`${showScroll ? 'max-h-80 overflow-y-auto' : ''}`}>
+      <style>{SCROLLBAR_CSS}</style>
+      <div className={`overflow-x-auto scrollbar-thin-blue ${showScroll ? 'max-h-80 overflow-y-auto' : ''}`}>
         <div className="sm:hidden">
           {/* Mobile card layout */}
           {filteredLeads.map((lead, index) => (
             <div
               key={index}
-              className={`p-3 mb-2 rounded-lg border ${isLight ? 'bg-white border-gray-200' : 'bg-gray-800 border-gray-700'} cursor-pointer`}
-              onClick={(e) => handleRowClick(lead, e)}
+              className={`p-3 mb-2 rounded-lg border ${isLight ? 'bg-white border-gray-200' : 'bg-gray-800 border-gray-700'} cursor-default`}
             >
               <div className="flex justify-between items-start mb-2">
                 <div>
                   <div className="font-medium text-sm">{lead.leadName}</div>
                   <div className="text-xs text-gray-500 dark:text-gray-400">{lead.mobile}</div>
+                  <div className="mt-1">{renderStageBadge(lead.status)}</div>
                 </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">{lead.stageDate}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">{formatDateSafe(lead.actionDate)}</div>
               </div>
               <div className="text-sm mb-3">{lead.lastComment}</div>
-              <div className="flex justify-end space-x-2">
-                <button 
-                  onClick={() => {
-                    setSelectedLead(lead);
-                    setShowLeadModal(true);
-                  }}
-                  className="text-blue-600 hover:text-blue-900 p-1" 
-                  title={t('preview')}
+              <div className="flex items-center justify-end gap-2 flex-nowrap">
+                <button
+                  title={t('Preview')}
+                  onClick={(e) => { e.stopPropagation(); setSelectedLead(lead); setShowLeadModal(true); }}
+                  className={`inline-flex items-center justify-center w-8 h-8 rounded-md border ${isLight ? 'border-gray-300 text-gray-700 hover:bg-gray-50' : 'border-gray-600 text-gray-200 hover:bg-gray-900/30'}`}
                 >
-                  <FaEye size={14} />
+                  <FaEye size={16} />
                 </button>
-                <button className="text-purple-600 hover:text-purple-900 p-1" title="Call">
-                  <FaPhone size={14} />
+                <button
+                  title={t('Add Action')}
+                  onClick={(e) => { e.stopPropagation(); setSelectedLead(lead); setShowAddActionModal(true) }}
+                  className={`inline-flex items-center justify-center w-8 h-8 rounded-md border ${isLight ? 'border-gray-300 text-gray-700 hover:bg-gray-50' : 'border-gray-600 text-gray-200 hover:bg-gray-900/30'}`}
+                >
+                  <FaPlus size={16} />
                 </button>
-                <button className="text-green-600 hover:text-green-900 p-1" title="WhatsApp">
-                  <FaWhatsapp size={14} />
+                <button
+                  title={t('Call')}
+                  onClick={(e) => { e.stopPropagation(); const raw = lead.phone || lead.mobile || ''; const digits = String(raw).replace(/[^0-9]/g, ''); if (digits) window.open(`tel:${digits}`); }}
+                  className={`inline-flex items-center justify-center w-8 h-8 rounded-md border ${isLight ? 'border-gray-300 hover:bg-gray-50 text-blue-600' : 'border-gray-600 hover:bg-gray-900/30 text-blue-400'}`}
+                >
+                  <FaPhone size={16} />
                 </button>
-                <button className="text-gray-600 hover:text-gray-900 p-1" title="Email">
-                  <FaEnvelope size={14} />
+                <button
+                  title="WhatsApp"
+                  onClick={(e) => { e.stopPropagation(); const raw = lead.phone || lead.mobile || ''; const digits = String(raw).replace(/[^0-9]/g, ''); if (digits) window.open(`https://wa.me/${digits}`); }}
+                  className={`inline-flex items-center justify-center w-8 h-8 rounded-md border ${isLight ? 'border-gray-300 hover:bg-gray-50 text-green-600' : 'border-gray-600 hover:bg-gray-900/30 text-green-400'}`}
+                >
+                  <FaWhatsapp size={16} />
                 </button>
-                <button className="text-red-600 hover:text-red-900 p-1" title="Google Meet">
-                  <FaVideo size={14} />
+                <button
+                  title={t('Email')}
+                  onClick={(e) => { e.stopPropagation(); if (lead.email) window.open(`mailto:${lead.email}`); }}
+                  className={`inline-flex items-center justify-center w-8 h-8 rounded-md border ${isLight ? 'border-gray-300 text-gray-700 hover:bg-gray-50' : 'border-gray-600 text-gray-200 hover:bg-gray-900/30'}`}
+                >
+                  <FaEnvelope size={16} />
+                </button>
+                <button
+                  title="Google Meet"
+                  onClick={(e) => { e.stopPropagation(); window.open('https://meet.google.com/', '_blank'); }}
+                  className={`inline-flex items-center justify-center w-8 h-8 rounded-md border ${isLight ? 'border-gray-300 hover:bg-gray-50' : 'border-gray-600 hover:bg-gray-900/30'}`}
+                >
+                  <img src={MEET_ICON_URL} alt="Meet" className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -337,53 +427,74 @@ export const DelayLeads = ({ dateFrom, dateTo }) => {
         
         <div className="hidden sm:block">
           {/* Desktop table layout */}
-          <table className="w-full text-sm text-left">
+          <table className="w-full min-w-max text-sm text-left">
             <thead className={`text-xs uppercase sticky top-0 ${isLight ? 'bg-gray-50' : 'bg-gray-800'}`}>
               <tr>
                 <th scope="col" className="px-6 py-3">{t('Lead Name')}</th>
-                <th scope="col" className="px-6 py-3">{t('Mobile')}</th>
-                <th scope="col" className="px-6 py-3">{t('Stage Date')}</th>
-                <th scope="col" className="px-6 py-3">{t('Last Comment')}</th>
-                <th scope="col" className="px-6 py-3"></th>
+                <th scope="col" className={`px-6 py-3 border-l ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>{t('Mobile')}</th>
+                <th scope="col" className={`px-6 py-3 border-l ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>{t('Actions')}</th>
+                <th scope="col" className={`px-6 py-3 border-l ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>{t('Stage')}</th>
+                <th scope="col" className={`px-6 py-3 border-l ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>{t('Last Comment')}</th>
+                <th scope="col" className={`px-6 py-3 border-l ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>{t('Action Date')}</th>
               </tr>
             </thead>
             <tbody>
               {filteredLeads.map((lead, index) => (
                 <tr
                   key={index}
-                  className={`border-b ${isLight ? 'bg-white border-gray-200' : 'bg-gray-800 border-gray-700'} hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer`}
-                  onClick={(e) => handleRowClick(lead, e)}
+                  className={`border-b ${isLight ? 'bg-white border-gray-200' : 'bg-gray-800 border-gray-700'} hover:bg-gray-50 dark:hover:bg-gray-700`}
                 >
                   <td className="px-6 py-4">{lead.leadName}</td>
-                  <td className="px-6 py-4">{lead.mobile}</td>
-                  <td className="px-6 py-4">{lead.stageDate}</td>
-                  <td className="px-6 py-4">{lead.lastComment}</td>
-                  <td className="px-6 py-4">
-                    <div className="flex space-x-2">
-                      <button 
-                        onClick={() => {
-                          setSelectedLead(lead);
-                          setShowLeadModal(true);
-                        }}
-                        className="text-blue-600 hover:text-blue-900 p-1" 
-                        title={t('preview')}
+                  <td className={`px-6 py-4 border-l ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>{lead.mobile}</td>
+                  <td className={`px-6 py-4 border-l ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>
+                    <div className="flex items-center gap-2 flex-nowrap">
+                      <button
+                        title={t('Preview')}
+                        onClick={(e) => { e.stopPropagation(); setSelectedLead(lead); setShowLeadModal(true); }}
+                        className={`inline-flex items-center justify-center w-8 h-8 rounded-md border ${isLight ? 'border-gray-300 text-gray-700 hover:bg-gray-50' : 'border-gray-600 text-gray-200 hover:bg-gray-900/30'}`}
                       >
                         <FaEye size={16} />
                       </button>
-                      <button className="text-purple-600 hover:text-purple-900 p-1" title="Call">
+                      <button
+                        title={t('Add Action')}
+                        onClick={(e) => { e.stopPropagation(); setSelectedLead(lead); setShowAddActionModal(true) }}
+                        className={`inline-flex items-center justify-center w-8 h-8 rounded-md border ${isLight ? 'border-gray-300 text-gray-700 hover:bg-gray-50' : 'border-gray-600 text-gray-200 hover:bg-gray-900/30'}`}
+                      >
+                        <FaPlus size={16} />
+                      </button>
+                      <button
+                        title={t('Call')}
+                        onClick={(e) => { e.stopPropagation(); const raw = lead.phone || lead.mobile || ''; const digits = String(raw).replace(/[^0-9]/g, ''); if (digits) window.open(`tel:${digits}`); }}
+                        className={`inline-flex items-center justify-center w-8 h-8 rounded-md border ${isLight ? 'border-gray-300 hover:bg-gray-50 text-blue-600' : 'border-gray-600 hover:bg-gray-900/30 text-blue-400'}`}
+                      >
                         <FaPhone size={16} />
                       </button>
-                      <button className="text-green-600 hover:text-green-900 p-1" title="WhatsApp">
+                      <button
+                        title="WhatsApp"
+                        onClick={(e) => { e.stopPropagation(); const raw = lead.phone || lead.mobile || ''; const digits = String(raw).replace(/[^0-9]/g, ''); if (digits) window.open(`https://wa.me/${digits}`); }}
+                        className={`inline-flex items-center justify-center w-8 h-8 rounded-md border ${isLight ? 'border-gray-300 hover:bg-gray-50 text-green-600' : 'border-gray-600 hover:bg-gray-900/30 text-green-400'}`}
+                      >
                         <FaWhatsapp size={16} />
                       </button>
-                      <button className="text-gray-600 hover:text-gray-900 p-1" title="Email">
+                      <button
+                        title={t('Email')}
+                        onClick={(e) => { e.stopPropagation(); if (lead.email) window.open(`mailto:${lead.email}`); }}
+                        className={`inline-flex items-center justify-center w-8 h-8 rounded-md border ${isLight ? 'border-gray-300 text-gray-700 hover:bg-gray-50' : 'border-gray-600 text-gray-200 hover:bg-gray-900/30'}`}
+                      >
                         <FaEnvelope size={16} />
                       </button>
-                      <button className="text-red-600 hover:text-red-900 p-1" title="Google Meet">
-                        <FaVideo size={16} />
+                      <button
+                        title="Google Meet"
+                        onClick={(e) => { e.stopPropagation(); window.open('https://meet.google.com/', '_blank'); }}
+                        className={`inline-flex items-center justify-center w-8 h-8 rounded-md border ${isLight ? 'border-gray-300 hover:bg-gray-50' : 'border-gray-600 hover:bg-gray-900/30'}`}
+                      >
+                        <img src={MEET_ICON_URL} alt="Meet" className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
+                  <td className={`px-6 py-4 border-l ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>{renderStageBadge(lead.status)}</td>
+                  <td className={`px-6 py-4 border-l ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>{lead.lastComment}</td>
+                  <td className={`px-6 py-4 border-l ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>{formatDateSafe(lead.actionDate)}</td>
                 </tr>
               ))}
             </tbody>
@@ -405,45 +516,12 @@ export const DelayLeads = ({ dateFrom, dateTo }) => {
         />
       )}
 
-      {/* Click-based Tooltip */}
-      {showTooltip && hoveredLead && (
-        <LeadHoverTooltip
-          lead={hoveredLead}
-          position={tooltipPosition}
-          innerRef={tooltipRef}
-          onAction={(action) => {
-            setShowTooltip(false);
-            setHoveredLead(null);
-            switch (action) {
-              case 'view':
-                setSelectedLead(hoveredLead);
-                setShowLeadModal(true);
-                break;
-              case 'call': {
-                const raw = hoveredLead.phone || hoveredLead.mobile || '';
-                const digits = String(raw).replace(/[^0-9]/g, '');
-                if (digits) window.open(`tel:${digits}`);
-                break;
-              }
-              case 'whatsapp': {
-                const raw = hoveredLead.phone || hoveredLead.mobile || '';
-                const digits = String(raw).replace(/[^0-9]/g, '');
-                if (digits) window.open(`https://wa.me/${digits}`);
-                break;
-              }
-              case 'email':
-                if (hoveredLead.email) window.open(`mailto:${hoveredLead.email}`);
-                break;
-              case 'video':
-                console.log('Video call:', hoveredLead);
-                break;
-              case 'delete':
-                // DelayLeads is a derived/sample list; deleting is not supported here.
-                alert(i18n.language === 'ar' ? 'الحذف غير متاح في هذه القائمة' : 'Delete not available in Delay Leads');
-                break;
-            }
-          }}
-          isRtl={i18n.language === 'ar'}
+      {showAddActionModal && (
+        <AddActionModal
+          isOpen={true}
+          onClose={() => setShowAddActionModal(false)}
+          onSave={handleSaveAction}
+          lead={selectedLead}
         />
       )}
     </div>

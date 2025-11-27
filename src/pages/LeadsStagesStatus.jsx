@@ -137,7 +137,10 @@ export default function LeadsStagesStatus() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="glass-panel rounded-2xl p-4">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold">{t('Pipeline Stages')}</h2>
+              <div className={`flex items-center ${i18n.language === 'ar' ? 'flex-row-reverse' : ''} gap-2`}>
+                <span aria-hidden className="inline-block w-1 h-5 rounded bg-blue-500"></span>
+                <h2 className="text-lg font-semibold">{t('Pipeline Stages')}</h2>
+              </div>
             </div>
             <form className="grid grid-cols-2 gap-3 mb-4" onSubmit={handleAddStage}>
               <input className="input" placeholder={t('Stage name (EN)')} value={newStage} onChange={e => setNewStage(e.target.value)} />

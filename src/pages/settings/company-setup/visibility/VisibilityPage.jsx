@@ -11,7 +11,7 @@ export default function VisibilityPage() {
 
   return (
     <Layout>
-      <div className="company-setup-page p-4">
+      <div className="company-setup-page p-3 sm:p-4">
         <PageHeader title="Visibility Matrix" description="Assign module access per department" />
         <Card>
           <VisibilityMatrix departments={companySetup.departments} visibility={companySetup.visibility} onChange={updateVisibility} />

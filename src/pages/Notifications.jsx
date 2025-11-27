@@ -27,7 +27,7 @@ const TYPES = [
   { value: 'system', label: 'System' },
 ]
 
-export default function Notifications() {
+export function NotificationsContent({ embedded = false }) {
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
 
@@ -102,16 +102,16 @@ export default function Notifications() {
   }
 
   return (
-    <Layout>
-      <div className="space-y-6">
+      <div className={`space-y-6 ${embedded ? 'p-0' : ''}`}>
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-semibold">{t('Notifications')}</h1>
+            <h1 className="page-title text-xl font-semibold">{t('Notifications')}</h1>
             <span className="inline-flex items-center px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
               {unreadCount} {t('Unread') || 'Unread'}
             </span>
           </div>
+          {!embedded && (
           <div className="flex items-center gap-2">
             <button type="button" onClick={markAllRead} className="btn btn-sm">
               {t('Mark all as read') || 'Mark all as read'}
@@ -120,6 +120,7 @@ export default function Notifications() {
               {t('Clear read') || 'Clear read'}
             </button>
           </div>
+          )}
         </div>
         <div className="h-3" aria-hidden="true"></div>
 
@@ -191,6 +192,13 @@ export default function Notifications() {
           )}
         </div>
       </div>
+  )
+}
+
+export default function Notifications() {
+  return (
+    <Layout>
+      <NotificationsContent embedded={false} />
     </Layout>
   )
 }

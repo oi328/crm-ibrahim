@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { FaUser, FaTimes, FaCog, FaPlus, FaEdit, FaCheckCircle, FaClock, FaSearch, FaFilter, FaSortAmountDown, FaList, FaCalendarAlt, FaPhone, FaEnvelope, FaTrash, FaEye, FaEllipsisV, FaWhatsapp, FaVideo, FaComments, FaMapMarkerAlt, FaDollarSign, FaUserCheck } from 'react-icons/fa';
 import AddActionModal from './AddActionModal';
 import EditLeadModal from './EditLeadModal';
@@ -225,8 +226,8 @@ const EnhancedLeadDetailsModal = ({ lead, isOpen, onClose, isArabic = false, the
     { id: 'communication', label: 'Communication' }
   ];
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-0">
+  return createPortal(
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-0">
       <div className="bg-slate-800 text-white w-full sm:max-w-5xl max-h-[85vh] h-auto sm:rounded-3xl overflow-y-auto shadow-2xl p-3 sm:p-4">
         {/* Header */}
         <div className="bg-slate-800 p-6 border-b border-slate-700">
@@ -940,7 +941,8 @@ const EnhancedLeadDetailsModal = ({ lead, isOpen, onClose, isArabic = false, the
           />
         </div>
       )}
-    </div>
+    </div>,
+    document.body
   );
 };
 

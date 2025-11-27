@@ -676,8 +676,8 @@ useEffect(() => { if (isDataMgmtActiveFlag) { openOnly('dataMgmt') } else { setD
   return (
     <aside 
       id="app-sidebar" 
-      className={`nova-sidebar group fixed inset-y-0 z-50 p-4 ${asideTone} flex flex-col h-full relative overflow-x-hidden ${
-        isRTL ? 'right-0 border-l' : 'left-0 border-r'
+      className={`nova-sidebar group fixed inset-y-0 z-50 ${isRTL ? 'pl-0 pr-4' : 'pl-4 pr-0'} py-4 ${asideTone} flex flex-col h-full relative overflow-x-hidden ${
+        isRTL ? 'right-0 border-l-0' : 'left-0 border-r-0'
       } ${isOpen ? 'sidebar-open' : ''} ${className || ''}`}
     >
       {/* Mobile close button (X) - Enhanced for better visibility and interaction */}

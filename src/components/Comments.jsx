@@ -2,10 +2,17 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import EnhancedLeadDetailsModal from './EnhancedLeadDetailsModal';
 
-export const Comments = () => {
+export const Comments = ({ employee, dateFrom, dateTo }) => {
   const { t, i18n } = useTranslation();
   const [selectedLead, setSelectedLead] = useState(null);
   const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
+  const SCROLLBAR_CSS = `
+    .scrollbar-thin-blue { scrollbar-width: thin; scrollbar-color: #2563eb transparent; }
+    .scrollbar-thin-blue::-webkit-scrollbar { width: 8px; }
+    .scrollbar-thin-blue::-webkit-scrollbar-track { background: transparent; }
+    .scrollbar-thin-blue::-webkit-scrollbar-thumb { background-color: #2563eb; border-radius: 9999px; }
+    .scrollbar-thin-blue:hover::-webkit-scrollbar-thumb { background-color: #1d4ed8; }
+  `
   
   // Enhanced sample data showing real employee-lead interactions
   const recentComments = [
@@ -101,6 +108,33 @@ export const Comments = () => {
     }
   ];
 
+  const withDates = recentComments.map((c, idx) => ({
+    ...c,
+    createdAt: new Date(Date.now() - (idx + 1) * 20 * 60 * 1000).toISOString()
+  }))
+
+  const inDateRange = (iso) => {
+    if (!dateFrom && !dateTo) return true
+    const d = new Date(iso)
+    if (isNaN(d)) return true
+    const day = new Date(d.getFullYear(), d.getMonth(), d.getDate())
+    if (dateFrom) {
+      const from = new Date(dateFrom)
+      from.setHours(0, 0, 0, 0)
+      if (day < from) return false
+    }
+    if (dateTo) {
+      const to = new Date(dateTo)
+      to.setHours(0, 0, 0, 0)
+      if (day > to) return false
+    }
+    return true
+  }
+
+  const displayComments = withDates.filter(c => (
+    (!employee || c.employeeName === employee) && inDateRange(c.createdAt)
+  ))
+
   const getPriorityColor = (priority) => {
     switch (priority) {
       case 'high':
@@ -170,8 +204,9 @@ export const Comments = () => {
 
   return (
     <>
-      <div className="space-y-3 max-h-96 overflow-y-auto">
-        {recentComments.map((comment) => (
+      <style>{SCROLLBAR_CSS}</style>
+      <div className="space-y-3 max-h-96 overflow-y-auto scrollbar-thin-blue">
+        {displayComments.map((comment) => (
           <div 
             key={comment.id} 
             className={`p-3 rounded-lg border ${getPriorityColor(comment.priority)} hover:shadow-md transition-shadow`}

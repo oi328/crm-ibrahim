@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import CalendarModal from './CalendarModal'
+import { NotificationsContent } from '../pages/Notifications'
 import SearchModal from './SearchModal'
 import { useTheme } from '../providers/ThemeProvider'
 import avatar from '../assets/react.svg'
@@ -47,6 +48,11 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
   const [isExtrasOpen, setIsExtrasOpen] = useState(false)
   const [profilePreviewOpen, setProfilePreviewOpen] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
+  const [isLanguageOpen, setIsLanguageOpen] = useState(false)
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
+  const searchRef = useRef(null)
+  const notificationsRef = useRef(null)
+  const languageRef = useRef(null)
 
   const handleSearch = () => {
     console.log('Search:', { query: searchQuery, filter: searchType })
@@ -89,6 +95,26 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
     };
   }, []);
 
+  useEffect(() => {
+    const onDocClick = (e) => {
+      if (isSearchDropdownOpen && searchRef.current && !searchRef.current.contains(e.target)) {
+        setIsSearchDropdownOpen(false)
+      }
+      if (isNotificationsOpen && notificationsRef.current && !notificationsRef.current.contains(e.target)) {
+        setIsNotificationsOpen(false)
+      }
+      if (isLanguageOpen && languageRef.current && !languageRef.current.contains(e.target)) {
+        setIsLanguageOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', onDocClick)
+    document.addEventListener('touchstart', onDocClick)
+    return () => {
+      document.removeEventListener('mousedown', onDocClick)
+      document.removeEventListener('touchstart', onDocClick)
+    }
+  }, [isSearchDropdownOpen, isNotificationsOpen, isLanguageOpen])
+
   // Header buttons unified styles with glass morphism effects
   const headerBtnBase = 'inline-flex items-center justify-center p-2 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500';
   const headerBtnTone = isLight 
@@ -107,10 +133,10 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
   return (
     <>
     <header 
-      className={`header-container nova-topbar fixed top-0 z-40 border-b ${headerTone}`}>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 max-[550px]:px-3 max-[320px]:px-2 h-14 max-[320px]:h-12 flex items-center justify-between">
+      className={`main-header nova-topbar fixed top-0 z-40 border-b ${headerTone}`}>
+      <div className="header-inner w-full h-14 max-[320px]:h-12 flex items-center justify-between">
         {/* Left: mobile toggle button and welcome message */}
-        <div className="flex items-center gap-3 max-[800px]:gap-2 max-[480px]:gap-1 max-[320px]:gap-1">
+        <div className="flex items-center gap-3 max-[800px]:gap-2 max-[480px]:gap-1 max-[320px]:gap-1 pl-0 ml-0" style={{ paddingInlineStart: 0, marginInlineStart: 0 }}>
           {/* Mobile sidebar toggle button */}
           <button
             type="button"
@@ -150,18 +176,18 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
               </svg>
             )}
           </button>
-          {!mobileSidebarOpen && (
-            <span className={`text-sm max-[480px]:text-xs ${isLight ? 'text-gray-700' : 'text-gray-300'}`}>{t('welcome_super_admin')}</span>
-          )}
-        </div>
+          <span className={`text-sm max-[480px]:text-xs font-semibold ${isLight ? 'text-gray-800' : 'text-gray-300'}`}>
+            {t('welcome_super_admin') || 'Welcome, Super Admin!'}
+          </span>
+          </div>
 
         {/* Right: actions */}
         <div className={`flex items-center gap-2 max-[768px]:gap-1.5 max-[480px]:gap-1`}>
           {/* Desktop Search icon placed first */}
-          <div className="max-[768px]:hidden">
+          <div className="max-[768px]:hidden relative" ref={searchRef}>
             <IconButton
               label={t('Search')}
-              className={`${headerBtnBase} ${headerBtnTone} p-1.5`}
+              className={`${headerBtnBase} ${headerBtnTone} p-1.5 ${isSearchDropdownOpen ? (isLight ? 'ring-2 ring-blue-400 bg-white/40' : 'ring-2 ring-blue-500 bg-gray-800/40') : ''}`}
               onClick={() => setIsSearchDropdownOpen((v) => !v)}
               aria-expanded={isSearchDropdownOpen}
             >
@@ -170,6 +196,9 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
                 <path d="M21 21l-4.5-4.5" />
               </svg>
             </IconButton>
+            {isSearchDropdownOpen && (
+              <SearchModal onClose={() => setIsSearchDropdownOpen(false)} variant="dropdown" />
+            )}
           </div>
 
           <div>
@@ -205,29 +234,38 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
             </IconButton>
           </div>
 
-          <div className="relative">
-            <IconButton label={t('Notifications')} className={`${headerBtnBase} ${headerBtnTone}`} onClick={() => navigate('/notifications')}>
+          <div className="relative" ref={notificationsRef}>
+            <IconButton label={t('Notifications')} className={`${headerBtnBase} ${headerBtnTone} ${isNotificationsOpen ? (isLight ? 'ring-2 ring-blue-400 bg-white/40' : 'ring-2 ring-blue-500 bg-gray-800/40') : ''}`} onClick={() => setIsNotificationsOpen((v)=>!v)}>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5 max-[480px]:w-4 max-[480px]:h-4">
                 <path d="M18 8a6 6 0 10-12 0v4l-2 2h16l-2-2V8" />
                 <path d="M13.73 21a2 2 0 01-3.46 0" />
               </svg>
             </IconButton>
             {unreadCount > 0 && <BellBadge count={unreadCount} />}
+            {isNotificationsOpen && (
+              <div className={`notifications-dropdown dropdown-panel absolute top-12 ${isRTL ? 'left-0' : 'right-0'} w-[520px] max-w-[90vw] max-h-[70vh] overflow-auto backdrop-blur-md backdrop-saturate-150 ${isLight ? 'bg-white/95 border border-white/40 ring-1 ring-black/10' : 'bg-gray-900/95 border border-gray-600/40 ring-1 ring-white/10'} rounded-xl shadow-xl z-50`} role="menu" aria-label={t('Notifications')}>
+                <div className="p-3">
+                  <NotificationsContent embedded={true} />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Language */}
-          <div className="max-[768px]:hidden">
-            <IconButton label={t('Language')} className={`${headerBtnBase} ${headerBtnTone}`} onClick={() => {
-              const newLang = i18n.language === 'en' ? 'ar' : 'en';
-              i18n.changeLanguage(newLang);
-              try { localStorage.setItem('language', newLang); } catch {}
-            }}>
+          <div className="max-[768px]:hidden relative" ref={languageRef}>
+            <IconButton label={t('Language')} className={`${headerBtnBase} ${headerBtnTone} ${isLanguageOpen ? (isLight ? 'ring-2 ring-blue-400 bg-white/40' : 'ring-2 ring-blue-500 bg-gray-800/40') : ''}`} onClick={() => setIsLanguageOpen((v)=>!v)}>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5">
                 <circle cx="12" cy="12" r="9" />
                 <path d="M3 12h18" />
                 <path d="M12 3v18" />
               </svg>
             </IconButton>
+            {isLanguageOpen && (
+              <div className={`dropdown-panel absolute top-12 ${isRTL ? 'left-0' : 'right-0'} w-44 backdrop-blur-md ${isLight ? 'bg-white/80 border border-white/30' : 'bg-gray-900/80 border border-gray-600/30'} rounded-xl shadow-2xl z-50`} role="menu" aria-label={t('Language')}>
+                <button className="w-full text-center px-4 py-2 text-sm hover:bg-[var(--table-row-hover)]" onClick={() => { i18n.changeLanguage('en'); try { localStorage.setItem('language','en'); } catch {} ; setIsLanguageOpen(false); }}>English</button>
+                <button className="w-full text-center px-4 py-2 text-sm hover:bg-[var(--table-row-hover)]" onClick={() => { i18n.changeLanguage('ar'); try { localStorage.setItem('language','ar'); } catch {} ; setIsLanguageOpen(false); }}>العربية</button>
+              </div>
+            )}
           </div>
 
 
@@ -245,7 +283,7 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
               </div>
             </button>
             {profilePreviewOpen && (
-              <div className={`absolute top-12 ${isRTL ? 'left-0' : 'right-0'} w-64 backdrop-blur-md ${isLight ? 'bg-white/80' : 'bg-gray-900/80'} border ${isLight ? 'border-white/30' : 'border-gray-600/30'} rounded-xl shadow-2xl z-50`} role="menu" aria-label={t('Profile menu')}>
+              <div className={`dropdown-panel absolute top-12 ${isRTL ? 'left-0' : 'right-0'} w-64 backdrop-blur-md ${isLight ? 'bg-white/80' : 'bg-gray-900/80'} border ${isLight ? 'border-white/30' : 'border-gray-600/30'} rounded-xl shadow-2xl z-50`} role="menu" aria-label={t('Profile menu')}>
                 {/* Caret */}
                 <div className={`absolute -top-2 ${isRTL ? 'left-6' : 'right-6'} w-3 h-3 backdrop-blur-md ${isLight ? 'bg-white/80' : 'bg-gray-900/80'} border-t border-l ${isLight ? 'border-white/30' : 'border-gray-600/30'} rotate-45`}></div>
 
@@ -350,10 +388,7 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
     {/* Calendar modal */}
     {calendarOpen && <CalendarModal open={calendarOpen} onClose={() => setCalendarOpen(false)} />}
 
-    {/* Search modal */}
-    {isSearchDropdownOpen && (
-      <SearchModal onClose={() => setIsSearchDropdownOpen(false)} />
-    )}
+    {/* Search modal handled inline as dropdown */}
 
     </>
   );

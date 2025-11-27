@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { FaTimes, FaPhone, FaEnvelope, FaCalendarAlt, FaComments, FaHandshake, FaFileAlt, FaCheck, FaMapMarkerAlt, FaToggleOn, FaToggleOff } from 'react-icons/fa';
 
@@ -135,12 +136,21 @@ const AddActionModal = ({ isOpen, onClose, onSave, lead, inline = false }) => {
   // Wrapper classes for overlay vs inline modes
   const overlayWrapper = inline 
     ? 'relative p-0'
-    : 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-0 sm:p-6';
+    : 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-0 sm:p-6';
   const containerClasses = inline 
     ? 'bg-gray-800 sm:rounded-lg shadow-xl w-full h-auto max-h-[85vh] overflow-y-auto'
     : 'bg-gray-800 sm:rounded-lg shadow-xl w-full sm:max-w-2xl max-h-[85vh] h-auto overflow-y-auto m-0 sm:m-4';
 
-  return (
+  useEffect(() => {
+    if (!inline && isOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return () => { document.body.style.overflow = prev; };
+    }
+  }, [inline, isOpen]);
+
+  const content = (
     <div className={overlayWrapper}>
       <div className={containerClasses}>
         {/* Header */}
@@ -376,6 +386,9 @@ const AddActionModal = ({ isOpen, onClose, onSave, lead, inline = false }) => {
       </div>
     </div>
   );
+
+  if (inline) return content;
+  return createPortal(content, document.body);
 };
 
 export default AddActionModal;

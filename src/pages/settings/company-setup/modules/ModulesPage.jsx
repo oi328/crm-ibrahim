@@ -11,7 +11,7 @@ export default function ModulesPage() {
 
   return (
     <Layout>
-      <div className="company-setup-page p-4">
+      <div className="company-setup-page p-3 sm:p-4">
         <PageHeader title="Modules Activation" description="Enable or disable modules" />
         <Card>
           <ModulesToggleList enabledModules={companySetup.enabledModules} onToggle={toggleModule} />
