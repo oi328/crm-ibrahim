@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import { api } from '../utils/api'
 
 const SERVICE_TYPES = ['Complaint', 'Inquiry', 'Request', 'VIP Support', 'Technical Issue']

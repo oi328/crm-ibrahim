@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@shared/context/ThemeProvider'
 
 export default function SearchModal({ onClose, variant = 'modal' }) {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
+  const { theme } = useTheme()
+  const isLight = theme === 'light'
 
   const [filterField, setFilterField] = useState('all'); // 'all' | 'lead' | 'mobile' | 'comment' | 'country'
   const [query, setQuery] = useState('');
@@ -20,20 +23,20 @@ export default function SearchModal({ onClose, variant = 'modal' }) {
   if (variant === 'dropdown') {
     return (
       <div
-        className={`dropdown-panel absolute top-12 ${isRTL ? 'left-0' : 'right-0'} w-80 rounded-xl backdrop-blur-md bg-white/90 dark:bg-gray-900/90 border border-gray-200 dark:border-gray-700 shadow-2xl z-50`}
+        className={`dropdown-panel absolute top-12 ${isRTL ? 'left-0' : 'right-0'} w-80 rounded-xl ${isLight ? 'bg-white border border-gray-200 shadow-2xl' : 'backdrop-blur-md bg-gray-900/90 border border-gray-700 shadow-2xl'} z-50`}
         role="dialog"
         aria-label={t('Search')}
       >
         <div className="px-4 py-3 space-y-3">
           <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-700 dark:text-gray-300 min-w-[70px]">
+            <label className={`text-sm min-w-[70px] ${isLight ? 'text-gray-800' : 'text-gray-300'}`}>
               {isRTL ? 'الفلتر' : 'Filter'}
             </label>
             <div className="relative">
               <select
                 value={filterField}
                 onChange={(e) => setFilterField(e.target.value)}
-                className={`appearance-none w-56 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 ${isRTL ? 'pl-8' : 'pr-8'}`}
+                className={`appearance-none w-56 px-3 py-2 rounded-lg border ${isLight ? 'border-gray-300 bg-white text-gray-900' : 'dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100'} ${isRTL ? 'pl-8' : 'pr-8'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
               >
                 <option value="all">{isRTL ? 'الكل' : 'All'}</option>
                 <option value="lead">{isRTL ? 'الليد' : 'Lead'}</option>
@@ -47,7 +50,7 @@ export default function SearchModal({ onClose, variant = 'modal' }) {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-700 dark:text-gray-300 min-w-[70px]">
+            <label className={`text-sm min-w-[70px] ${isLight ? 'text-gray-800' : 'text-gray-300'}`}>
               {t('Search')}
             </label>
             <input
@@ -55,13 +58,13 @@ export default function SearchModal({ onClose, variant = 'modal' }) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={isRTL ? 'اكتب للبحث...' : 'Type to search...'}
-              className="w-56 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+              className={`w-56 px-3 py-2 rounded-lg border ${isLight ? 'border-gray-300 bg-white text-gray-900 placeholder:text-gray-500' : 'dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
             />
           </div>
           <div className="pt-2 flex items-center justify-end gap-2 border-t border-gray-200 dark:border-gray-700">
             <button
               onClick={() => { setQuery(''); setFilterField('all'); try { localStorage.removeItem('globalSearch'); window.dispatchEvent(new Event('globalSearchCleared')); } catch {} }}
-              className="text-xs px-3 py-2 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
+              className={`text-xs px-3 py-2 rounded-md border ${isLight ? 'bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200' : 'dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700'}`}
             >
               {isRTL ? 'مسح' : 'Clear'}
             </button>
@@ -88,18 +91,18 @@ export default function SearchModal({ onClose, variant = 'modal' }) {
 
       {/* القائمة المنسدلة أسفل التوب بار */}
       <div
-        className={`absolute top-14 ${isRTL ? 'left-4' : 'right-4'} w-[90vw] max-w-md rounded-xl backdrop-blur-md bg-white/90 dark:bg-gray-900/90 border border-gray-200 dark:border-gray-700 shadow-2xl`}
+        className={`absolute top-14 ${isRTL ? 'left-4' : 'right-4'} w-[90vw] max-w-md rounded-xl ${isLight ? 'bg-white border border-gray-200 shadow-2xl' : 'backdrop-blur-md bg-gray-900/90 border border-gray-700 shadow-2xl'}`}
         role="dialog"
         aria-modal="true"
       >
         {/* رأس القائمة */}
         <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-          <div className="text-sm font-semibold">
+          <div className={`text-sm font-semibold ${isLight ? 'text-gray-900' : ''}`}>
             {t('Search')}
           </div>
           <button
             onClick={onClose}
-            className="text-xs px-2 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
+            className={`text-xs px-2 py-1 rounded-md border ${isLight ? 'bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200' : 'dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700'}`}
           >
             {isRTL ? 'إغلاق' : 'Close'}
           </button>
@@ -109,13 +112,13 @@ export default function SearchModal({ onClose, variant = 'modal' }) {
         <div className="px-4 py-3 space-y-3">
           {/* اختيار الحقل (الدولة أو الليد) */}
           <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-700 dark:text-gray-300 min-w-[70px]">
+            <label className={`text-sm min-w-[70px] ${isLight ? 'text-gray-800' : 'text-gray-300'}`}>
               {isRTL ? 'الفلتر' : 'Filter'}
             </label>
             <select
               value={filterField}
               onChange={(e) => setFilterField(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+              className={`flex-1 px-3 py-2 rounded-lg border ${isLight ? 'border-gray-300 bg-white text-gray-900' : 'dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
             >
               <option value="all">{isRTL ? 'الكل' : 'All'}</option>
               <option value="lead">{isRTL ? 'الليد' : 'Lead'}</option>
@@ -127,7 +130,7 @@ export default function SearchModal({ onClose, variant = 'modal' }) {
 
           {/* حقل البحث */}
           <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-700 dark:text-gray-300 min-w-[70px]">
+            <label className={`text-sm min-w-[70px] ${isLight ? 'text-gray-800' : 'text-gray-300'}`}>
               {t('Search')}
             </label>
             <input
@@ -135,7 +138,7 @@ export default function SearchModal({ onClose, variant = 'modal' }) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={isRTL ? 'اكتب للبحث...' : 'Type to search...'}
-              className="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+              className={`flex-1 px-3 py-2 rounded-lg border ${isLight ? 'border-gray-300 bg-white text-gray-900 placeholder:text-gray-500' : 'dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
             />
           </div>
 
@@ -143,7 +146,7 @@ export default function SearchModal({ onClose, variant = 'modal' }) {
           <div className="pt-2 flex items-center justify-end gap-2 border-t border-gray-200 dark:border-gray-700">
             <button
               onClick={() => { setQuery(''); }}
-              className="text-xs px-3 py-2 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
+              className={`text-xs px-3 py-2 rounded-md border ${isLight ? 'bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200' : 'dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700'}`}
             >
               {isRTL ? 'مسح' : 'Clear'}
             </button>

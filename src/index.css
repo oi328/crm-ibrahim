@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* Browser Reset for Cross-Browser Compatibility */
 * {
@@ -27,7 +26,7 @@ html {
 
 body {
   margin: 0;
-  font-family: inherit;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
   background: var(--app-bg);
   color: var(--app-text);
 }
@@ -260,6 +259,7 @@ input[type="number"]::-webkit-outer-spin-button {
   border: 1px solid rgba(255, 255, 255, 0.25);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
   border-radius: 1rem;
+  color: #0f172a; /* slate-900 for strong readability in light mode */
 }
 .dark .glass-panel {
   -webkit-backdrop-filter: saturate(180%) blur(12px);
@@ -676,8 +676,14 @@ input[type="number"]::-webkit-outer-spin-button {
   }
   
   .sidebar-responsive.open {
-    transform: translateX(0);
+    transform: translateX(0)
   }
+}
+
+/* Force-hide mobile sidebar toggle on desktop */
+@media (min-width: 768px) {
+  .mobile-sidebar-toggle { display: none !important; }
+}
   
   .sidebar-overlay {
     position: fixed;
@@ -689,7 +695,7 @@ input[type="number"]::-webkit-outer-spin-button {
     z-index: 40;
     backdrop-filter: blur(4px);
   }
-}
+
 
 /* Enhanced Responsive Forms */
 .form-responsive {
@@ -885,15 +891,6 @@ input[type="number"]::-webkit-outer-spin-button {
   100% { transform: rotate(360deg); }
 }
 
-/* Enhanced Enhanced font loading and rendering for cross-browser consistency */
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 300 700;
-  font-display: swap;
-  src: url('https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
 
 /* Font rendering optimization for different browsers */
 * {
@@ -953,60 +950,144 @@ body {
   }
   
   body {
-    @apply bg-white dark:bg-gray-950 text-[#3f4246] dark:text-gray-100 transition-colors duration-200;
+    background-color: #ffffff;
+    color: #3f4246;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+  .dark body {
+    background-color: #0a0a0a;
+    color: #f3f4f6;
   }
 }
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-blue-800 dark:bg-blue-900 dark:text-gray-200 dark:hover:bg-blue-800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    outline: none;
+    border: 1px solid #d1d5db;
+    background-color: #ffffff;
+    color: #374151;
   }
+  .btn:hover { background-color: #f3f4f6; }
+  .btn:focus { box-shadow: 0 0 0 2px #3b82f6, 0 0 0 4px rgba(59, 130, 246, 0.2); }
+  .dark .btn { border-color: #1e40af; background-color: #1e3a8a; color: #e5e7eb; }
+  .dark .btn:hover { background-color: #1e40af; }
   
-  .btn-primary {
-    @apply border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 focus:ring-blue-500 dark:border-blue-800 dark:bg-blue-900 dark:text-gray-200 dark:hover:bg-blue-800;
-  }
+  .btn-primary { border: 1px solid #d1d5db; background-color: #ffffff; color: #374151; }
+  .btn-primary:hover { background-color: #f3f4f6; }
+  .btn-primary:focus { box-shadow: 0 0 0 2px #3b82f6, 0 0 0 4px rgba(59, 130, 246, 0.2); }
+  .dark .btn-primary { border-color: #1e40af; background-color: #1e3a8a; color: #e5e7eb; }
+  .dark .btn-primary:hover { background-color: #1e40af; }
   
-  .btn-secondary {
-    @apply bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600;
-  }
+  .btn-secondary { background-color: #e5e7eb; color: #111827; }
+  .btn-secondary:hover { background-color: #d1d5db; }
+  .btn-secondary:focus { box-shadow: 0 0 0 2px #6b7280, 0 0 0 4px rgba(107, 114, 128, 0.2); }
+  .dark .btn-secondary { background-color: #374151; color: #f5f5f5; }
+  .dark .btn-secondary:hover { background-color: #4b5563; }
   
-  .btn-outline {
-    @apply border border-gray-300 bg-white text-[#2e3135] hover:bg-gray-50 focus:ring-blue-500 dark:border-blue-800 dark:bg-blue-900 dark:text-gray-200 dark:hover:bg-blue-800;
-  }
+  .btn-outline { border: 1px solid #d1d5db; background-color: #ffffff; color: #2e3135; }
+  .btn-outline:hover { background-color: #f9fafb; }
+  .btn-outline:focus { box-shadow: 0 0 0 2px #3b82f6, 0 0 0 4px rgba(59, 130, 246, 0.2); }
+  .dark .btn-outline { border-color: #1e40af; background-color: #1e3a8a; color: #e5e7eb; }
+  .dark .btn-outline:hover { background-color: #1e40af; }
 
   /* New button variants */
   .btn-danger {
-    @apply inline-flex items-center justify-center px-3 py-2 text-sm font-medium rounded-md border border-red-600 text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    border: 1px solid #dc2626;
+    color: #ffffff;
+    background-color: #ef4444;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    outline: none;
   }
-  .dark .btn-danger {
-    @apply bg-red-700 hover:bg-red-600 border-red-500 text-white;
-  }
+  .btn-danger:hover { background-color: #dc2626; }
+  .btn-danger:focus { box-shadow: 0 0 0 2px #ef4444, 0 0 0 4px rgba(239, 68, 68, 0.2); }
+  .dark .btn-danger { background-color: #b91c1c; border-color: #ef4444; color: #ffffff; }
+  .dark .btn-danger:hover { background-color: #dc2626; }
 
   /* save (gradient) — لم يعد مستخدم في صفحة المنتجات */
   .btn-save {
-    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-md text-white bg-gradient-to-r from-indigo-500 via-blue-500 to-cyan-500 shadow-md hover:shadow-lg hover:-translate-y-0.5 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition transform border border-indigo-600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 600;
+    border-radius: 0.375rem;
+    color: #ffffff;
+    background-image: linear-gradient(to right, #6366f1, #3b82f6, #06b6d4);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border: 1px solid #4f46e5;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    outline: none;
   }
+  .btn-save:hover { box-shadow: 0 6px 10px rgba(0,0,0,0.15); transform: translateY(-2px) scale(1.05); }
+  .btn-save:focus { box-shadow: 0 0 0 2px #6366f1, 0 0 0 4px rgba(99, 102, 241, 0.2); }
 
   /* أيقونة حذف حمراء بخلفية شفافة */
   .btn-icon-danger {
-    @apply inline-flex items-center justify-center p-2 text-sm rounded-md bg-transparent text-red-600 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 0.375rem;
+    background-color: transparent;
+    color: #dc2626;
+    transition: color 0.2s ease;
+    outline: none;
   }
-  .dark .btn-icon-danger { @apply text-red-400 hover:text-red-300; }
+  .btn-icon-danger:hover { color: #b91c1c; }
+  .dark .btn-icon-danger { color: #f87171; }
+  .dark .btn-icon-danger:hover { color: #fca5a5; }
 
   /* pill-style buttons */
   .btn-pill {
-    @apply rounded-full px-4 py-2 border border-gray-300 bg-transparent text-[#2e3135] hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-transparent dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700;
+    border-radius: 9999px;
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    background-color: transparent;
+    color: #2e3135;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    outline: none;
   }
+  .btn-pill:hover { background-color: #f3f4f6; border-color: #9ca3af; }
+  .btn-pill:focus { box-shadow: 0 0 0 2px #3b82f6, 0 0 0 4px rgba(59, 130, 246, 0.2); }
+  .dark .btn-pill { background-color: transparent; border-color: #4b5563; color: #e5e7eb; }
+  .dark .btn-pill:hover { background-color: #374151; }
   .btn-pill-active {
-    @apply rounded-full px-4 py-2 border text-white focus:outline-none focus:ring-2 focus:ring-blue-500;
-    border-color: #2D88FF; /* match primary */
-    background-color: #2D88FF; /* active tab exact-ish blue */
+    border-radius: 9999px;
+    padding: 0.5rem 1rem;
+    border: 1px solid #2D88FF;
+    background-color: #2D88FF;
+    color: #ffffff;
+    outline: none;
   }
+  .btn-pill-active:focus { box-shadow: 0 0 0 2px #3b82f6, 0 0 0 4px rgba(59, 130, 246, 0.2); }
   
   .card {
-    @apply rounded-xl shadow-md border border-gray-200 dark:border-blue-700 dark:bg-blue-900;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+    border: 1px solid #e5e7eb;
     background-color: #f9fafb;
   }
+  .dark .card { border-color: #1d4ed8; background-color: #1e3a8a; }
   /* remove gradient in dark mode, rely on dark:bg from @apply */
   .dark .card { background-image: none; }
 
@@ -1042,13 +1123,28 @@ body {
   }
   
   .input {
-    @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400;
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
     background-color: #ffffff;
+    color: #374151;
   }
+  .input::placeholder { color: #9ca3af; }
+  .input:focus { outline: none; box-shadow: 0 0 0 2px #3b82f6; border-color: #3b82f6; }
+  .dark .input { background-color: #374151; border-color: #4b5563; color: #ffffff; }
+  .dark .input::placeholder { color: #9ca3af; }
   
   .label {
-    @apply block text-sm font-medium text-[#4b4f54] dark:text-gray-300;
+    display: block;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    color: #4b4f54;
   }
+  .dark .label { color: #d1d5db; }
 
   /* Gradient text for Dashboard title in content */
   .text-dashboard-gradient {
@@ -1077,9 +1173,6 @@ body {
   }
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 /* Sidebar behavior: icons-only by default, expand when expanded class is added */
 .sidebar-collapsible {
@@ -1093,35 +1186,43 @@ body {
 
 /* Adjust content container margin and width when sidebar is expanded */
 #app-sidebar ~ .content-container {
-  margin-left: 280px !important; /* يبدأ المحتوى والهيدر بجانب السايدبار */
-  width: calc(100% - 280px) !important;
-  transition: margin-left 200ms ease, width 200ms ease;
+  position: relative;
+  left: var(--sidebar-desktop-width);
+  margin-left: 0 !important;
+  width: calc(100% - var(--sidebar-desktop-width)) !important;
+  transition: left 200ms ease, width 200ms ease;
 }
 
 /* RTL support: عندما يكون اتجاه الصفحة RTL، يجب إزاحة المحتوى يمينًا بدل اليسار */
 [dir='rtl'] #app-sidebar ~ .content-container {
-  margin-right: 280px !important;
+  position: relative;
+  right: var(--sidebar-desktop-width);
+  margin-right: 0 !important;
   margin-left: 0 !important;
-  width: calc(100% - 280px) !important;
-  transition: margin-right 200ms ease, width 200ms ease;
+  width: calc(100% - var(--sidebar-desktop-width)) !important;
+  transition: right 200ms ease, width 200ms ease;
 }
 
-.content-container {
-  margin-left: 280px !important;
-  width: calc(100% - 280px) !important;
-  transition: margin-left 200ms ease, width 200ms ease;
+.app-glass-neon > .content-container {
+  position: relative;
+  left: var(--sidebar-desktop-width);
+  margin-left: 0 !important;
+  width: calc(100% - var(--sidebar-desktop-width)) !important;
+  transition: left 200ms ease, width 200ms ease;
   padding-top: 56px; /* يعادل ارتفاع الهيدر لتجنب التداخل */
-  padding-left: 0; /* إزالة الحشو ليتلاصق الهيدر مع السايدبار */
+  padding-left: 0.5rem;
   padding-bottom: 1.5rem;
 }
 
 /* RTL support: المحتوى يتزاح يمينًا عند RTL */
-[dir='rtl'] .content-container {
-  margin-right: 280px !important;
+[dir='rtl'] .app-glass-neon > .content-container {
+  position: relative;
+  right: var(--sidebar-desktop-width);
+  margin-right: 0 !important;
   margin-left: 0 !important;
-  width: calc(100% - 280px) !important;
-  transition: margin-right 200ms ease, width 200ms ease;
-  padding-right: 0; /* إزالة الحشو في RTL */
+  width: calc(100% - var(--sidebar-desktop-width)) !important;
+  transition: right 200ms ease, width 200ms ease;
+  padding-right: 0.5rem;
 }
 
 /* Adjust top offset for very small screens where header is shorter */
@@ -1148,7 +1249,7 @@ body {
 .main-header {
   position: fixed;
   top: 0;
-  left: 10px;
+  left: var(--sidebar-desktop-width);
   right: 0;
 }
 [dir='rtl'] .main-header {
@@ -1163,12 +1264,14 @@ body {
 /* welcome overlay removed; welcome text sits in left flex group */
 
 /* على الشاشات الصغيرة حيث يكون السايدبار 64px، يزاح الهيدر بنفس المقدار */
-@media (max-width: 768px) {
+  @media (max-width: 768px) {
   #app-sidebar ~ .content-container {
+    left: 0 !important;
     margin-left: 0 !important;
     width: 100% !important;
   }
   [dir='rtl'] #app-sidebar ~ .content-container {
+    right: 0 !important;
     margin-right: 0 !important;
     margin-left: 0 !important;
     width: 100% !important;
@@ -1553,11 +1656,19 @@ body {
   .sidebar-collapsible button[aria-label] {
     display: none;
   }
+  /* Hide sidebar close button on desktop */
+  @media (min-width: 768px) {
+    #app-sidebar .logo-brand button[aria-label="Close"],
+    #app-sidebar .logo-brand button[aria-label="إغلاق"] {
+      display: none !important;
+    }
+  }
   
   /* Mobile toggle button positioning */
   .mobile-sidebar-toggle {
+    display: none;
     position: fixed;
-    top: 80px; /* Below the header, positioned between logo and dashboard */
+    top: 80px; /* Below the header */
     left: 12px;
     z-index: 60; /* Above sidebar and all other elements */
     background: linear-gradient(135deg, #3b82f6, #2563eb);
@@ -1566,8 +1677,10 @@ body {
     border-radius: 50%;
     width: 40px; /* Reduced from 44px */
     height: 40px; /* Reduced from 44px */
-    display: flex;
     align-items: center;
+  }
+  @media (max-width: 767px) {
+    .mobile-sidebar-toggle { display: inline-flex !important; }
   }
 
   /* Ensure inventory submenu icons are perfectly centered in mobile collapsed view */
@@ -1737,21 +1850,46 @@ body {
 
 /* Base styles */
 body {
-  @apply bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100;
+  background-color: #ffffff;
+  color: #1f2937;
+}
+.dark body {
+  background-color: #111827;
+  color: #f3f4f6;
 }
 
 .btn {
-  @apply inline-flex items-center gap-2 px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 transition dark:border-blue-800 dark:bg-blue-900 dark:text-gray-200 dark:hover:bg-blue-800;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  color: #374151;
+  transition: background-color 0.2s ease;
 }
+.btn:hover { background-color: #f3f4f6; }
+.dark .btn { border-color: #1e40af; background-color: #1e3a8a; color: #e5e7eb; }
+.dark .btn:hover { background-color: #1e40af; }
 
 .btn-outline {
-  @apply px-3 py-2 rounded-md border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 dark:border-blue-800 dark:text-gray-200 dark:bg-blue-900;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  background-color: #ffffff;
 }
+.btn-outline:hover { background-color: #f3f4f6; }
+.dark .btn-outline { border-color: #1e40af; color: #e5e7eb; background-color: #1e3a8a; }
 
-  .card {
-    @apply rounded-xl shadow-md border border-gray-200 dark:border-blue-700 dark:bg-blue-900;
-    background-color: #f9fafb;
-  }
+.card {
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+.dark .card { border-color: #1d4ed8; background-color: #1e3a8a; }
 
   /* Glassy card variant duplication to ensure availability if this block compiles later */
   .glass-card.card {
@@ -1765,8 +1903,15 @@ body {
   }
 
 .input {
-  @apply px-3 py-2 rounded-md border border-gray-300 bg-white text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-900 dark:border-blue-700 dark:text-gray-200;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  color: #374151;
 }
+.input::placeholder { color: #9ca3af; }
+.input:focus { outline: none; box-shadow: 0 0 0 2px #3b82f6; }
+.dark .input { background-color: #1e3a8a; border-color: #1d4ed8; color: #e5e7eb; }
 
 /* Mobile date input optimization */
 @media (max-width: 640px) {
@@ -1776,14 +1921,15 @@ body {
   }
 }
 
-.label {
-  @apply text-gray-700 dark:text-gray-300;
-}
+.label { color: #374151; }
+.dark .label { color: #d1d5db; }
 
 .text-dashboard-gradient {
   background: linear-gradient(90deg, #1f2937, #111827);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 .bg-dashboard {
@@ -2088,11 +2234,11 @@ body {
 .content-container {
   position: relative;
   z-index: 1;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(14px) saturate(1.15);
-  -webkit-backdrop-filter: blur(14px) saturate(1.15);
-  border-radius: 16px;
+  background: transparent;
+  border: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-radius: 0;
 }
 
 /* Glass panel utility for sections/cards */
@@ -2150,31 +2296,15 @@ body {
   position: relative;
   display: inline-block;
   text-decoration: none;
-  padding-inline-start: 12px;
+  padding-inline-start: 0;
 }
 .page-title::before {
   content: "";
-  position: absolute;
-  inset-inline-start: 0;
-  top: 50%;
-  width: 4px;
-  height: 1em;
-  background: linear-gradient(180deg, #22d3ee, #3b82f6);
-  border-radius: 9999px;
-  transform: translateY(-50%);
+  display: none;
 }
 .page-title::after {
   content: "";
-  position: absolute;
-  inset-inline-start: 0;
-  inset-inline-end: 0;
-  inset-block-end: -4px;
-  height: 3px;
-  background: linear-gradient(90deg, #22d3ee, #3b82f6);
-  border-radius: 9999px;
-  opacity: 0.9;
-  transform: scaleX(0.85);
-  transition: transform 180ms ease, opacity 180ms ease;
+  display: none;
 }
 .page-title:hover::after {
   transform: scaleX(1);
@@ -2185,36 +2315,29 @@ body {
   position: relative;
   display: inline-block;
   text-decoration: none;
-  padding-inline-start: 12px;
+  padding-inline-start: 0;
 }
 .page-title-auto h1::before,
 .page-title-auto h2::before {
   content: "";
-  position: absolute;
-  inset-inline-start: 0;
-  top: 50%;
-  width: 4px;
-  height: 1em;
-  background: linear-gradient(180deg, #22d3ee, #3b82f6);
-  border-radius: 9999px;
-  transform: translateY(-50%);
+  display: none;
 }
 .page-title-auto h1::after,
 .page-title-auto h2::after {
   content: "";
-  position: absolute;
-  inset-inline-start: 0;
-  inset-inline-end: 0;
-  inset-block-end: -4px;
-  height: 3px;
-  background: linear-gradient(90deg, #22d3ee, #3b82f6);
-  border-radius: 9999px;
-  opacity: 0.9;
-  transform: scaleX(0.85);
-  transition: transform 180ms ease, opacity 180ms ease;
+  display: none;
 }
 .page-title-auto h1:hover::after,
 .page-title-auto h2:hover::after {
   transform: scaleX(1);
   opacity: 1;
+}
+/* Ensure page-level headers inside scroll containers are sticky */
+.content-container .main-header {
+  display: none !important;
+}
+
+/* Hide any duplicate sidebars rendered inside pages when Layout already provides one */
+#app-sidebar ~ #app-sidebar {
+  display: none !important;
 }

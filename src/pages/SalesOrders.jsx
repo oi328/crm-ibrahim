@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { api } from '../utils/api'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 
 export default function SalesOrders() {
   const { t } = useTranslation()

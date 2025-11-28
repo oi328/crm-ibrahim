@@ -1,4 +1,8 @@
 /* Nova theme styles to match the provided design screenshot */
+/* === Light Mode Theme Map ===
+   IMPORTANT: هذا الملف خاص بالـ LIGHT MODE فقط.
+ 
+*/
 
 :root {
   /* Light mode defaults */
@@ -35,6 +39,42 @@
   --neon-accent: #60a5fa; /* blue-400 */
   --glass-bg: rgba(255, 255, 255, 0.55);
   --glass-border: rgba(0, 0, 0, 0.08);
+
+  /* Light Mode tokens (lm-*) */
+  /* أساسيات */
+  --lm-bg: #f7fafc;
+  --lm-surface: #ffffff;
+  --lm-muted-surface: #f3f6f8;
+  --lm-border: #e3e8ee;
+  --lm-shadow: 0 6px 18px rgba(20, 34, 48, 0.06);
+
+  /* نصوص */
+  --lm-text: #12202b;
+  --lm-subtext: #475569;
+  --lm-muted: #7b8794;
+
+  /* ألوان الـ actions */
+  --lm-primary: #2563eb;
+  --lm-primary-contrast: #ffffff;
+  --lm-accent: #06b6d4;
+  --lm-success: #16a34a;
+  --lm-warning: #f59e0b;
+  --lm-danger: #ef4444;
+
+  /* أيقونات */
+  --lm-icon-default: #334155;
+  --lm-icon-muted: #94a3b8;
+
+  /* حقول وتواريخ */
+  --lm-input-bg: #ffffff;
+  --lm-input-text: #0f1724;
+  --lm-input-placeholder: #9aa4b2;
+  --lm-input-focus-border: rgba(37,99,235,0.25);
+
+  /* زر Reset */
+  --lm-reset-bg: #f1f5f9;
+  --lm-reset-border: #94a3b8;
+  --lm-reset-text: #1f2937;
 }
 
 .dark {
@@ -86,6 +126,127 @@ body, .content-container {
   background: var(--content-bg);
   color: var(--content-text);
 }
+
+/* ------------------------------
+   Light Mode component snippets
+   (Ready-to-use)
+------------------------------ */
+
+/* 1) Navbar icons */
+.navbar .icon,
+.nova-topbar .icon {
+  color: var(--lm-icon-default);
+  background: transparent;
+  border-radius: 10px;
+  padding: 10px;
+  opacity: 1;
+}
+.navbar .icon.small,
+.nova-topbar .icon.small { color: var(--lm-icon-muted); }
+
+/* 2) Filter card container */
+.filter-card {
+  background: var(--lm-surface);
+  border: 1px solid var(--lm-border);
+  box-shadow: var(--lm-shadow);
+  border-radius: 12px;
+  padding: 20px;
+}
+.filter-card .heading {
+  color: var(--lm-text);
+  font-weight: 700;
+  font-size: 20px;
+}
+
+/* 3) Inputs & Selects */
+.lm-input,
+.lm-select {
+  background: var(--lm-input-bg) !important;
+  color: var(--lm-input-text) !important;
+  border: 1px solid var(--lm-border) !important;
+  border-radius: 10px !important;
+  padding: 14px 16px !important;
+  font-size: 16px !important;
+}
+.lm-input::placeholder,
+.lm-select::placeholder { color: var(--lm-input-placeholder) !important; }
+.lm-input:focus,
+.lm-select:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 4px var(--lm-input-focus-border) !important;
+  border-color: var(--lm-primary) !important;
+}
+
+/* 4) Date input with calendar icon */
+.date-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--lm-input-bg);
+  border: 1px solid var(--lm-border);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+.date-input .icon { color: var(--lm-icon-muted); background: rgba(0,0,0,0.02); padding: 8px; border-radius: 8px; }
+
+/* 5) Reset button */
+.btn-reset {
+  background: var(--lm-reset-bg);
+  color: var(--lm-reset-text);
+  border: 1px solid var(--lm-reset-border);
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+.btn-reset:hover { background: #e9eef4; }
+
+/* 6) CTA */
+.btn-primary { background: var(--lm-primary); color: var(--lm-primary-contrast); border-radius: 8px; padding: 12px 20px; box-shadow: 0 6px 16px rgba(37,99,235,0.18); }
+
+/* 7) Info cards */
+.info-card {
+  background: linear-gradient(180deg, #ffffff, #fbfdff);
+  border: 1px solid var(--lm-border);
+  color: var(--lm-text);
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: var(--lm-shadow);
+}
+.info-card .value { font-size: 36px; font-weight: 700; color: var(--lm-text); }
+.info-card .label { color: var(--lm-subtext); }
+
+/* 8) Section headers */
+.lm-section-header { color: var(--lm-text); font-weight: 700; }
+
+/* 9) Badges */
+.lm-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 18px; padding: 0 6px; font-size: 11px; border-radius: 10px; background: rgba(37,99,235,0.18); color: var(--lm-primary-contrast); }
+
+/* Delay Leads table (Light Mode) */
+html:not(.dark) .delay-table { background: var(--lm-surface); color: var(--lm-text); }
+html:not(.dark) .delay-table thead { background: #f3f4f6; color: var(--lm-text); border-bottom: 1px solid var(--lm-border); }
+html:not(.dark) .delay-table tbody tr { background: #ffffff; border-bottom: 1px solid var(--lm-border); }
+html:not(.dark) .delay-table tbody tr:nth-child(even) { background: #f9fbff; }
+html:not(.dark) .delay-table tbody tr:hover { background: rgba(37,99,235,0.06); }
+html:not(.dark) .delay-table tbody tr.is-active,
+html:not(.dark) .delay-table tbody tr[aria-selected="true"],
+html:not(.dark) .delay-table tbody tr.active,
+html:not(.dark) .delay-table tbody tr.is-selected { background: #f1f5f9 !important; color: var(--lm-text) !important; }
+html:not(.dark) .delay-table .cell-divider { border-left: 1px solid var(--lm-border); }
+
+/* Action buttons */
+html:not(.dark) .action-btn { border: 1px solid var(--lm-border); background: var(--lm-input-bg); color: var(--lm-text); border-radius: 10px; }
+html:not(.dark) .action-btn:focus { outline: none; box-shadow: 0 0 0 4px var(--lm-input-focus-border); border-color: var(--lm-primary); }
+html:not(.dark) .action-btn.icon-blue { color: #2563eb; }
+html:not(.dark) .action-btn.icon-green { color: #16a34a; }
+
+/* Stage badges (optional override) */
+.stage-badge { border-radius: 10px; font-weight: 600; padding: 2px 8px; font-size: 12px; }
+.stage-badge.new { background:#dbeafe; color:#1d4ed8; }
+.stage-badge.in-progress { background:#fde68a; color:#b45309; }
+.stage-badge.qualified { background:#d1fae5; color:#065f46; }
+.stage-badge.converted { background:#ede9fe; color:#6d28d9; }
+.stage-badge.lost { background:#fee2e2; color:#b91c1c; }
+.stage-cell { background: #f6f9ff; }
 
 /* Topbar */
 .nova-topbar {
@@ -159,12 +320,12 @@ body, .content-container {
 /* Gradient hover and active backgrounds */
 #app-sidebar.nova-sidebar nav a:hover,
 #app-sidebar.nova-sidebar nav button:hover {
-  background: linear-gradient(90deg, rgba(37,99,235,0.12), rgba(37,99,235,0.04));
+  background: linear-gradient(90deg, rgba(37,99,235,0.18), rgba(37,99,235,0.08));
 }
 #app-sidebar.nova-sidebar nav a.border-l-4,
 #app-sidebar.nova-sidebar nav a.active-link-indicator,
 #app-sidebar.nova-sidebar nav button.active-parent {
-  background: linear-gradient(90deg, rgba(37,99,235,0.18), rgba(37,99,235,0.06));
+  background: linear-gradient(90deg, rgba(37,99,235,0.25), rgba(37,99,235,0.10));
 }
 
 /* Custom scrollbar */
@@ -201,8 +362,9 @@ body, .content-container {
   padding: 0 6px;
   font-size: 11px;
   border-radius: 10px;
-  background: rgba(37,99,235,0.25);
+  background: rgba(37,99,235,0.85);
   color: #fff;
+  font-weight: 700;
 }
 
 /* Logo glow */

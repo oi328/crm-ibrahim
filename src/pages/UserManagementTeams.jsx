@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import UMActionButtons from '../components/UMActionButtons'
 import AssignmentModal from '../components/AssignmentModal'
 import { ClipboardCheck, Handshake, Ticket } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import SearchableSelect from '../components/SearchableSelect'
+import SearchableSelect from '@shared/components/SearchableSelect'
 
 const MOCK_TEAMS = [
   { id: 't-2001', name: 'Support', leader: 'Ahmed Ali', members: 8, role: 'Support', createdAt: '2025-10-01' },

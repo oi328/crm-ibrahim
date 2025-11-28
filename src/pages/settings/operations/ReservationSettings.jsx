@@ -1,12 +1,10 @@
 import React from 'react'
-import Layout from '../../../components/Layout'
 import { useTranslation } from 'react-i18next'
 import ReservationSettingsManager from '../../../components/settings/ReservationSettingsManager'
 
 export default function SettingsReservations() {
   const { t } = useTranslation()
   return (
-    <Layout title={t('Reservation Settings')}>
       <div className="p-4 space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">{t('Reservation Settings')}</h2>
@@ -16,6 +14,5 @@ export default function SettingsReservations() {
 
         <ReservationSettingsManager />
       </div>
-    </Layout>
   )
 }

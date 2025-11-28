@@ -7,11 +7,11 @@ const setDocumentDirection = (language) => {
   document.documentElement.lang = language;
 };
 
-// Set initial direction
-setDocumentDirection(i18n.language);
+// Set initial direction with safe fallback
+setDocumentDirection(i18n.language || 'en');
 
 i18n.on('languageChanged', (lng) => {
-  setDocumentDirection(lng);
+  setDocumentDirection(lng || 'en');
 });
 
 const resources = {

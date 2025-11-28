@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Layout from '../components/Layout';
-import SearchableSelect from '../components/SearchableSelect';
+import Layout from '@shared/layouts/Layout';
+import SearchableSelect from '@shared/components/SearchableSelect';
 import { DEPARTMENTS, getTeamsForDept } from '../data/orgStructure'
 import { useTranslation } from 'react-i18next'
 

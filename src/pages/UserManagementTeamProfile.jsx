@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import { Edit, UserPlus, Trash, X, Eye, UserMinus } from 'lucide-react'
 
 const mockTeam = {

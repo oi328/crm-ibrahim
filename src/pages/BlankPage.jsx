@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Sidebar } from '../components/Sidebar';
-import Topbar from '../components/Topbar';
+import { Sidebar } from '@shared/components/Sidebar';
+import Topbar from '@shared/components/Topbar';
 
 export const BlankPage = () => {
   const { t } = useTranslation();

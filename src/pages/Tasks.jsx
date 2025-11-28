@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import { useTranslation } from 'react-i18next'
 import NewTaskModal from '../components/NewTaskModal'
 import TaskDetailsModal from '../components/TaskDetailsModal'

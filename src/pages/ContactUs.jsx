@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import { useTranslation } from 'react-i18next'
 
 export default function ContactUs() {

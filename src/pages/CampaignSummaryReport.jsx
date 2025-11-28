@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react'
-import Layout from '../components/Layout'
 import { useTranslation } from 'react-i18next'
 import * as XLSX from 'xlsx'
 import { Bar, Line } from 'react-chartjs-2'
@@ -122,7 +121,6 @@ export default function CampaignSummaryReport() {
   }, [platformStats, needingImprovement])
 
   return (
-    <Layout>
       <div id="report-root" className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold">{t('Campaign Summary')}</h1>
@@ -294,6 +292,5 @@ export default function CampaignSummaryReport() {
           </section>
         </div>
       </div>
-    </Layout>
   )
 }

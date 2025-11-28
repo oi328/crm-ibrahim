@@ -1,5 +1,5 @@
 import React from 'react'
-import { useTheme } from '../providers/ThemeProvider'
+import { useTheme } from '@shared/context/ThemeProvider'
 import { useTranslation } from 'react-i18next'
 
 const MobileSidebarToggle = ({ isOpen, onToggle }) => {

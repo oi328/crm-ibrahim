@@ -4,7 +4,7 @@ import { FaTimes, FaPhone, FaEnvelope, FaMapMarkerAlt, FaCalendarAlt, FaUser, Fa
 import AddLeadModal from './AddLeadModal';
 import EditLeadModal from './EditLeadModal';
 import LeadDetailsModal from './LeadDetailsModal';
-import AddActionModal from './AddActionModal';
+import AddActionModal from '@components/AddActionModal';
 
 const LeadModal = ({ isOpen, onClose, lead, theme = 'light' }) => {
   const { t } = useTranslation();

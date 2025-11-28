@@ -15,6 +15,21 @@ const PORT = process.env.PORT || 8787
 app.use(cors({ origin: [/^http:\/\/localhost:\d+$/] }))
 app.use(express.json())
 
+app.use((req, res, next) => {
+  res.setHeader('Content-Security-Policy', [
+    "default-src 'self';",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval';",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
+    "font-src 'self' https://fonts.gstatic.com;",
+    "img-src 'self' data: blob: https://i.pravatar.cc https://img.icons8.com;",
+    "connect-src 'self';",
+    "frame-ancestors 'self';",
+    "base-uri 'self';",
+    "form-action 'self';"
+  ].join(' '))
+  next()
+})
+
 // Serve uploaded files statically
 const ROOT_DIR = path.resolve(process.cwd())
 const UPLOADS_DIR = path.join(ROOT_DIR, 'uploads')

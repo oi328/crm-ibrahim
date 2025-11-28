@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import ModulesSettings from '../components/settings/ModulesSettings'
 
 export default function SettingsModules() {

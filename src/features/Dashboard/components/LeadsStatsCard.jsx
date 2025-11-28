@@ -1,8 +1,9 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTheme } from '@shared/context/ThemeProvider';
 
 export const LeadsStatsCard = ({ title, value, change, changeType, icon, color, compact = false }) => {
-  const { t } = useTranslation();
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
   
   const getChangeColor = () => {
     if (changeType === 'positive') return 'text-green-600 dark:text-green-400';
@@ -17,7 +18,7 @@ export const LeadsStatsCard = ({ title, value, change, changeType, icon, color, 
   };
 
   return (
-    <div className={`bg-[var(--panel-bg)] ${compact ? 'p-2' : 'p-4'} rounded-lg shadow-md border border-[var(--panel-border)]`}>
+    <div className={`bg-[var(--panel-bg)] ${compact ? 'p-2' : 'p-4'} rounded-lg shadow-md border border-[var(--panel-border)] h-full flex flex-col justify-between`}>
       <div className={`flex items-center justify-between ${compact ? 'mb-0.5' : 'mb-2'}`}>
         <div className={`rounded-lg ${compact ? 'p-1' : 'p-2'} ${color}`}>
           <span className={`text-white ${compact ? 'text-sm' : 'text-lg'}`}>{icon}</span>
@@ -26,8 +27,8 @@ export const LeadsStatsCard = ({ title, value, change, changeType, icon, color, 
           {getChangeIcon()} {change}
         </div>
       </div>
-      <h4 className={`${compact ? 'text-xs' : 'text-sm'} font-medium text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text ${compact ? 'mb-0' : 'mb-1'}`}>{title}</h4>
-      <p className={`${compact ? 'text-lg' : 'text-2xl'} font-bold`}>{value}</p>
+      <h4 className={`${compact ? 'text-xs' : 'text-sm'} font-semibold ${isLight ? 'text-[var(--content-text)]' : 'dark:text-gray-100'} ${compact ? 'mb-0' : 'mb-1'}`}>{title}</h4>
+      <p className={`${compact ? 'text-lg' : 'text-2xl'} font-bold ${isLight ? 'text-[var(--text-primary)]' : 'dark:text-gray-100'}`}>{value}</p>
     </div>
   );
 };

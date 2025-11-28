@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { Edit, KeyRound, Lock, Unlock, Trash, X } from 'lucide-react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import Layout from '../components/Layout';
-import SearchableSelect from '../components/SearchableSelect';
+import Layout from '@shared/layouts/Layout';
+import SearchableSelect from '@shared/components/SearchableSelect';
 import { loadDevicesForUser } from '../utils/device'
 
 const mockUser = {

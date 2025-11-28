@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react'
 import CalendarModal from './CalendarModal'
-import { NotificationsContent } from '../pages/Notifications'
+import { NotificationsContent } from '@pages/Notifications'
 import SearchModal from './SearchModal'
-import { useTheme } from '../providers/ThemeProvider'
-import avatar from '../assets/react.svg'
+import { useTheme } from '@shared/context/ThemeProvider'
+import { useAppState } from '@shared/context/AppStateProvider'
+import { logout as svcLogout } from '@services/auth'
+import avatar from '@assets/react.svg'
+const AVATAR_PLACEHOLDER = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect width='100%' height='100%' fill='%239ca3af'/><text x='50%' y='54%' font-family='system-ui,Segoe UI,Arial' font-size='28' fill='white' text-anchor='middle'>I</text></svg>";
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom'
 
@@ -28,16 +31,51 @@ const IconButton = ({ children, label, className, onClick, showLabel = true }) =
   </button>
 )
 
+function WelcomeSection({ isLight, onMobileToggle, mobileSidebarOpen, text }) {
+  const [isDesktop, setIsDesktop] = useState(false)
+  useEffect(() => {
+    const update = () => setIsDesktop(window.matchMedia('(min-width: 768px)').matches)
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
+  return (
+    <div className="flex items-center gap-3 max-[800px]:gap-2 max-[480px]:gap-1 max-[320px]:gap-1 pl-0 ml-0" style={{ paddingInlineStart: 0, marginInlineStart: 0 }}>
+      {!isDesktop && (
+        <button
+          type="button"
+          onClick={() => { if (typeof onMobileToggle === 'function') { onMobileToggle() } }}
+          className={`mobile-sidebar-toggle inline-flex md:hidden items-center justify-center p-1.5 rounded-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            isLight 
+              ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' 
+              : 'text-gray-300 hover:text-white hover:bg-gray-700'
+          }`}
+          aria-label={mobileSidebarOpen ? 'Close menu' : 'Open menu'}
+        >
+          {mobileSidebarOpen ? (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 text-red-500">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 transition-transform duration-300">
+              <path d="M3 12h18M3 6h18M3 18h18" />
+            </svg>
+          )}
+        </button>
+      )}
+      <span className={`text-sm max-[480px]:text-xs font-semibold whitespace-nowrap flex-shrink-0 min-w-fit max-w-[40vw] truncate ${isLight ? 'text-gray-800' : 'text-gray-300'}`}>{text}</span>
+    </div>
+  )
+}
+
 export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExpanded }) {
   const { theme, setTheme } = useTheme()
   const isLight = theme === 'light'
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const navigate = useNavigate()
-  
-  // Debug: Check if onMobileToggle is a function
-  console.log('Topbar props:', { onMobileToggle, mobileSidebarOpen, isSidebarExpanded })
-  console.log('onMobileToggle type:', typeof onMobileToggle)
+  const { user } = useAppState()
   
   const [isCalendarOpen, setIsCalendarOpen] = useState(false)
   const [isSearchDropdownOpen, setIsSearchDropdownOpen] = useState(false)
@@ -59,8 +97,12 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
   }
 
   useEffect(() => {
-    // Don't open extras by default - let user control it
-    // This fixes the toggle functionality
+    try {
+      const savedLang = localStorage.getItem('language') || localStorage.getItem('lang')
+      if (savedLang && savedLang !== i18n.language) {
+        i18n.changeLanguage(savedLang)
+      }
+    } catch {}
   }, [])
 
   const isRtl = isRTL; // Use the reactive isRTL instead of static check
@@ -120,7 +162,9 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
   const headerBtnTone = isLight 
     ? 'text-gray-600 hover:text-gray-800 backdrop-blur-md bg-white/20 hover:bg-white/40 border border-white/30 hover:border-white/50 shadow-lg hover:shadow-xl hover:scale-105 hover:-translate-y-0.5' 
     : 'text-gray-400 hover:text-gray-200 backdrop-blur-md bg-gray-800/20 hover:bg-gray-700/40 border border-gray-600/30 hover:border-gray-500/50 shadow-lg hover:shadow-xl hover:scale-105 hover:-translate-y-0.5';
-  const headerTone = isLight ? 'bg-white border-gray-200' : 'bg-gray-900 border-gray-800';
+  const headerTone = isLight 
+    ? 'bg-white/35 backdrop-blur-md border-white/30 shadow-sm'
+    : 'bg-gray-900 border-gray-800';
   const mobileExtrasBase = 'flex flex-col items-center justify-center gap-1 p-2 rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-400/40';
   const mobileExtrasSearch = isLight ? 'bg-purple-50 border-purple-200 hover:bg-purple-100 text-purple-700' : 'bg-purple-900/20 border-purple-600 hover:bg-purple-900/30 text-purple-300';
   const mobileExtrasTasks = isLight ? 'bg-green-50 border-green-200 hover:bg-green-100 text-green-700' : 'bg-green-900/20 border-green-600 hover:bg-green-900/30 text-green-300';
@@ -133,53 +177,14 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
   return (
     <>
     <header 
-      className={`main-header nova-topbar fixed top-0 z-40 border-b ${headerTone}`}>
-      <div className="header-inner w-full h-14 max-[320px]:h-12 flex items-center justify-between">
-        {/* Left: mobile toggle button and welcome message */}
-        <div className="flex items-center gap-3 max-[800px]:gap-2 max-[480px]:gap-1 max-[320px]:gap-1 pl-0 ml-0" style={{ paddingInlineStart: 0, marginInlineStart: 0 }}>
-          {/* Mobile sidebar toggle button */}
-          <button
-            type="button"
-            onClick={() => {
-              console.log('Mobile toggle button clicked!')
-              console.log('Current mobileSidebarOpen state:', mobileSidebarOpen)
-              console.log('onMobileToggle function check:', typeof onMobileToggle)
-              if (typeof onMobileToggle === 'function') {
-                onMobileToggle()
-              } else {
-                console.error('onMobileToggle is not a function:', onMobileToggle)
-              }
-            }}
-            className={`md:hidden inline-flex items-center justify-center p-1.5 rounded-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              isLight 
-                ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' 
-                : 'text-gray-300 hover:text-white hover:bg-gray-700'
-            }`}
-            aria-label={mobileSidebarOpen ? t('Close menu') : t('Open menu')}
-          >
-            {mobileSidebarOpen ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                className="w-4 h-4 text-red-500"
-              >
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            ) : (
-              // Hamburger icon when sidebar is closed
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 transition-transform duration-300">
-                <path d="M3 12h18M3 6h18M3 18h18" />
-              </svg>
-            )}
-          </button>
-          <span className={`text-sm max-[480px]:text-xs font-semibold ${isLight ? 'text-gray-800' : 'text-gray-300'}`}>
-            {t('welcome_super_admin') || 'Welcome, Super Admin!'}
-          </span>
-          </div>
+      className={`main-header nova-topbar fixed top-0 z-50 border-b ${headerTone}`}>
+      <div className="header-inner w-full h-16 max-[320px]:h-14 flex items-center justify-between px-2 max-[480px]:px-1">
+        <WelcomeSection
+          isLight={isLight}
+          onMobileToggle={onMobileToggle}
+          mobileSidebarOpen={mobileSidebarOpen}
+          text={t('welcome_super_admin', 'Welcome, Super Admin!')}
+        />
 
         {/* Right: actions */}
         <div className={`flex items-center gap-2 max-[768px]:gap-1.5 max-[480px]:gap-1`}>
@@ -276,54 +281,91 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
               className={`flex items-center gap-2 px-3 py-2 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isLight 
                 ? 'backdrop-blur-md bg-white/20 hover:bg-white/40 border border-white/30 hover:border-white/50 shadow-lg hover:shadow-xl hover:scale-105 hover:-translate-y-0.5' 
                 : 'backdrop-blur-md bg-gray-800/20 hover:bg-gray-700/40 border border-gray-600/30 hover:border-gray-500/50 shadow-lg hover:shadow-xl hover:scale-105 hover:-translate-y-0.5'}`}>
-              <img src="https://i.pravatar.cc/150?u=a042581f4e29026024d" alt="User" className="w-8 h-8 rounded-full" />
+              <img src={AVATAR_PLACEHOLDER} alt="User" className="w-8 h-8 rounded-full" />
               <div className="max-[880px]:hidden text-left">
                 <div className="text-sm font-semibold">{t('Ibrahim')}</div>
                 <div className="text-xs text-[var(--muted-text)]">{t('Admin')}</div>
               </div>
             </button>
             {profilePreviewOpen && (
-              <div className={`dropdown-panel absolute top-12 ${isRTL ? 'left-0' : 'right-0'} w-64 backdrop-blur-md ${isLight ? 'bg-white/80' : 'bg-gray-900/80'} border ${isLight ? 'border-white/30' : 'border-gray-600/30'} rounded-xl shadow-2xl z-50`} role="menu" aria-label={t('Profile menu')}>
-                {/* Caret */}
-                <div className={`absolute -top-2 ${isRTL ? 'left-6' : 'right-6'} w-3 h-3 backdrop-blur-md ${isLight ? 'bg-white/80' : 'bg-gray-900/80'} border-t border-l ${isLight ? 'border-white/30' : 'border-gray-600/30'} rotate-45`}></div>
+              <div className={`dropdown-panel absolute top-12 ${isRTL ? 'left-0' : 'right-0'} w-72 max-w-[92vw] backdrop-blur-md ${isLight ? 'bg-white/90' : 'bg-gray-900/90'} border ${isLight ? 'border-white/30' : 'border-gray-600/30'} rounded-xl shadow-2xl z-50`} role="menu" aria-label={t('Profile menu')}>
+                <div className={`absolute -top-2 ${isRTL ? 'left-6' : 'right-6'} w-3 h-3 backdrop-blur-md ${isLight ? 'bg-white/90' : 'bg-gray-900/90'} border-t border-l ${isLight ? 'border-white/30' : 'border-gray-600/30'} rotate-45`}></div>
 
-                {/* User header */}
                 <div className="px-4 py-3 flex items-center gap-3">
-                  <img src="https://i.pravatar.cc/150?u=a042581f4e29026024d" alt="User" className="w-10 h-10 rounded-full" />
-                  <div className="flex-1">
-                    <div className="text-sm font-semibold">{t('Ibrahim')}</div>
-                    <div className="text-xs text-[var(--muted-text)]">{t('Admin')}</div>
+                  <img src={AVATAR_PLACEHOLDER} alt="User" className="w-10 h-10 rounded-full" />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-semibold truncate">{user?.name || t('Administrator')}</div>
+                    <div className="text-xs text-[var(--muted-text)] truncate">{user?.email || 'admin@example.com'}</div>
+                    <button
+                      className="mt-1 text-xs font-semibold text-blue-600 hover:text-blue-700"
+                      onClick={() => { setProfilePreviewOpen(false); navigate('/settings/profile') }}
+                    >
+                      {t('My Profile')} ▸
+                    </button>
                   </div>
+                  <span className="inline-flex items-center justify-center w-2 h-2 rounded-full bg-green-500" aria-hidden></span>
                 </div>
                 <div className="h-px bg-[var(--divider)]"></div>
 
-                {/* Menu items */}
-                {/* Change Photo */}
                 <button
-                  onClick={() => console.log('Profile: Change Photo')}
+                  onClick={() => { setProfilePreviewOpen(false); navigate('/settings/system/security') }}
                   className="w-full flex items-center gap-3 px-4 py-2 text-sm text-[var(--content-text)] hover:bg-[var(--table-row-hover)] transition-colors"
                   role="menuitem"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-4 h-4">
-                    <rect x="3" y="5" width="14" height="12" rx="2" />
-                    <circle cx="10" cy="11" r="3" />
-                    <path d="M17 8l4-2v10l-4-2" />
-                  </svg>
-                  <span>{t('Change Photo')}</span>
+                  <span className="w-5 h-5 inline-flex items-center justify-center">🔐</span>
+                  <span>{t('Security Settings')}</span>
                 </button>
-                {/* Edit Information */}
+
                 <button
-                  onClick={() => console.log('Profile: Edit Information')}
+                  onClick={() => { setProfilePreviewOpen(false); navigate('/user-management/access-logs') }}
                   className="w-full flex items-center gap-3 px-4 py-2 text-sm text-[var(--content-text)] hover:bg-[var(--table-row-hover)] transition-colors"
                   role="menuitem"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-4 h-4">
-                    <path d="M12 20h9" />
-                    <path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4 12.5-12.5z" />
-                  </svg>
-                  <span>{t('Edit Information')}</span>
+                  <span className="w-5 h-5 inline-flex items-center justify-center">📱</span>
+                  <span>{t('Linked Devices')}</span>
                 </button>
-                {/* End menu */}
+
+                <button
+                  onClick={() => { setProfilePreviewOpen(false); navigate('/settings/profile/company') }}
+                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-[var(--content-text)] hover:bg-[var(--table-row-hover)] transition-colors"
+                  role="menuitem"
+                >
+                  <span className="w-5 h-5 inline-flex items-center justify-center">🏢</span>
+                  <span>{t('Company Profile')}</span>
+                </button>
+
+                <div className="h-px bg-[var(--divider)]"></div>
+
+                <button
+                  onClick={() => { setProfilePreviewOpen(false); setIsLanguageOpen(true) }}
+                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-[var(--content-text)] hover:bg-[var(--table-row-hover)] transition-colors"
+                  role="menuitem"
+                >
+                  <span className="w-5 h-5 inline-flex items-center justify-center">🌐</span>
+                  <span className="flex-1">{t('Language')}</span>
+                  <span className="text-xs text-[var(--muted-text)]">{i18n.language === 'ar' ? 'العربية' : 'English'}</span>
+                </button>
+
+                <button
+                  onClick={() => { toggleTheme(); setProfilePreviewOpen(false) }}
+                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-[var(--content-text)] hover:bg-[var(--table-row-hover)] transition-colors"
+                  role="menuitem"
+                >
+                  <span className="w-5 h-5 inline-flex items-center justify-center">🌓</span>
+                  <span className="flex-1">{t('Theme')}</span>
+                  <span className="text-xs text-[var(--muted-text)]">{isLight ? 'light' : 'dark'}</span>
+                </button>
+
+                <div className="h-px bg-[var(--divider)]"></div>
+
+                <button
+                  onClick={async () => { setProfilePreviewOpen(false); await svcLogout(); navigate('/login') }}
+                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-[var(--content-text)] hover:bg-[var(--table-row-hover)] transition-colors"
+                  role="menuitem"
+                >
+                  <span className="w-5 h-5 inline-flex items-center justify-center">↪️</span>
+                  <span>{t('Logout')}</span>
+                </button>
               </div>
             )}
           </div>
@@ -341,10 +383,9 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
       </div>
     </header>
 
-    {/* Mobile Extras: drawer from bottom */}
     {isExtrasOpen && (
-      <div className="md:hidden fixed inset-x-0 bottom-0 z-40">
-        <div className={`py-3 px-3 border-t backdrop-blur-sm ${headerTone}`}>
+      <div className="md:hidden fixed inset-x-0 top-16 max-[320px]:top-14 z-40">
+        <div className={`py-2 px-3 border-b backdrop-blur-sm ${headerTone}`}>
           <div className="grid grid-cols-4 gap-3">
             <IconButton
               label={t('Search')}

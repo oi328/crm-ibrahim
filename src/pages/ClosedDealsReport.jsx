@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import { useTranslation } from 'react-i18next'
 import * as XLSX from 'xlsx'
 import { Bar, Line } from 'react-chartjs-2'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, PointElement, LineElement, Tooltip, Legend } from 'chart.js'
-import { PieChart } from '../components/PieChart'
-import SearchableSelect from '../components/SearchableSelect'
+import { PieChart } from '@shared/components/PieChart'
+import SearchableSelect from '@shared/components/SearchableSelect'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Tooltip, Legend)
 

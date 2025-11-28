@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import AddActionModal from './AddActionModal'
+import AddActionModal from '@components/AddActionModal'
 
 // Local storage helpers for actions per day
 const STORAGE_KEY = 'userActionsByDate'
@@ -91,7 +91,7 @@ export default function CalendarModal({ open, onClose, tone = 'light' }) {
   const [actionsByDate, setActionsByDate] = useState({})
   const [showAddActionModal, setShowAddActionModal] = useState(false)
   const [showDailyActions, setShowDailyActions] = useState(false)
-  const [actionsView, setActionsView] = useState('day')
+  const [actionsView, setActionsView] = useState('selected')
   const [selectedAction, setSelectedAction] = useState(null)
   // Dynamic column height for calendar and actions column
   const [columnHeight, setColumnHeight] = useState(520)
@@ -329,8 +329,8 @@ export default function CalendarModal({ open, onClose, tone = 'light' }) {
 
   const getActionsByTimeframe = (view) => {
     let list = []
-    if (view === 'day') {
-      list = actionsFor(today)
+    if (view === 'selected' || view === 'day') {
+      list = actionsFor(selectedDate || today)
     } else if (view === 'week') {
       const s = startOfWeek(today)
       const e = endOfWeek(today)
@@ -447,6 +447,39 @@ export default function CalendarModal({ open, onClose, tone = 'light' }) {
               {cursor.toLocaleString(undefined, { month: 'long', year: 'numeric' })}
             </span>
             <div className="flex items-center gap-2">
+              <select
+                value={month}
+                onChange={(e) => {
+                  const m = parseInt(e.target.value, 10)
+                  setCursor(new Date(year, m, 1))
+                }}
+                className={`px-2 py-1 text-xs rounded-md border ${isLight ? 'bg-white border-gray-300 text-gray-800' : 'bg-gray-700 border-gray-600 text-gray-200'}`}
+                aria-label="Select month"
+              >
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <option key={i} value={i}>
+                    {new Date(2000, i, 1).toLocaleString(undefined, { month: 'long' })}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={year}
+                onChange={(e) => {
+                  const y = parseInt(e.target.value, 10)
+                  setCursor(new Date(y, month, 1))
+                }}
+                className={`px-2 py-1 text-xs rounded-md border ${isLight ? 'bg-white border-gray-300 text-gray-800' : 'bg-gray-700 border-gray-600 text-gray-200'}`}
+                aria-label="Select year"
+              >
+                {Array.from({ length: 21 }).map((_, idx) => {
+                  const y = today.getFullYear() - 10 + idx
+                  return (
+                    <option key={y} value={y}>{y}</option>
+                  )
+                })}
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
               <button
                 className={`p-1 rounded-md ${isLight ? 'hover:bg-gray-200' : 'hover:bg-gray-700'}`}
                 onClick={() => setCursor(new Date(year, month - 1, 1))}
@@ -545,6 +578,7 @@ export default function CalendarModal({ open, onClose, tone = 'light' }) {
               <div className="grid grid-cols-7 gap-1 flex-1 overflow-y-auto">
                 {grid.map(({ date, inMonth }, idx) => {
                   const isToday = date.toDateString() === today.toDateString()
+                  const isSelected = selectedDate && date.toDateString() === selectedDate.toDateString()
                   let acts = actionsFor(date)
                   // Apply person and lead filters
                   if (selectedEmployee && selectedEmployee !== t('All Employees')) {
@@ -561,7 +595,7 @@ export default function CalendarModal({ open, onClose, tone = 'light' }) {
                   return (
                     <div className="relative group" key={idx}>
                       <button
-                        onClick={() => setSelectedDate(date)}
+                        onClick={() => { setSelectedDate(date); setActionsView('selected') }}
                         onMouseEnter={() => setHoverDate(date)}
                         onMouseLeave={() => setHoverDate(null)}
                         className={`text-center rounded-lg border p-2 min-h-[70px] w-full transition-colors duration-150 ${
@@ -572,7 +606,7 @@ export default function CalendarModal({ open, onClose, tone = 'light' }) {
                             : isLight
                               ? 'bg-gray-50 border-gray-200 opacity-50'
                               : 'bg-gray-900 border-gray-800 opacity-50'
-                        } ${isToday ? 'ring-2 ring-indigo-500' : ''}`}
+                        } ${isToday ? 'ring-2 ring-indigo-500' : ''} ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
                       >
                         <span className="text-sm font-medium">{date.getDate()}</span>
                         {acts.length > 0 && (
@@ -595,7 +629,7 @@ export default function CalendarModal({ open, onClose, tone = 'light' }) {
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1">
                       {[
-                        { key: 'day', label: t('Day') },
+                        { key: 'selected', label: (selectedDate && selectedDate.toDateString() === today.toDateString()) ? t('Today') : t('Selected', 'Selected') },
                         { key: 'week', label: t('Week') },
                         { key: 'month', label: t('Month') },
                         { key: 'upcoming', label: t('Upcoming') }

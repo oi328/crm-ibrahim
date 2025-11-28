@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import SearchableSelect from '../components/SearchableSelect'
+import SearchableSelect from '@shared/components/SearchableSelect'
 
 // Mock data for demo purposes
 const MOCK_DEPT = {

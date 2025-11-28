@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { Bar, Line } from 'react-chartjs-2'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js'
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend)
-import { PieChart } from './PieChart'
+import { PieChart } from '@shared/components/PieChart'
+import { useTheme } from '@shared/context/ThemeProvider'
 import { FaSlidersH, FaSearch, FaUser, FaCalendar, FaDollarSign, FaTimes, FaFilter } from 'react-icons/fa';
 import { BiSlider } from 'react-icons/bi';
 import { 
@@ -25,6 +26,8 @@ import {
 export const LeadsAnalysisChart = ({ data, chartType = 'bar', filters = {}, legendLabel = 'Sales' }) => {
   const { t, i18n } = useTranslation()
   const lang = i18n.language || 'en'
+  const { theme } = useTheme()
+  const isLight = theme === 'light'
   const xAxisLabel = lang === 'ar' ? 'الأشهر' : 'Months'
   const yAxisLabel = lang === 'ar' ? 'عدد العملاء المحتملين' : 'No. of Leads'
   const [chartData, setChartData] = useState([])
@@ -270,12 +273,12 @@ export const LeadsAnalysisChart = ({ data, chartType = 'bar', filters = {}, lege
       maintainAspectRatio: false,
       devicePixelRatio: 2,
       plugins: {
-        legend: { position: 'top', display: true, labels: { usePointStyle: true, boxWidth: 8 } },
+        legend: { position: 'top', display: true, labels: { usePointStyle: true, boxWidth: 8, color: isLight ? '#0f172a' : undefined } },
         tooltip: { enabled: true }
       },
       scales: {
-        x: { grid: { display: false }, ticks: { maxRotation: 0, minRotation: 0 }, title: { display: true, text: xAxisLabel } },
-        y: { beginAtZero: true, grid: { display: true }, ticks: { precision: 0 }, title: { display: true, text: yAxisLabel } }
+        x: { grid: { display: false }, ticks: { maxRotation: 0, minRotation: 0, color: isLight ? '#0f172a' : undefined }, title: { display: true, text: xAxisLabel, color: isLight ? '#0f172a' : undefined, font: { size: 13, weight: 600 } } },
+        y: { beginAtZero: true, grid: { display: true }, ticks: { precision: 0, color: isLight ? '#0f172a' : undefined }, title: { display: true, text: yAxisLabel, color: isLight ? '#0f172a' : undefined, font: { size: 13, weight: 600 } } }
       }
     }
 
@@ -306,12 +309,12 @@ export const LeadsAnalysisChart = ({ data, chartType = 'bar', filters = {}, lege
       maintainAspectRatio: false,
       devicePixelRatio: 2,
       plugins: {
-        legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } },
+        legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8, color: isLight ? '#0f172a' : undefined } },
         tooltip: { enabled: true }
       },
       scales: {
-        x: { stacked: true, grid: { display: false }, ticks: { maxRotation: 0, minRotation: 0 }, title: { display: true, text: xAxisLabel } },
-        y: { stacked: true, beginAtZero: true, grid: { display: true }, ticks: { precision: 0 }, title: { display: true, text: yAxisLabel } }
+        x: { stacked: true, grid: { display: false }, ticks: { maxRotation: 0, minRotation: 0, color: isLight ? '#0f172a' : undefined }, title: { display: true, text: xAxisLabel, color: isLight ? '#0f172a' : undefined, font: { size: 13, weight: 600 } } },
+        y: { stacked: true, beginAtZero: true, grid: { display: true }, ticks: { precision: 0, color: isLight ? '#0f172a' : undefined }, title: { display: true, text: yAxisLabel, color: isLight ? '#0f172a' : undefined, font: { size: 13, weight: 600 } } }
       }
     }
 
@@ -347,12 +350,12 @@ export const LeadsAnalysisChart = ({ data, chartType = 'bar', filters = {}, lege
       maintainAspectRatio: false,
       devicePixelRatio: 2,
       plugins: {
-        legend: { position: 'top', display: true, labels: { usePointStyle: true, boxWidth: 8 } },
+        legend: { position: 'top', display: true, labels: { usePointStyle: true, boxWidth: 8, color: isLight ? '#0f172a' : undefined } },
         tooltip: { enabled: true }
       },
       scales: {
-        x: { grid: { display: false }, ticks: { maxRotation: 0, minRotation: 0 }, title: { display: true, text: xAxisLabel } },
-        y: { beginAtZero: true, grid: { display: true }, ticks: { precision: 0 }, title: { display: true, text: yAxisLabel } }
+        x: { grid: { display: false }, ticks: { maxRotation: 0, minRotation: 0, color: isLight ? '#0f172a' : undefined }, title: { display: true, text: xAxisLabel, color: isLight ? '#0f172a' : undefined, font: { size: 13, weight: 600 } } },
+        y: { beginAtZero: true, grid: { display: true }, ticks: { precision: 0, color: isLight ? '#0f172a' : undefined }, title: { display: true, text: yAxisLabel, color: isLight ? '#0f172a' : undefined, font: { size: 13, weight: 600 } } }
       }
     }
 

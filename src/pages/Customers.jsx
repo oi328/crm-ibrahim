@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import Layout from '../components/Layout'
 import { api } from '../utils/api'
 
 const defaultForm = {
@@ -216,7 +215,6 @@ export const Customers = () => {
   }
 
   return (
-    <Layout>
       <div className="space-y-4 bg-[var(--content-bg)] text-[var(--content-text)] overflow-x-hidden overflow-y-auto">
         {/* Page Title */}
         <div className="flex items-center justify-between">
@@ -409,6 +407,7 @@ export const Customers = () => {
           </div>
         </section>
       </div>
-    </Layout>
   )
 }
+
+export default Customers

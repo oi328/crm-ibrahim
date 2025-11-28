@@ -1,9 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { useTheme } from '../providers/ThemeProvider';
+import { useTheme } from '@shared/context/ThemeProvider';
 import { useNavigate } from 'react-router-dom';
 import { useStages } from '../hooks/useStages';
-import { Sidebar } from '../components/Sidebar';
-import Topbar from '../components/Topbar';
 import { useState } from 'react';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 
@@ -86,7 +84,6 @@ export const AddNewLead = () => {
   const { theme } = useTheme();
   const isLight = theme === 'light';
   const navigate = useNavigate();
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const [name, setName] = useState('');
   const [source, setSource] = useState('');
@@ -148,7 +145,7 @@ export const AddNewLead = () => {
                 ...(l.mobileNumbers || [{ code: '+20', number: '' }]),
                 { code: l.mobileNumbers?.[0]?.code || '+20', number: '' },
               ],
-            }
+}
           : l
       )
     );
@@ -218,9 +215,6 @@ export const AddNewLead = () => {
 
   // مكوّن اختيار كود الدولة مع العلم فقط
   const CountryCodeSelect = ({ value, onChange }) => {
-    const { t, i18n } = useTranslation();
-    const isArabic = i18n.language === 'ar';
-
     return (
       <select
         value={value}
@@ -332,27 +326,10 @@ export const AddNewLead = () => {
   };
 
   return (
-    <div className={`app-layout ${i18n.language === 'ar' ? 'rtl' : 'ltr'}`}>
-      {/* Sidebar */}
-        {/* Sidebar */}
-        <Sidebar 
-          isOpen={mobileSidebarOpen}
-          onClose={() => setMobileSidebarOpen(false)}
-        />
-    
-        {/* Content container */}
-        <div className="content-container flex flex-col min-h-screen overflow-hidden">
-          {/* Header */}
-          <Topbar 
-            onMobileToggle={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-            mobileSidebarOpen={mobileSidebarOpen}
-          />
-    
-          <main className="flex-1 min-h-0 p-6 pb-24 space-y-4 bg-[var(--content-bg)] text-[var(--content-text)] overflow-y-auto overflow-x-hidden">
-            {/* Page Title */}
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('Add New Lead')}</h1>
+    <div className={`p-6 pb-24 bg-[var(--content-bg)] text-[var(--content-text)]`}>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('Add New Lead')}</h1>
 
-            <div className={`p-4 md:p-6 rounded-lg border ${formTone}`}>
+      <div className={`p-4 md:p-6 rounded-lg border ${formTone}`}>
               {/* Two-column layout */}
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-lg font-semibold">{i18n.language === 'ar' ? 'العميل الرئيسي' : t('Primary Lead')}</h2>
@@ -730,43 +707,40 @@ export const AddNewLead = () => {
 
 
 
-            </div>
-          </main>
+      </div>
 
-            {/* Fixed action bar for Additional Leads - Inside main content only */}
-            <div className={`sticky bottom-0 left-0 right-0 z-50 border-t-2 ${isLight ? 'bg-white border-gray-300 shadow-2xl' : 'bg-gray-900 border-gray-600 shadow-2xl'} backdrop-blur-md mt-6`}>
-              <div className="px-4 py-3 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <h2 className={`text-lg font-bold ${isLight ? 'text-purple-700' : 'text-cyan-300'}`}>
-                    {i18n.language === 'ar' ? 'ليدز إضافية' : t('Additional Leads')}
-                  </h2>
-                  <button
-                    type="button"
-                    onClick={addExtraLead}
-                    className={`inline-flex items-center justify-center p-2 rounded-md border-2 transition-all duration-200 ${isLight ? 'bg-blue-50 border-blue-400 text-blue-700 hover:bg-blue-100 hover:border-blue-500' : 'bg-gray-800 border-gray-600 text-blue-300 hover:bg-gray-700 hover:border-gray-500'} hover:opacity-95 hover:shadow-lg active:scale-95`}
-                    aria-label={i18n.language === 'ar' ? 'إضافة ليد' : t('Add Lead')}
-                    title={i18n.language === 'ar' ? 'إضافة ليد' : t('Add Lead')}
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                  </button>
-                </div>
-                <div className="inline-flex w-fit">
-                  <button
-                    type="button"
-                    onClick={handleSave}
-                    disabled={!isFormValid}
-                    className={`inline-flex items-center gap-2 px-6 py-2 rounded-md font-bold transition-all duration-150 ease-out transform disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none hover:opacity-95 hover:-translate-y-0.5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-emerald-500/60 shadow-lg hover:shadow-xl ${isLight ? 'bg-green-600 hover:bg-green-700 active:bg-green-800 text-white border-2 border-green-500' : 'bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white border-2 border-emerald-600'}`}
-                  >
-                    {i18n.language === 'ar' ? 'تأكيد الإضافة' : t('Confirm Add')}
-                  </button>
-                </div>
-              </div>
-            </div>
+      <div className={`sticky bottom-0 left-0 right-0 z-50 border-t-2 ${isLight ? 'bg-white border-gray-300 shadow-2xl' : 'bg-gray-900 border-gray-600 shadow-2xl'} backdrop-blur-md mt-6`}>
+        <div className="px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h2 className={`text-lg font-bold ${isLight ? 'text-purple-700' : 'text-cyan-300'}`}>
+              {i18n.language === 'ar' ? 'ليدز إضافية' : t('Additional Leads')}
+            </h2>
+            <button
+              type="button"
+              onClick={addExtraLead}
+              className={`inline-flex items-center justify-center p-2 rounded-md border-2 transition-all duration-200 ${isLight ? 'bg-blue-50 border-blue-400 text-blue-700 hover:bg-blue-100 hover:border-blue-500' : 'bg-gray-800 border-gray-600 text-blue-300 hover:bg-gray-700 hover:border-gray-500'} hover:opacity-95 hover:shadow-lg active:scale-95`}
+              aria-label={i18n.language === 'ar' ? 'إضافة ليد' : t('Add Lead')}
+              title={i18n.language === 'ar' ? 'إضافة ليد' : t('Add Lead')}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </button>
+          </div>
+          <div className="inline-flex w-fit">
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={!isFormValid}
+              className={`inline-flex items-center gap-2 px-6 py-2 rounded-md font-bold transition-all duration-150 ease-out transform disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none hover:opacity-95 hover:-translate-y-0.5 active:scale-95 focus:outline-none focus:ring-2 focus:ring-emerald-500/60 shadow-lg hover:shadow-xl ${isLight ? 'bg-green-600 hover:bg-green-700 active:bg-green-800 text-white border-2 border-green-500' : 'bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white border-2 border-emerald-600'}`}
+            >
+              {i18n.language === 'ar' ? 'تأكيد الإضافة' : t('Confirm Add')}
+            </button>
+          </div>
         </div>
       </div>
-    );
+    </div>
+  );
 };
 
 export default AddNewLead;

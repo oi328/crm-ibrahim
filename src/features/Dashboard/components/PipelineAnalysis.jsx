@@ -13,6 +13,7 @@ import {
   Legend
 } from 'chart.js';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@shared/context/ThemeProvider';
 import { 
   FaChartBar, 
   FaChartLine, 
@@ -85,6 +86,9 @@ ChartJS.register(
 export const PipelineAnalysis = ({ selectedEmployee, dateFrom, dateTo }) => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language || 'en'
+  const { theme } = useTheme();
+  const isLight = theme === 'light'
+
 
   // Toolbar state
   const [selectedMeasure, setSelectedMeasure] = useState('count');
@@ -249,7 +253,7 @@ export const PipelineAnalysis = ({ selectedEmployee, dateFrom, dateTo }) => {
 
   // Chart options
   const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
-  const tickColor = isDark ? '#e5e7eb' : '#374151';
+  const tickColor = isLight ? '#0f172a' : '#e5e7eb';
   const measureDisplay = selectedMeasure === 'count'
     ? (lang === 'ar' ? 'عدد العملاء المحتملين' : 'No. of Leads')
     : selectedMeasure === 'value'
@@ -272,11 +276,11 @@ export const PipelineAnalysis = ({ selectedEmployee, dateFrom, dateTo }) => {
     maintainAspectRatio: false,
     plugins: {
       legend: { position: 'top', labels: { color: tickColor } },
-      title: { display: true, text: `${t('Pipeline Analysis')} - ${t(selectedMeasure)} (${t('by Stage')})`, color: tickColor }
+      title: { display: true, text: `${t('Pipeline Analysis')} - ${t(selectedMeasure)} (${t('by Stage')})`, color: tickColor, font: { size: 14, weight: 'bold' } }
     },
     scales: {
-      x: { grid: { display: false }, ticks: { color: tickColor, font: { size: 12 } }, title: { display: true, text: xLabelBar, color: tickColor } },
-      y: { beginAtZero: true, grid: { display: false }, ticks: { color: tickColor, font: { size: 12 } }, title: { display: true, text: yLabelBar, color: tickColor } }
+      x: { grid: { display: false }, ticks: { color: tickColor, font: { size: 13, weight: 600 } }, title: { display: true, text: xLabelBar, color: tickColor, font: { size: 13, weight: 600 } } },
+      y: { beginAtZero: true, grid: { display: false }, ticks: { color: tickColor, font: { size: 13, weight: 600 } }, title: { display: true, text: yLabelBar, color: tickColor, font: { size: 13, weight: 600 } } }
     }
   };
   
@@ -285,11 +289,11 @@ export const PipelineAnalysis = ({ selectedEmployee, dateFrom, dateTo }) => {
     maintainAspectRatio: false,
     plugins: {
       legend: { position: 'top', labels: { color: tickColor } },
-      title: { display: true, text: `${t('Pipeline Analysis')} - ${t(selectedMeasure)} (${t('Over Time')})`, color: tickColor }
+      title: { display: true, text: `${t('Pipeline Analysis')} - ${t(selectedMeasure)} (${t('Over Time')})`, color: tickColor, font: { size: 14, weight: 'bold' } }
     },
     scales: {
-      x: { grid: { display: false }, ticks: { color: tickColor, font: { size: 12 } }, title: { display: true, text: xLabelLine, color: tickColor } },
-      y: { grid: { display: false }, ticks: { color: tickColor, font: { size: 12 } }, title: { display: true, text: yLabelLine, color: tickColor } }
+      x: { grid: { display: false }, ticks: { color: tickColor, font: { size: 13, weight: 600 } }, title: { display: true, text: xLabelLine, color: tickColor, font: { size: 13, weight: 600 } } },
+      y: { grid: { display: false }, ticks: { color: tickColor, font: { size: 13, weight: 600 } }, title: { display: true, text: yLabelLine, color: tickColor, font: { size: 13, weight: 600 } } }
     }
   };
 
@@ -323,11 +327,12 @@ export const PipelineAnalysis = ({ selectedEmployee, dateFrom, dateTo }) => {
     return filteredData;
   }, [filteredData]);
 
+
   return (
     <div className="w-full">
       {/* Toolbar (simplified like Leads Analysis) */}
       <div className="flex flex-wrap items-center gap-2 mb-3 justify-end">
-        <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+        <span className={`${isLight ? 'text-blue-700 font-semibold' : 'dark:text-gray-300'} text-sm`}>
           {chartType === 'bar'
             ? (lang === 'ar' ? 'رسم بياني عمودي' : 'Bar Chart')
             : chartType === 'line'
@@ -343,45 +348,35 @@ export const PipelineAnalysis = ({ selectedEmployee, dateFrom, dateTo }) => {
                 onClick={() => setChartType('bar')}
                 title={t('Bar')}
                 aria-label={t('Bar')}
-                className={`group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out ${chartType === 'bar' ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25 scale-105' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-600 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-105'} border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500`}
-                title={lang === 'ar' ? 'رسم بياني عمودي' : 'Bar Chart'}
-              >
+                className={`group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out ${chartType === 'bar' ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25 scale-105' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-600 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-105'} border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500`}>
                 <RiBarChart2Line className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setChartType('line')}
                 title={t('Line')}
                 aria-label={t('Line')}
-                className={`group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out ${chartType === 'line' ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/25 scale-105' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-gray-600 hover:text-purple-600 dark:hover:text-purple-400 hover:scale-105'} border border-gray-200 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-500`}
-                title={lang === 'ar' ? 'رسم بياني خطي' : 'Line Chart'}
-              >
+                className={`group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out ${chartType === 'line' ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/25 scale-105' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-gray-600 hover:text-purple-600 dark:hover:text-purple-400 hover:scale-105'} border border-gray-200 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-500`}>
                 <RiLineChartLine className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setChartType('pie')}
                 title={t('Pie')}
                 aria-label={t('Pie')}
-                className={`group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out ${chartType === 'pie' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/25 scale-105' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-gray-600 hover:text-orange-600 dark:hover:text-orange-400 hover:scale-105'} border border-gray-200 dark:border-gray-600 hover:border-orange-300 dark:hover:border-orange-500`}
-                title={lang === 'ar' ? 'رسم بياني دائري' : 'Pie Chart'}
-              >
+                className={`group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out ${chartType === 'pie' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/25 scale-105' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-gray-600 hover:text-orange-600 dark:hover:text-orange-400 hover:scale-105'} border border-gray-200 dark:border-gray-600 hover:border-orange-300 dark:hover:border-orange-500`}>
                 <RiPieChartLine className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setChartType('pivot')}
                 title={t('Pivot')}
                 aria-label={t('Pivot')}
-                className={`group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out ${chartType === 'pivot' ? 'bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-lg shadow-teal-500/25 scale-105' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-teal-50 dark:hover:bg-gray-600 hover:text-teal-600 dark:hover:text-teal-400 hover:scale-105'} border border-gray-200 dark:border-gray-600 hover:border-teal-300 dark:hover:border-teal-500`}
-                title={lang === 'ar' ? 'جدول محوري' : 'Pivot Table'}
-              >
+                className={`group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out ${chartType === 'pivot' ? 'bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-lg shadow-teal-500/25 scale-105' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-teal-50 dark:hover:bg-gray-600 hover:text-teal-600 dark:hover:text-teal-400 hover:scale-105'} border border-gray-200 dark:border-gray-600 hover:border-teal-300 dark:hover:border-teal-500`}>
                 <RiTable2 className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setChartType('list')}
                 title={t('List')}
                 aria-label={t('List')}
-                className={`group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out ${chartType === 'list' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/25 scale-105' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-gray-600 hover:text-green-600 dark:hover:text-green-400 hover:scale-105'} border border-gray-200 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-500`}
-                title={lang === 'ar' ? 'قائمة' : 'List'}
-              >
+                className={`group relative flex items-center justify-center px-3 py-2 rounded-md transition-all duration-300 ease-in-out ${chartType === 'list' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/25 scale-105' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-gray-600 hover:text-green-600 dark:hover:text-green-400 hover:scale-105'} border border-gray-200 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-500`}>
                 <RiListUnordered className="w-4 h-4" />
               </button>
             </div>
@@ -574,11 +569,11 @@ export const PipelineAnalysis = ({ selectedEmployee, dateFrom, dateTo }) => {
             <tbody>
               {pivotRows.map((row, idx) => (
                 <tr key={idx} className="border-t border-gray-200 dark:border-gray-700">
-                  <td className="px-3 py-2 font-medium text-gray-900 dark:text-white">{row.stage}</td>
+                  <td className={`px-3 py-2 font-medium ${isLight ? 'text-black' : 'dark:text-white'}`}>{row.stage}</td>
                   {row.values.map((v, i) => (
-                    <td key={i} className="px-3 py-2 text-gray-700 dark:text-gray-300">{v}</td>
+                    <td key={i} className={`px-3 py-2 ${isLight ? 'text-black' : 'dark:text-gray-300'}`}>{v}</td>
                   ))}
-                  <td className="px-3 py-2 font-semibold">{Math.round(row.total * 100) / 100}</td>
+                  <td className={`px-3 py-2 font-semibold ${isLight ? 'text-black' : 'dark:text-gray-100'}`}>{Math.round(row.total * 100) / 100}</td>
                 </tr>
               ))}
             </tbody>
@@ -602,12 +597,12 @@ export const PipelineAnalysis = ({ selectedEmployee, dateFrom, dateTo }) => {
             <tbody>
               {listRows.map((r, i) => (
                 <tr key={i} className="border-t border-gray-200 dark:border-gray-700">
-                  <td className="px-3 py-2 text-gray-700 dark:text-gray-300">{applyYearToLabel(r.date)}</td>
-                  <td className="px-3 py-2 text-gray-700 dark:text-gray-300">{r.employee}</td>
-                  <td className="px-3 py-2 text-gray-700 dark:text-gray-300">{r.leadName}</td>
-                  <td className="px-3 py-2 text-gray-700 dark:text-gray-300">{r.stage}</td>
-                  <td className="px-3 py-2 text-gray-700 dark:text-gray-300">{r.value}</td>
-                  <td className="px-3 py-2 text-gray-700 dark:text-gray-300">{r.prorated}</td>
+                  <td className={`px-3 py-2 ${isLight ? 'text-black' : 'dark:text-gray-300'}`}>{applyYearToLabel(r.date)}</td>
+                  <td className={`px-3 py-2 ${isLight ? 'text-black' : 'dark:text-gray-300'}`}>{r.employee}</td>
+                  <td className={`px-3 py-2 ${isLight ? 'text-black' : 'dark:text-gray-300'}`}>{r.leadName}</td>
+                  <td className={`px-3 py-2 ${isLight ? 'text-black' : 'dark:text-gray-300'}`}>{r.stage}</td>
+                  <td className={`px-3 py-2 ${isLight ? 'text-black' : 'dark:text-gray-300'}`}>{r.value}</td>
+                  <td className={`px-3 py-2 ${isLight ? 'text-black' : 'dark:text-gray-300'}`}>{r.prorated}</td>
                 </tr>
               ))}
             </tbody>

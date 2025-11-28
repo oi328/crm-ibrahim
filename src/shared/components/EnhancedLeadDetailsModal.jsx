@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { FaUser, FaTimes, FaCog, FaPlus, FaEdit, FaCheckCircle, FaClock, FaSearch, FaFilter, FaSortAmountDown, FaList, FaCalendarAlt, FaPhone, FaEnvelope, FaTrash, FaEye, FaEllipsisV, FaWhatsapp, FaVideo, FaComments, FaMapMarkerAlt, FaDollarSign, FaUserCheck } from 'react-icons/fa';
-import AddActionModal from './AddActionModal';
-import EditLeadModal from './EditLeadModal';
-import { useStages } from '../hooks/useStages';
+import AddActionModal from '@components/AddActionModal';
+import EditLeadModal from '@components/EditLeadModal';
+import { useStages } from '@hooks/useStages';
 
 const EnhancedLeadDetailsModal = ({ lead, isOpen, onClose, isArabic = false, theme = 'light' }) => {
   const [activeTab, setActiveTab] = useState('overview');

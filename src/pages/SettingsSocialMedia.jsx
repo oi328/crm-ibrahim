@@ -1,5 +1,5 @@
 import React from 'react'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import { useTranslation } from 'react-i18next'
 import SocialMediaSettings from '../components/settings/SocialMediaSettings'
 

@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
+import { useTheme } from '@shared/context/ThemeProvider';
 import { useTranslation } from 'react-i18next';
-import EnhancedLeadDetailsModal from './EnhancedLeadDetailsModal';
+import EnhancedLeadDetailsModal from '@shared/components/EnhancedLeadDetailsModal';
 
 const RecentPhoneCalls = ({ employee, dateFrom, dateTo }) => {
   const { t, i18n } = useTranslation();
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
   const [selectedLead, setSelectedLead] = useState(null);
   const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
   const SCROLLBAR_CSS = `
@@ -194,53 +197,64 @@ const RecentPhoneCalls = ({ employee, dateFrom, dateTo }) => {
       <style>{SCROLLBAR_CSS}</style>
       <div className="space-y-3 max-h-96 overflow-y-auto scrollbar-thin-blue">
         {displayCalls.map((call) => (
-          <div key={call.id} className="p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+          <div
+            key={call.id}
+            className={`p-3 rounded-lg border hover:shadow-md transition-shadow ${
+              isLight
+                ? (call.callType === 'missed'
+                    ? 'bg-red-50 border-white'
+                    : call.callType === 'outgoing'
+                      ? 'bg-emerald-50 border-white'
+                      : 'bg-blue-50 border-white')
+                : 'dark:bg-gray-800 dark:border-gray-700'
+            }`}
+          >
             <div className="flex items-start justify-between mb-2">
               <div className="flex items-center gap-2">
                 {getCallTypeIcon(call.callType)}
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <span className="text-sm font-semibold text-gray-800 dark:text-gray-300">
                   {getCallTypeLabel(call.callType)}
                 </span>
               </div>
-              <span className="text-xs text-gray-500 dark:text-gray-400">
+              <span className={`text-xs ${isLight ? 'text-gray-800' : 'dark:text-gray-400'}`}>
                 {call.timestamp}
               </span>
             </div>
             
             <div className="space-y-1 mb-2">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                <span className={`text-xs font-semibold ${isLight ? 'text-gray-700' : 'dark:text-gray-400'}`}>
                   {t('Employee')}:
                 </span>
-                <span className="text-sm text-gray-800 dark:text-gray-200">
+                <span className={`text-sm ${isLight ? 'text-gray-900' : 'dark:text-gray-200'}`}>
                   {call.employeeName}
                 </span>
               </div>
               
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                <span className={`text-xs font-semibold ${isLight ? 'text-gray-700' : 'dark:text-gray-400'}`}>
                   {t('Lead')}:
                 </span>
-                <span className="text-sm text-gray-800 dark:text-gray-200">
+                <span className={`text-sm ${isLight ? 'text-gray-900' : 'dark:text-gray-200'}`}>
                   {call.leadName}
                 </span>
               </div>
               
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                <span className={`text-xs font-semibold ${isLight ? 'text-gray-700' : 'dark:text-gray-400'}`}>
                   {t('Phone')}:
                 </span>
-                <span className="text-sm text-gray-800 dark:text-gray-200">
+                <span className={`text-sm ${isLight ? 'text-gray-900' : 'dark:text-gray-200'}`}>
                   {call.phoneNumber}
                 </span>
               </div>
               
               {call.duration !== '00:00' && (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                  <span className={`text-xs font-semibold ${isLight ? 'text-gray-700' : 'dark:text-gray-400'}`}>
                     {t('Duration')}:
                   </span>
-                  <span className="text-sm text-gray-800 dark:text-gray-200">
+                  <span className={`text-sm ${isLight ? 'text-gray-900' : 'dark:text-gray-200'}`}>
                     {call.duration}
                   </span>
                 </div>
@@ -248,7 +262,7 @@ const RecentPhoneCalls = ({ employee, dateFrom, dateTo }) => {
             </div>
             
             {call.notes && (
-              <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-700 rounded text-xs text-gray-600 dark:text-gray-300">
+              <div className="mt-2 p-2 bg-[var(--lm-surface)] dark:bg-gray-700 rounded text-xs text-gray-600 dark:text-gray-300">
                 <span className="font-medium">{t('Notes')}:</span> {call.notes}
               </div>
             )}

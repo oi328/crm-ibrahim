@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import i18n from '../i18n'
@@ -7,7 +7,7 @@ import * as XLSX from 'xlsx'
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'
 import { Bar, Doughnut, Line } from 'react-chartjs-2'
-import SearchableSelect from '../components/SearchableSelect'
+import SearchableSelect from '@shared/components/SearchableSelect'
 import {
   Chart as ChartJS,
   CategoryScale,

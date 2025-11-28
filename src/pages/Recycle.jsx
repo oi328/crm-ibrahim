@@ -1,28 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useTheme } from '../providers/ThemeProvider'
-import { Sidebar } from '../components/Sidebar'
-import Topbar from '../components/Topbar'
+import { useTheme } from '@shared/context/ThemeProvider'
 import ColumnToggle from '../components/ColumnToggle'
-import EnhancedLeadDetailsModal from '../components/EnhancedLeadDetailsModal'
+import EnhancedLeadDetailsModal from '@shared/components/EnhancedLeadDetailsModal'
 import RecycleActionsModal from '../components/RecycleActionsModal'
 import LeadHoverTooltip from '../components/LeadHoverTooltip'
 import { 
-  FaSearch, 
-  FaFilter, 
-  FaDownload, 
-  FaEye, 
-  FaPhone, 
-  FaWhatsapp, 
-  FaEnvelope, 
-  FaVideo, 
-  FaTrash,
+  FaSearch,
+  FaDownload,
+  FaEye,
   FaUndo,
-  FaTrashAlt,
-  FaChevronDown,
-  FaChevronUp,
-  FaTimes,
-  FaPlus
+  FaTrashAlt
 } from 'react-icons/fa'
 import * as XLSX from 'xlsx'
 import { useLocation } from 'react-router-dom'
@@ -45,7 +33,7 @@ export function Recycle() {
   // Tooltip states
   const [showTooltip, setShowTooltip] = useState(false)
   const [hoveredLead, setHoveredLead] = useState(null)
-  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
+  const [tooltipPosition] = useState({ x: 0, y: 0 })
   const tooltipRef = useRef(null)
 
   // Filter states
@@ -73,7 +61,6 @@ export function Recycle() {
   const [deletedDateFilter, setDeletedDateFilter] = useState('')
 
   // UI states
-  const [showFilters, setShowFilters] = useState(false)
   const [showAllFilters, setShowAllFilters] = useState(false)
   const [sortBy, setSortBy] = useState('deletedAt')
   const [sortOrder, setSortOrder] = useState('desc')
@@ -89,7 +76,7 @@ export function Recycle() {
   const [bulkFeedback, setBulkFeedback] = useState(null)
   
   // Mobile sidebar state
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  
 
   const location = useLocation()
   useEffect(() => {
@@ -97,7 +84,7 @@ export function Recycle() {
       const params = new URLSearchParams(location.search || '')
       const s = params.get('stage')
       if (s) setStageFilter(s)
-    } catch (e) {}
+    } catch (e) { console.warn('Invalid stage param', e) }
   }, [location.search])
 
   // Column visibility
@@ -445,6 +432,8 @@ export function Recycle() {
       const existingLeads = JSON.parse(localStorage.getItem('leads') || '[]')
       existingLeads.push(restoredLead)
       localStorage.setItem('leads', JSON.stringify(existingLeads))
+      localStorage.setItem('leadsData', JSON.stringify(existingLeads))
+      try { window.dispatchEvent(new CustomEvent('leadsDataUpdated')) } catch {}
       
       // Remove from deleted leads
       const updatedDeletedLeads = deletedLeads.filter(lead => lead.id !== leadId)
@@ -478,6 +467,8 @@ export function Recycle() {
       const restoredLeads = leadsToRestore.map(({ deletedAt, ...lead }) => lead)
       existingLeads.push(...restoredLeads)
       localStorage.setItem('leads', JSON.stringify(existingLeads))
+      localStorage.setItem('leadsData', JSON.stringify(existingLeads))
+      try { window.dispatchEvent(new CustomEvent('leadsDataUpdated')) } catch {}
       
       // Remove from deleted leads
       const updatedDeletedLeads = deletedLeads.filter(lead => !selectedLeads.includes(lead.id))
@@ -560,17 +551,7 @@ export function Recycle() {
   }
 
   return (
-    <div className={`app-layout ${i18n.language === 'ar' ? 'rtl' : 'ltr'}`}>
-      <Sidebar
-        isOpen={mobileSidebarOpen}
-        onClose={() => setMobileSidebarOpen(false)}
-      />
-      <div className={`content-container`}>
-        <Topbar
-          onMobileToggle={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-          mobileSidebarOpen={mobileSidebarOpen}
-        />
-        <main className="flex-1 p-6 bg-[var(--content-bg)] text-[var(--content-text)] overflow-x-auto overflow-y-auto space-y-8 md:space-y-10 lg:space-y-12">
+    <div className="p-6 bg-[var(--content-bg)] text-[var(--content-text)] space-y-8 md:space-y-10 lg:space-y-12">
           {/* Page Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -1065,21 +1046,11 @@ export function Recycle() {
               <button
                 onClick={() => {
                   if (selectedLeads.length === 0) {
-                    alert(t('Please select items to restore'));
-                    return;
+                    alert(t('Please select items to restore'))
+                    return
                   }
                   if (window.confirm(t('Are you sure you want to restore the selected leads?'))) {
-                    // Restore selected leads logic
-                    selectedLeads.forEach(id => {
-                      const leadToRestore = deletedLeads.find(lead => lead.id === id);
-                      if (leadToRestore) {
-                        setLeads(prev => [...prev, leadToRestore]);
-                        setDeletedLeads(prev => prev.filter(lead => lead.id !== id));
-                      }
-                    });
-                    localStorage.setItem('crmLeads', JSON.stringify(leads.concat(deletedLeads.filter(lead => selectedLeads.includes(lead.id)))));
-                    localStorage.setItem('deletedLeads', JSON.stringify(deletedLeads.filter(lead => !selectedLeads.includes(lead.id))));
-                    setSelectedLeads([]);
+                    handleBulkRestore()
                   }
                 }}
                 className="flex items-center gap-3 px-10 py-5 my-6 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white font-bold text-lg rounded-2xl shadow-2xl hover:shadow-green-500/50 transition-all duration-500 transform hover:scale-110 hover:-translate-y-2 active:scale-95 border-4 border-green-300 hover:border-green-200 ring-4 ring-green-200/30 hover:ring-green-300/50"
@@ -1416,8 +1387,6 @@ export function Recycle() {
               </nav>
             )}
           </div>
-       </main>
-       </div>
 
       {/* Enhanced Lead Details Modal */}
       {showLeadModal && (
@@ -1480,6 +1449,8 @@ export function Recycle() {
           isRtl={i18n.language === 'ar'}
         />
       )}
-     </div>
-   )
+    </div>
+  )
  }
+ 
+ export default Recycle

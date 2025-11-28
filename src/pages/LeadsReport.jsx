@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import Layout from '../components/Layout'; // Import Layout
+import Layout from '@shared/layouts/Layout'; // Import Layout
 import { mockReservationData, mockCallsData, mockTeamsData, mockTotalAccounts } from '../data/mockData';
 import Tabs from '../components/LeadsReport/Tabs';
 import SalesActions from '../components/LeadsReport/SalesActions';

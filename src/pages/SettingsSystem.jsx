@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import SystemPreferences from '../components/settings/SystemPreferences'
 
 export default function SettingsSystem() {

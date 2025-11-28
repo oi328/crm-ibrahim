@@ -3,8 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import UMActionButtons from '../components/UMActionButtons';
 import AssignmentModal from '../components/AssignmentModal';
 import { ClipboardCheck, Handshake, Ticket } from 'lucide-react';
-import Layout from '../components/Layout';
-import SearchableSelect from '../components/SearchableSelect';
+import Layout from '@shared/layouts/Layout';
+import SearchableSelect from '@shared/components/SearchableSelect';
 import { DEPARTMENTS } from '../data/orgStructure'
 import { useTranslation } from 'react-i18next';
 // Removed file-saver dependency; using Blob + link for export

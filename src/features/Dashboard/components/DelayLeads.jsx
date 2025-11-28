@@ -1,15 +1,15 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { FaWhatsapp, FaEnvelope, FaEye, FaPhone, FaPlus } from 'react-icons/fa';
-import AddActionModal from './AddActionModal';
-import { useTheme } from '../providers/ThemeProvider';
-import EnhancedLeadDetailsModal from './EnhancedLeadDetailsModal';
-import LeadHoverTooltip from './LeadHoverTooltip';
+import AddActionModal from '@components/AddActionModal';
+import { useTheme } from '@shared/context/ThemeProvider';
+import EnhancedLeadDetailsModal from '@shared/components/EnhancedLeadDetailsModal';
+import LeadHoverTooltip from '@components/LeadHoverTooltip';
 
 export const DelayLeads = ({ dateFrom, dateTo, selectedEmployee }) => {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
-  const MEET_ICON_URL = 'https://img.icons8.com/color/48/google-meet.png'
+  const MEET_ICON_URL = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24'><rect x='2' y='4' width='12' height='16' rx='3' fill='%23ffffff'/><rect x='2' y='4' width='12' height='4' rx='2' fill='%234285F4'/><rect x='2' y='4' width='4' height='16' rx='2' fill='%2334A853'/><rect x='10' y='4' width='4' height='16' rx='2' fill='%23FBBC05'/><rect x='2' y='16' width='12' height='4' rx='2' fill='%23EA4335'/><polygon points='14,9 22,5 22,19 14,15' fill='%2334A853'/></svg>"
   const SCROLLBAR_CSS = `
     .scrollbar-thin-blue { scrollbar-width: thin; scrollbar-color: #2563eb transparent; }
     .scrollbar-thin-blue::-webkit-scrollbar { height: 6px; }
@@ -191,18 +191,29 @@ export const DelayLeads = ({ dateFrom, dateTo, selectedEmployee }) => {
 
   const renderStageBadge = (status) => {
     const s = String(status || '').toLowerCase()
-    const cls = s === 'new' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200'
-      : s === 'qualified' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-200'
-      : s === 'in-progress' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-200'
-      : s === 'converted' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-200'
-      : s === 'lost' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200'
-      : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200'
     const label = s === 'new' ? t('New')
       : s === 'qualified' ? t('Qualified')
       : s === 'in-progress' ? t('In Progress')
       : s === 'converted' ? t('Converted')
       : s === 'lost' ? t('Lost')
       : (status || '-')
+
+    if (isLight) {
+      const map = s === 'new' ? 'new'
+        : s === 'qualified' ? 'qualified'
+        : s === 'in-progress' ? 'in-progress'
+        : s === 'converted' ? 'converted'
+        : s === 'lost' ? 'lost'
+        : 'new'
+      return <span className={`stage-badge ${map}`}>{label}</span>
+    }
+
+    const cls = s === 'new' ? 'dark:bg-blue-900/30 dark:text-blue-200'
+      : s === 'qualified' ? 'dark:bg-emerald-900/30 dark:text-emerald-200'
+      : s === 'in-progress' ? 'dark:bg-amber-900/30 dark:text-amber-200'
+      : s === 'converted' ? 'dark:bg-purple-900/30 dark:text-purple-200'
+      : s === 'lost' ? 'dark:bg-red-900/30 dark:text-red-200'
+      : 'dark:bg-gray-900/30 dark:text-gray-200'
     return <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded ${cls}`}>{label}</span>
   }
 
@@ -286,9 +297,9 @@ export const DelayLeads = ({ dateFrom, dateTo, selectedEmployee }) => {
     <div className={`p-4 ${bgColor} h-full overflow-auto rounded-lg shadow-md border ${isLight ? 'border-gray-200' : 'border-gray-700'} ${textColor}`}>
       <div className={`flex items-center ${i18n.language === 'ar' ? 'flex-row-reverse' : ''} gap-2 mb-2`}>
         <span aria-hidden className="inline-block w-1 h-5 rounded bg-blue-500"></span>
-        <h3 className="text-lg font-semibold">{t('Delay Leads')}</h3>
+        <h3 className="text-xl font-semibold">{t('Delay Leads')}</h3>
       </div>
-      
+
       <div className="flex flex-wrap gap-2 mb-4 text-sm">
         {(() => {
           // Build filter buttons from Settings stages with counts
@@ -427,7 +438,7 @@ export const DelayLeads = ({ dateFrom, dateTo, selectedEmployee }) => {
         
         <div className="hidden sm:block">
           {/* Desktop table layout */}
-          <table className="w-full min-w-max text-sm text-left">
+          <table className="delay-table w-full min-w-max text-sm text-left">
             <thead className={`text-xs uppercase sticky top-0 ${isLight ? 'bg-gray-50' : 'bg-gray-800'}`}>
               <tr>
                 <th scope="col" className="px-6 py-3">{t('Lead Name')}</th>
@@ -444,55 +455,55 @@ export const DelayLeads = ({ dateFrom, dateTo, selectedEmployee }) => {
                   key={index}
                   className={`border-b ${isLight ? 'bg-white border-gray-200' : 'bg-gray-800 border-gray-700'} hover:bg-gray-50 dark:hover:bg-gray-700`}
                 >
-                  <td className="px-6 py-4">{lead.leadName}</td>
-                  <td className={`px-6 py-4 border-l ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>{lead.mobile}</td>
-                  <td className={`px-6 py-4 border-l ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>
+                  <td className="px-6 py-4 cell-divider">{lead.leadName}</td>
+                  <td className={`px-6 py-4 border-l cell-divider ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>{lead.mobile}</td>
+                  <td className={`px-6 py-4 border-l cell-divider ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>
                     <div className="flex items-center gap-2 flex-nowrap">
                       <button
                         title={t('Preview')}
                         onClick={(e) => { e.stopPropagation(); setSelectedLead(lead); setShowLeadModal(true); }}
-                        className={`inline-flex items-center justify-center w-8 h-8 rounded-md border ${isLight ? 'border-gray-300 text-gray-700 hover:bg-gray-50' : 'border-gray-600 text-gray-200 hover:bg-gray-900/30'}`}
+                        className={`action-btn inline-flex items-center justify-center w-8 h-8 rounded-md ${isLight ? '' : 'border border-gray-600 text-gray-200 hover:bg-gray-900/30'}`}
                       >
                         <FaEye size={16} />
                       </button>
                       <button
                         title={t('Add Action')}
                         onClick={(e) => { e.stopPropagation(); setSelectedLead(lead); setShowAddActionModal(true) }}
-                        className={`inline-flex items-center justify-center w-8 h-8 rounded-md border ${isLight ? 'border-gray-300 text-gray-700 hover:bg-gray-50' : 'border-gray-600 text-gray-200 hover:bg-gray-900/30'}`}
+                        className={`action-btn inline-flex items-center justify-center w-8 h-8 rounded-md ${isLight ? '' : 'border border-gray-600 text-gray-200 hover:bg-gray-900/30'}`}
                       >
                         <FaPlus size={16} />
                       </button>
                       <button
                         title={t('Call')}
                         onClick={(e) => { e.stopPropagation(); const raw = lead.phone || lead.mobile || ''; const digits = String(raw).replace(/[^0-9]/g, ''); if (digits) window.open(`tel:${digits}`); }}
-                        className={`inline-flex items-center justify-center w-8 h-8 rounded-md border ${isLight ? 'border-gray-300 hover:bg-gray-50 text-blue-600' : 'border-gray-600 hover:bg-gray-900/30 text-blue-400'}`}
+                        className={`action-btn icon-blue inline-flex items-center justify-center w-8 h-8 rounded-md ${isLight ? '' : 'border border-gray-600 hover:bg-gray-900/30 text-blue-400'}`}
                       >
                         <FaPhone size={16} />
                       </button>
                       <button
                         title="WhatsApp"
                         onClick={(e) => { e.stopPropagation(); const raw = lead.phone || lead.mobile || ''; const digits = String(raw).replace(/[^0-9]/g, ''); if (digits) window.open(`https://wa.me/${digits}`); }}
-                        className={`inline-flex items-center justify-center w-8 h-8 rounded-md border ${isLight ? 'border-gray-300 hover:bg-gray-50 text-green-600' : 'border-gray-600 hover:bg-gray-900/30 text-green-400'}`}
+                        className={`action-btn icon-green inline-flex items-center justify-center w-8 h-8 rounded-md ${isLight ? '' : 'border border-gray-600 hover:bg-gray-900/30 text-green-400'}`}
                       >
                         <FaWhatsapp size={16} />
                       </button>
                       <button
                         title={t('Email')}
                         onClick={(e) => { e.stopPropagation(); if (lead.email) window.open(`mailto:${lead.email}`); }}
-                        className={`inline-flex items-center justify-center w-8 h-8 rounded-md border ${isLight ? 'border-gray-300 text-gray-700 hover:bg-gray-50' : 'border-gray-600 text-gray-200 hover:bg-gray-900/30'}`}
+                        className={`action-btn inline-flex items-center justify-center w-8 h-8 rounded-md ${isLight ? '' : 'border border-gray-600 text-gray-200 hover:bg-gray-900/30'}`}
                       >
                         <FaEnvelope size={16} />
                       </button>
                       <button
                         title="Google Meet"
                         onClick={(e) => { e.stopPropagation(); window.open('https://meet.google.com/', '_blank'); }}
-                        className={`inline-flex items-center justify-center w-8 h-8 rounded-md border ${isLight ? 'border-gray-300 hover:bg-gray-50' : 'border-gray-600 hover:bg-gray-900/30'}`}
+                        className={`action-btn inline-flex items-center justify-center w-8 h-8 rounded-md ${isLight ? '' : 'border border-gray-600 hover:bg-gray-900/30'}`}
                       >
                         <img src={MEET_ICON_URL} alt="Meet" className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
-                  <td className={`px-6 py-4 border-l ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>{renderStageBadge(lead.status)}</td>
+                  <td className={`px-6 py-4 border-l cell-divider ${isLight ? 'stage-cell' : ''} ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>{renderStageBadge(lead.status)}</td>
                   <td className={`px-6 py-4 border-l ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>{lead.lastComment}</td>
                   <td className={`px-6 py-4 border-l ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>{formatDateSafe(lead.actionDate)}</td>
                 </tr>

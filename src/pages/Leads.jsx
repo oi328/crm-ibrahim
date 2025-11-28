@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useTheme } from '../providers/ThemeProvider'
+import { useTheme } from '@shared/context/ThemeProvider'
 import { FaPlus, FaSearch, FaFilter, FaDownload, FaEye, FaEdit, FaTrash, FaPhone, FaEnvelope, FaWhatsapp, FaVideo, FaUserPlus } from 'react-icons/fa'
 import { api } from '../utils/api'
-import { Sidebar } from '../components/Sidebar'
-import Topbar from '../components/Topbar'
 import LeadModal from '../components/LeadModal'
-import EnhancedLeadDetailsModal from '../components/EnhancedLeadDetailsModal'
+import EnhancedLeadDetailsModal from '@shared/components/EnhancedLeadDetailsModal'
 import ImportLeadsModal from '../components/ImportLeadsModal'
 import ColumnToggle from '../components/ColumnToggle'
 import LeadHoverTooltip from '../components/LeadHoverTooltip'
@@ -20,7 +18,7 @@ export const Leads = () => {
   const { theme } = useTheme()
   const navigate = useNavigate()
   const { stages, statuses } = useStages()
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  
   const [leads, setLeads] = useState([])
   const [filteredLeads, setFilteredLeads] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -105,7 +103,7 @@ export const Leads = () => {
       const m = String(d.getMonth() + 1).padStart(2, '0')
       const day = String(d.getDate()).padStart(2, '0')
       return `${y}-${m}-${day}`
-    }
+}
 
     const newLeads = Array.from({ length: count }, (_, idx) => {
       const id = maxId + idx + 1
@@ -190,8 +188,6 @@ export const Leads = () => {
           { name: 'lost', color: '#ef4444', icon: '❌' }
         ];
         setStageDefs(defaultStages);
-        // Save default stages to localStorage
-        localStorage.setItem('crmStages', JSON.stringify(defaultStages));
       } else {
         setStageDefs(normalized);
       }
@@ -205,7 +201,6 @@ export const Leads = () => {
         { name: 'lost', color: '#ef4444', icon: '❌' }
       ];
       setStageDefs(defaultStages);
-      localStorage.setItem('crmStages', JSON.stringify(defaultStages));
     }
   }, [])
 
@@ -854,17 +849,7 @@ export const Leads = () => {
   
 
   return (
-    <div className={`app-layout ${i18n.language === 'ar' ? 'rtl' : 'ltr'}`}>
-      <Sidebar
-        isOpen={mobileSidebarOpen}
-        onClose={() => setMobileSidebarOpen(false)}
-      />
-      <div className={`content-container`}>
-        <Topbar
-          onMobileToggle={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-          mobileSidebarOpen={mobileSidebarOpen}
-        />
-      <main className="flex-1 p-6 bg-[var(--content-bg)] text-[var(--content-text)] overflow-x-auto overflow-y-auto space-y-8 md:space-y-10 lg:space-y-12">
+    <div className={`p-6 bg-[var(--content-bg)] text-[var(--content-text)] space-y-8 md:space-y-10 lg:space-y-12`}>
           {/* Page Title and Add Button */}
           <div className="flex w-full items-center justify-between gap-6 mb-4 lg:gap-0">
             <div className="flex items-center gap-3 flex-1">
@@ -1813,8 +1798,7 @@ export const Leads = () => {
               onImport={handleExcelUpload}
             />
           )}
-       </main>
-       </div>
+       
 
        {/* Floating Add New Lead Button for Mobile */}
        <button 
@@ -1894,5 +1878,7 @@ export const Leads = () => {
         />
       )}
      </div>
-   )
- }
+  )
+}
+
+export default Leads

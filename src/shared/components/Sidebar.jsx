@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react'
  import { NavLink, useLocation } from 'react-router-dom'
- import { useTheme } from '../providers/ThemeProvider'
-import { useAppState } from '../providers/AppStateProvider'
+import { useTheme } from '@shared/context/ThemeProvider'
+import { useAppState } from '@shared/context/AppStateProvider'
 import { useTranslation } from 'react-i18next';
-import logo from '../assets/be-souhola-logo.svg';
- import { useStages } from '../hooks/useStages';
+import logo from '@assets/be-souhola-logo.svg';
+ import { useStages } from '@hooks/useStages';
 
 // دالة ترجع أيقونة مناسبة لكل عنصر
 const getIcon = (key) => {
@@ -622,11 +622,11 @@ useEffect(() => { if (isDataMgmtActiveFlag) { openOnly('dataMgmt') } else { setD
   }
   const asideTone = isLight ? 'bg-gray-100 border-gray-200 text-gray-800' : 'bg-gray-900 border-gray-800 text-gray-100'
   const baseLink = isLight
-    ? 'group flex items-center gap-3 px-4 py-1.5 rounded-md text-gray-700 hover:bg-blue-50 transition overflow-hidden'
-    : 'group flex items-center gap-3 px-4 py-1.5 rounded-md text-gray-200 hover:bg-gray-800 transition overflow-hidden'
+    ? 'group flex items-center gap-3 px-4 py-2 rounded-md text-slate-900 hover:bg-blue-50 transition overflow-hidden'
+    : 'group flex items-center gap-3 px-4 py-2 rounded-md text-gray-200 hover:bg-gray-800 transition overflow-hidden'
   const iconContainer = 'flex-shrink-0 nova-icon flex items-center justify-center'
   const activeLink = isLight
-    ? `bg-blue-100 text-blue-700 ${isRTL ? 'active-link-indicator' : 'border-l-4'} border-blue-500 font-medium shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]`
+    ? `bg-indigo-100 text-indigo-800 ${isRTL ? 'active-link-indicator' : 'border-l-4'} border-indigo-400 font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]`
     : `bg-gray-800 text-blue-400 ${isRTL ? 'active-link-indicator' : 'border-l-4'} border-blue-500 font-medium`
   const iconTone = isLight ? 'text-gray-500 group-hover:text-blue-600' : 'text-gray-400 group-hover:text-blue-400'
   const backLabel = langCode.startsWith('ar') ? 'رجوع' : 'Back'
@@ -680,58 +680,36 @@ useEffect(() => { if (isDataMgmtActiveFlag) { openOnly('dataMgmt') } else { setD
         isRTL ? 'right-0 border-l-0' : 'left-0 border-r-0'
       } ${isOpen ? 'sidebar-open' : ''} ${className || ''}`}
     >
-      {/* Mobile close button (X) - Enhanced for better visibility and interaction */}
-      <button
-        type="button"
-        aria-label="إغلاق القائمة الجانبية"
-        onClick={(e) => { 
-          e.preventDefault(); 
-          e.stopPropagation(); 
-          console.log('🔴 Close button clicked - السايدبار سيتم إغلاقه الآن');
-          console.log('🔍 Current isOpen state:', isOpen);
-          console.log('🔍 onClose function exists:', !!onClose);
-          if (onClose) {
-            console.log('✅ Calling onClose function...');
-            onClose();
-            console.log('✅ onClose function called successfully');
-          } else {
-            console.error('❌ onClose function is not available!');
-          }
-        }}
-        className={`md:hidden absolute top-4 ${isRTL ? 'left-4' : 'right-4'} z-[60] p-3 rounded-full bg-red-500 hover:bg-red-600 active:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-300 shadow-xl transition-all duration-200 border-2 border-white`}
-        style={{ zIndex: 9999 }}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="3"
-          className="w-6 h-6 text-white"
-        >
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
-      </button>
-      
-
-      {/* Logo and company name */}
-        <div className="logo-brand flex items-center gap-1 mb-1 mt-0">
-        <img src={logo} alt="Be Souhola" className="w-11 h-11 flex-shrink-0" style={{ backgroundColor: 'transparent' }} />
-        <div className="flex flex-col leading-tight min-w-0">
-          <span className={`sidebar-label whitespace-nowrap hidden md:block ${isLight ? 'text-[11px] text-[#0b2b4f]' : 'text-[10px] text-white'}`}>Make everything...</span>
-          <span className="sidebar-label font-semibold text-base truncate bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent drop-shadow-sm">Be Souhola</span>
+      <div className="logo-brand flex items-center justify-between gap-1 mb-3 mt-0">
+        <div className="flex items-center gap-1">
+          <img src={logo} alt="Be Souhola" className={`w-11 h-11 flex-shrink-0 ${isLight ? 'rounded-xl bg-white drop-shadow-sm ring-1 ring-indigo-300' : 'drop-shadow-lg'}`} style={{ backgroundColor: 'transparent' }} />
+          <div className="flex flex-col leading-tight min-w-0">
+            <span className={`sidebar-label whitespace-nowrap hidden md:block ${isLight ? 'text-[11px] text-gray-800 font-semibold' : 'text-[10px] text-white'}`}>Make everything...</span>
+            <span className={`sidebar-label truncate ${isLight ? 'text-indigo-800 font-bold text-base' : 'bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent drop-shadow-sm font-semibold text-base'}`}>Be Souhola</span>
+          </div>
         </div>
+        <button
+          type="button"
+          aria-label={isRTL ? 'إغلاق' : 'Close'}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onClose && onClose(); }}
+          className={`md:hidden ${isLight ? 'bg-white/80 hover:bg-white text-slate-700 ring-1 ring-[var(--lm-border)]' : 'bg-gray-800/60 hover:bg-gray-700 text-gray-200 ring-1 ring-gray-700'} rounded-xl p-2 shadow-sm transition-colors`}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+            <path d="M6 6l12 12M6 18L18 6" />
+          </svg>
+        </button>
       </div>
       {/* Spacer below brand to push menu down */}
         <div className="sidebar-brand-spacer h-0"></div>
       
-        <nav className={`flex-1 md:pt-0 overflow-y-hidden overflow-x-hidden mt-0 pb-16 ${inventoryOpen ? 'inventory-open' : ''}`}>
+        <nav className={`flex-1 md:pt-0 overflow-y-auto overflow-x-hidden mt-0 pb-16 ${inventoryOpen ? 'inventory-open' : ''}`}>
         {/* Dashboard */}
         {!isSectionViewOpen && !isMarketingActive && !isCoreReportsActive && (
           <NavLink
             to="/dashboard"
-            className={({ isActive }) => `${baseLink} ${isActive ? activeLink : ''}`}
+            className={({ isActive }) => `${isLight 
+              ? 'group flex items-center gap-3 rounded-md text-slate-900 hover:bg-blue-50 transition overflow-hidden' 
+              : 'group flex items-center gap-3 rounded-md text-gray-200 hover:bg-gray-800 transition overflow-hidden'} px-5 py-2.5 ${isActive ? activeLink : ''}`}
           >
             <span className="nova-icon-label">
               <span className={`${iconContainer} ${iconTone}`}>
@@ -747,7 +725,7 @@ useEffect(() => { if (isDataMgmtActiveFlag) { openOnly('dataMgmt') } else { setD
         {!isMarketingActive && !isCoreReportsActive && (!isSectionViewOpen || leadMgmtOpen) && activeModules.includes('leads') && (
           <div className="w-full">
           {leadMgmtOpen && (
-            <div className={`sticky top-0 z-10 flex items-center ${isRTL ? 'justify-start' : 'justify-between'} mb-2 ${isLight ? 'bg-gray-100' : 'bg-gray-900'} px-2 py-1`}>
+            <div className={`sticky top-0 z-10 flex items-center ${isRTL ? 'justify-start' : 'justify-between'} mb-2 ${isLight ? 'bg-[var(--lm-muted-surface)] border border-[var(--lm-border)]' : 'bg-gray-900'} px-2 py-1 rounded-md`}>
               <button type="button" onClick={() => setLeadMgmtOpen(false)} className={`text-sm font-semibold ${isLight ? 'text-gray-700 hover:text-gray-900' : 'text-gray-200 hover:text-white'} flex items-center gap-2`}>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
                   <path d="M15 18l-6-6 6-6" />
@@ -807,15 +785,7 @@ useEffect(() => { if (isDataMgmtActiveFlag) { openOnly('dataMgmt') } else { setD
               </span>
             </NavLink>
 
-            <NavLink
-              to="/leads/stages-status"
-              className={({ isActive }) => `${baseLink} ${isRTL ? '!pr-0' : '!pl-0'} ${isActive ? activeLink : ''}`}
-            >
-              <span className="nova-icon-label">
-                <span className={`${iconContainer} ${iconTone}`}>🗂️</span>
-                <span className="text-[15px] link-label">{t('Stages & Status')}</span>
-              </span>
-            </NavLink>
+            
 
             {/* Stages submenu */}
             <div className={`mt-1 ${isRTL ? '!pr-0' : '!pl-0'}`}>
@@ -896,7 +866,7 @@ useEffect(() => { if (isDataMgmtActiveFlag) { openOnly('dataMgmt') } else { setD
         {!isMarketingActive && !isCoreReportsActive && (!isSectionViewOpen || inventoryOpen) && (
         <div className="w-full">
           {inventoryOpen ? (
-            <div className={`sticky top-0 z-10 flex items-center justify-between mb-2 ${isLight ? 'bg-gray-100' : 'bg-gray-900'} px-2 py-1`}>
+            <div className={`sticky top-0 z-10 flex items-center justify-between mb-2 ${isLight ? 'bg-[var(--lm-muted-surface)] border border-[var(--lm-border)]' : 'bg-gray-900'} px-2 py-1 rounded-md`}>
               <span className="text-sm font-bold link-label">{t('Inventory')}</span>
               <button
                 type="button"
@@ -967,7 +937,7 @@ useEffect(() => { if (isDataMgmtActiveFlag) { openOnly('dataMgmt') } else { setD
         {!isCoreReportsActive && (!isSectionViewOpen || marketingOpen) && activeModules.includes('campaigns') && (
         <div className="w-full">
           {(isMarketingActive || marketingOpen) && (
-            <div className={`sticky top-0 z-10 flex items-center justify-between mb-2 ${isLight ? 'bg-gray-100' : 'bg-gray-900'} px-2 py-1`}>
+            <div className={`sticky top-0 z-10 flex items-center justify-between mb-2 ${isLight ? 'bg-[var(--lm-muted-surface)] border border-[var(--lm-border)]' : 'bg-gray-900'} px-2 py-1 rounded-md`}>
               <span className="text-sm font-bold link-label">{t('Marketing Modules')}</span>
               <button
                 type="button"
@@ -1184,7 +1154,7 @@ useEffect(() => { if (isDataMgmtActiveFlag) { openOnly('dataMgmt') } else { setD
         {!isMarketingActive && (!isSectionViewOpen || reportsOpen) && (
           <div className="w-full">
             {reportsOpen && (
-              <div className={`sticky top-0 z-10 flex items-center justify-between mb-2 ${isLight ? 'bg-gray-100' : 'bg-gray-900'} px-2 py-1`}>
+              <div className={`sticky top-0 z-10 flex items-center justify-between mb-2 ${isLight ? 'bg-[var(--lm-muted-surface)] border border-[var(--lm-border)]' : 'bg-gray-900'} px-2 py-1 rounded-md`}>
                 <span className="text-sm font-bold link-label">{t('Reports')}</span>
                 <button
                   type="button"
@@ -1306,7 +1276,7 @@ useEffect(() => { if (isDataMgmtActiveFlag) { openOnly('dataMgmt') } else { setD
         {!isMarketingActive && !isCoreReportsActive && (!isSectionViewOpen || usersOpen) && (
           <div className="w-full">
             {usersOpen ? (
-              <div className={`sticky top-0 z-10 flex items-center justify-between mb-2 ${isLight ? 'bg-gray-100' : 'bg-gray-900'} px-2 py-1`}>
+              <div className={`sticky top-0 z-10 flex items-center justify-between mb-2 ${isLight ? 'bg-[var(--lm-muted-surface)] border border-[var(--lm-border)]' : 'bg-gray-900'} px-2 py-1 rounded-md`}>
                 <span className="text-sm font-bold link-label">{t('User Management')}</span>
                 <button
                   type="button"
@@ -1433,7 +1403,7 @@ useEffect(() => { if (isDataMgmtActiveFlag) { openOnly('dataMgmt') } else { setD
                   setCustomersOpen(false)
                   setReportsOpen(false)
                 }}
-                className={({ isActive }) => `${baseLink} w-full justify-between ${isSettingsActive ? 'active-parent' : ''} bg-indigo-50 dark:bg-indigo-900/40 border border-indigo-200 dark:border-indigo-800`}
+                className={({ isActive }) => `${baseLink} w-full justify-between ${isSettingsActive ? 'active-parent' : ''} ${isLight ? 'bg-indigo-100 border border-indigo-300 text-indigo-800 font-semibold' : 'dark:bg-indigo-900/40 border dark:border-indigo-800'}`}
               >
                 <span className="nova-icon-label">
                   <span className={`${iconContainer} ${iconTone}`}>{getIcon('Settings')}</span>
@@ -1759,7 +1729,7 @@ useEffect(() => { if (isDataMgmtActiveFlag) { openOnly('dataMgmt') } else { setD
         <div className={`border-t ${isLight ? 'border-gray-200' : 'border-gray-800'} mb-3`}></div>
         <NavLink
           to="/contact"
-          className={({ isActive }) => `${baseLink} ${isActive ? activeLink : ''} bg-emerald-50 dark:bg-emerald-900/40 border border-emerald-200 dark:border-emerald-800`}
+          className={({ isActive }) => `${baseLink} ${isActive ? activeLink : ''}`}
         >
           <span className="nova-icon-label"><span className={`${iconContainer} ${iconTone}`}>{getIcon('Contact us')}</span><span className="link-label">{t('Contact us')}</span></span>
         </NavLink>

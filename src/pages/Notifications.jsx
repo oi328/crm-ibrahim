@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import { useTranslation } from 'react-i18next'
-import NotificationItem from '../components/NotificationItem'
+import NotificationItem from '@shared/components/NotificationItem'
+import SearchableSelect from '@shared/components/SearchableSelect'
 
 function seedNotifications() {
   const now = Date.now()
@@ -106,18 +107,18 @@ export function NotificationsContent({ embedded = false }) {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="page-title text-xl font-semibold">{t('Notifications')}</h1>
+            <h1 className="page-title text-xl font-semibold">{t('Notifications', 'Notifications')}</h1>
             <span className="inline-flex items-center px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-              {unreadCount} {t('Unread') || 'Unread'}
+              {unreadCount} {t('Unread', 'Unread')}
             </span>
           </div>
           {!embedded && (
           <div className="flex items-center gap-2">
             <button type="button" onClick={markAllRead} className="btn btn-sm">
-              {t('Mark all as read') || 'Mark all as read'}
+              {t('Mark all as read', 'Mark all as read')}
             </button>
             <button type="button" onClick={clearRead} className="btn btn-sm btn-outline">
-              {t('Clear read') || 'Clear read'}
+              {t('Clear read', 'Clear read')}
             </button>
           </div>
           )}
@@ -130,46 +131,45 @@ export function NotificationsContent({ embedded = false }) {
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => setTab('all')}
-              className={`px-3 py-1.5 text-sm rounded-md border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 active:scale-[0.98] ${tab==='all' ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-transparent border-gray-300 dark:border-gray-700 text-[var(--content-text)] hover:bg-blue-50 dark:hover:bg-blue-900/10 hover:shadow'}`}
+              className={`px-3 py-1.5 text-sm rounded-md border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 active:scale-[0.98] ${tab==='all' ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-gray-50 dark:bg-transparent border-gray-300 dark:border-gray-700 text-gray-800 dark:text-[var(--content-text)] hover:bg-blue-50 dark:hover:bg-blue-900/10 hover:shadow'}`}
             >
               {t('All')}
             </button>
             <button
               onClick={() => setTab('unread')}
-              className={`px-3 py-1.5 text-sm rounded-md border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 active:scale-[0.98] ${tab==='unread' ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-transparent border-gray-300 dark:border-gray-700 text-[var(--content-text)] hover:bg-blue-50 dark:hover:bg-blue-900/10 hover:shadow'}`}
+              className={`px-3 py-1.5 text-sm rounded-md border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 active:scale-[0.98] ${tab==='unread' ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-gray-50 dark:bg-transparent border-gray-300 dark:border-gray-700 text-gray-800 dark:text-[var(--content-text)] hover:bg-blue-50 dark:hover:bg-blue-900/10 hover:shadow'}`}
             >
-              {t('Unread') || 'Unread'}
+              {t('Unread', 'Unread')}
             </button>
             <button
               onClick={() => setTab('archived')}
-              className={`px-3 py-1.5 text-sm rounded-md border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 active:scale-[0.98] ${tab==='archived' ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-transparent border-gray-300 dark:border-gray-700 text-[var(--content-text)] hover:bg-blue-50 dark:hover:bg-blue-900/10 hover:shadow'}`}
+              className={`px-3 py-1.5 text-sm rounded-md border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 active:scale-[0.98] ${tab==='archived' ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-gray-50 dark:bg-transparent border-gray-300 dark:border-gray-700 text-gray-800 dark:text-[var(--content-text)] hover:bg-blue-50 dark:hover:bg-blue-900/10 hover:shadow'}`}
             >
-              {t('Archived') || 'Archived'}
+              {t('Archived', 'Archived')}
             </button>
           </div>
 
-          {/* Search (reduced width) */}
-          <div className="w-full max-w-xs sm:max-w-sm">
-            <div className="relative">
+          {/* Search + Filter side-by-side */}
+          <div className="flex items-center gap-2 w-full">
+            <div className="relative flex-1">
               <input
                 value={q}
                 onChange={e=>setQ(e.target.value)}
                 placeholder={t('Search')}
-                className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-[var(--content-bg)] text-[var(--content-text)] px-3 py-2 pl-8 pr-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border px-3 py-2.5 pl-8 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800 border-gray-300 placeholder:text-gray-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
               />
-              <span className="absolute left-2 top-1/2 -translate-y-1/2 opacity-60">
+              <span className="absolute left-2 top-1/2 -translate-y-1/2 opacity-70 text-gray-600 dark:text-gray-300">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-4 h-4"><circle cx="11" cy="11" r="6" /><path d="M21 21l-4.5-4.5" /></svg>
               </span>
             </div>
-          </div>
-
-          {/* Type selector */}
-          <div>
-            <select value={type} onChange={e=>setType(e.target.value)} className="rounded-md border border-gray-300 dark:border-gray-700 bg-[var(--content-bg)] text-[var(--content-text)] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-              {TYPES.map(opt => (
-                <option key={opt.value} value={opt.value}>{t(opt.label) || opt.label}</option>
-              ))}
-            </select>
+            <div className="w-40">
+              <SearchableSelect
+                options={TYPES}
+                value={type}
+                onChange={setType}
+                placeholder={t('All')}
+              />
+            </div>
           </div>
         </div>
 
@@ -177,7 +177,7 @@ export function NotificationsContent({ embedded = false }) {
         <div className="space-y-2">
           {visible.length === 0 ? (
             <div className="text-center py-16 border border-dashed rounded-md text-sm opacity-75">
-              {t('No notifications') || 'No notifications'}
+              {t('No notifications', 'No notifications')}
             </div>
           ) : (
             visible.map(n => (

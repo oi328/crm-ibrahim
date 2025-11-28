@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LuEye } from 'react-icons/lu'
-import { PieChart } from '../PieChart'
+import { PieChart } from '@shared/components/PieChart'
 
 const normalize = (s) => String(s || '').trim().toLowerCase()
 

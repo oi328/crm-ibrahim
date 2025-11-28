@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import { api } from '../utils/api'
-import { PieChart } from '../components/PieChart'
+import { PieChart } from '@shared/components/PieChart'
 
 export default function SupportReports() {
   const { t } = useTranslation()
@@ -295,4 +295,4 @@ export default function SupportReports() {
     </Layout>
   )
 }
-import SearchableSelect from '../components/SearchableSelect'
+import SearchableSelect from '@shared/components/SearchableSelect'

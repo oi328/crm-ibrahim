@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import { useTranslation } from 'react-i18next'
 import i18n from '../i18n'
 import * as XLSX from 'xlsx'
 import { Bar, Line } from 'react-chartjs-2'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, PointElement, LineElement, Tooltip, Legend } from 'chart.js'
-import { PieChart } from '../components/PieChart'
+import { PieChart } from '@shared/components/PieChart'
 import { RiUploadLine, RiRefreshLine } from 'react-icons/ri'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Tooltip, Legend)
@@ -189,10 +189,10 @@ const ImportsReport = () => {
       </div>
       {/* Top actions under header (right aligned) */}
       <div className="flex justify-end gap-2 mb-4">
-        <button onClick={exportPdf} className="btn btn-primary">{t('Download PDF')}</button>
-        <button onClick={exportExcel} className="btn btn-secondary">{t('Download Excel')}</button>
+        <button onClick={exportPdf} className="btn btn-primary">{t('Download PDF', 'Download PDF')}</button>
+        <button onClick={exportExcel} className="btn btn-secondary">{t('Download Excel', 'Download Excel')}</button>
         <button onClick={() => setShowImport(true)} className="btn btn-accent inline-flex items-center gap-2">
-          <RiUploadLine /> {t('Import')}
+          <RiUploadLine /> {t('Import', 'Import')}
         </button>
       </div>
 
@@ -201,23 +201,23 @@ const ImportsReport = () => {
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex flex-col">
-              <label className="text-sm text-[var(--muted-text)]">{t('Manager')}</label>
+              <label className="text-sm text-[var(--muted-text)]">{t('Manager', 'Manager')}</label>
               <select value={managerFilter} onChange={e => setManagerFilter(e.target.value)} className="input min-w-[160px]">
-                <option value="all">{t('All')}</option>
+                <option value="all">{t('All', 'All')}</option>
                 {managers.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
             </div>
             <div className="flex flex-col">
-              <label className="text-sm text-[var(--muted-text)]">{t('Employee')}</label>
+              <label className="text-sm text-[var(--muted-text)]">{t('Employee', 'Employee')}</label>
               <select value={employeeFilter} onChange={e => setEmployeeFilter(e.target.value)} className="input min-w-[160px]">
-                <option value="all">{t('All')}</option>
+                <option value="all">{t('All', 'All')}</option>
                 {employees.map(e => <option key={e} value={e}>{e}</option>)}
               </select>
             </div>
             <div className="flex flex-col">
-              <label className="text-sm text-[var(--muted-text)]">{t('Department')}</label>
+              <label className="text-sm text-[var(--muted-text)]">{t('Department', 'Department')}</label>
               <select value={departmentFilter} onChange={e => setDepartmentFilter(e.target.value)} className="input min-w-[140px]">
-                <option value="all">{t('All')}</option>
+                <option value="all">{t('All', 'All')}</option>
                 {departments.map(d => <option key={d} value={d}>{d}</option>)}
               </select>
             </div>
@@ -435,7 +435,7 @@ const ImportsReport = () => {
               </div>
               <div className="sm:col-span-2">
                 <label className="text-sm text-[var(--muted-text)]">{t('Notes / Errors')}</label>
-                <textarea value={importNotes} onChange={e => setImportNotes(e.target.value)} className="input" rows={3} placeholder={t('Optional') || 'Optional'} />
+                <textarea value={importNotes} onChange={e => setImportNotes(e.target.value)} className="input" rows={3} placeholder={t('Optional', 'Optional')} />
               </div>
             </div>
             <div className="mt-3 flex items-center justify-end gap-2">

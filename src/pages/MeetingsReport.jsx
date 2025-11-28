@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import { useTranslation } from 'react-i18next'
 import { ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts'
-import { PieChart as Donut } from '../components/PieChart'
+import { PieChart as Donut } from '@shared/components/PieChart'
 import * as XLSX from 'xlsx'
 import { RiFilterLine, RiBarChart2Line, RiCalendarCheckLine } from 'react-icons/ri'
 

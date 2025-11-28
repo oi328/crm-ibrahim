@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import BillingSettings from '../components/settings/BillingSettings'
 
 export default function SettingsBilling() {

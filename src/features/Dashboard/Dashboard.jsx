@@ -1,18 +1,16 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { Sidebar } from '../components/Sidebar'
-import Topbar from '../components/Topbar'
-import { PieChart } from '../components/PieChart';
-import ActiveUsersChart from '../components/ActiveUsersChart'
-import ActiveCampaignsCard from '../components/ActiveCampaignsCard'
-import { PipelineAnalysis } from '../components/PipelineAnalysis';
-import { Comments } from '../components/Comments'
-import RecentPhoneCalls from '../components/RecentPhoneCalls';
+import { PieChart } from '@shared/components/PieChart';
+import ActiveUsersChart from '@features/Dashboard/components/ActiveUsersChart'
+import ActiveCampaignsCard from '@features/Dashboard/components/ActiveCampaignsCard'
+import { PipelineAnalysis } from '@features/Dashboard/components/PipelineAnalysis';
+import { Comments } from '@features/Dashboard/components/Comments'
+import RecentPhoneCalls from '@features/Dashboard/components/RecentPhoneCalls';
 import { useTranslation } from 'react-i18next';
-import { DelayLeads } from '../components/DelayLeads';
-import { LeadsAnalysisChart } from '../components/LeadsAnalysisChart';
-import { LeadsStatsCard } from '../components/LeadsStatsCard';
-import { useTheme } from '../providers/ThemeProvider';
-import SearchableSelect from '../components/SearchableSelect'
+import { DelayLeads } from '@features/Dashboard/components/DelayLeads';
+import { LeadsAnalysisChart } from '@features/Dashboard/components/LeadsAnalysisChart';
+import { LeadsStatsCard } from '@features/Dashboard/components/LeadsStatsCard';
+import { useTheme } from '@shared/context/ThemeProvider';
+import SearchableSelect from '@shared/components/SearchableSelect'
 import { 
   RiBarChart2Line, 
   RiLineChartLine, 
@@ -25,11 +23,11 @@ import {
 export const Dashboard = () => {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
+  const isLight = theme === 'light';
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [selectedManager, setSelectedManager] = useState('')
   const [selectedEmployee, setSelectedEmployee] = useState('')
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [isMobileQuick, setIsMobileQuick] = useState(false);
   const [showAllQuick, setShowAllQuick] = useState(false);
   const [isDesktopQuick, setIsDesktopQuick] = useState(false);
@@ -195,70 +193,115 @@ export const Dashboard = () => {
   const COLOR_STYLES = {
     blue: {
       container: 'border-blue-400 dark:border-blue-500 bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 dark:from-blue-800 dark:via-blue-700 dark:to-blue-600 shadow-blue-300/50 dark:shadow-blue-500/25',
+      containerLight: 'border-blue-400 bg-gradient-to-br from-blue-100/60 via-blue-100/40 to-blue-100/30 backdrop-blur-sm shadow-blue-300/30',
+      containerDark: 'border-blue-500 bg-gradient-to-br from-blue-800 via-blue-700 to-blue-600 shadow-blue-500/25',
       patternFrom: 'from-blue-200',
       patternTo: 'to-blue-300',
+      patternFromLight: 'from-blue-200/40',
+      patternToLight: 'to-blue-300/30',
       iconBg: 'bg-blue-600 dark:bg-blue-500',
+      iconBgLight: 'bg-blue-600/80',
+      iconBgDark: 'bg-blue-500',
     },
     green: {
       container: 'border-green-400 dark:border-green-500 bg-gradient-to-br from-green-100 via-green-200 to-green-300 dark:from-green-800 dark:via-green-700 dark:to-green-600 shadow-green-300/50 dark:shadow-green-500/25',
+      containerLight: 'border-green-400 bg-gradient-to-br from-green-100/60 via-green-100/40 to-green-100/30 backdrop-blur-sm shadow-green-300/30',
+      containerDark: 'border-green-500 bg-gradient-to-br from-green-800 via-green-700 to-green-600 shadow-green-500/25',
       patternFrom: 'from-green-200',
       patternTo: 'to-green-300',
+      patternFromLight: 'from-green-200/40',
+      patternToLight: 'to-green-300/30',
       iconBg: 'bg-green-600 dark:bg-green-500',
+      iconBgLight: 'bg-green-600/80',
+      iconBgDark: 'bg-green-500',
+      badgeLightBg: 'bg-green-100/60',
+      badgeLightText: 'text-green-700',
+      badgeLightBorder: 'border-green-300',
     },
     yellow: {
       container: 'border-yellow-400 dark:border-yellow-500 bg-gradient-to-br from-yellow-100 via-yellow-200 to-yellow-300 dark:from-yellow-800 dark:via-yellow-700 dark:to-yellow-600 shadow-yellow-300/50 dark:shadow-yellow-500/25',
+      containerLight: 'border-yellow-400 bg-gradient-to-br from-yellow-100/60 via-yellow-100/40 to-yellow-100/30 backdrop-blur-sm shadow-yellow-300/30',
+      containerDark: 'border-yellow-500 bg-gradient-to-br from-yellow-800 via-yellow-700 to-yellow-600 shadow-yellow-500/25',
       patternFrom: 'from-yellow-200',
       patternTo: 'to-yellow-300',
+      patternFromLight: 'from-yellow-200/40',
+      patternToLight: 'to-yellow-300/30',
       iconBg: 'bg-yellow-600 dark:bg-yellow-500',
+      iconBgLight: 'bg-yellow-600/80',
+      iconBgDark: 'bg-yellow-500',
+      badgeLightBg: 'bg-yellow-100/60',
+      badgeLightText: 'text-yellow-700',
+      badgeLightBorder: 'border-yellow-300',
     },
     red: {
       container: 'border-red-400 dark:border-red-500 bg-gradient-to-br from-red-100 via-red-200 to-red-300 dark:from-red-800 dark:via-red-700 dark:to-red-600 shadow-red-300/50 dark:shadow-red-500/25',
+      containerLight: 'border-red-400 bg-gradient-to-br from-red-100/60 via-red-100/40 to-red-100/30 backdrop-blur-sm shadow-red-300/30',
+      containerDark: 'border-red-500 bg-gradient-to-br from-red-800 via-red-700 to-red-600 shadow-red-500/25',
       patternFrom: 'from-red-200',
       patternTo: 'to-red-300',
+      patternFromLight: 'from-red-200/40',
+      patternToLight: 'to-red-300/30',
       iconBg: 'bg-red-600 dark:bg-red-500',
+      iconBgLight: 'bg-red-600/80',
+      iconBgDark: 'bg-red-500',
+      badgeLightBg: 'bg-red-100/60',
+      badgeLightText: 'text-red-700',
+      badgeLightBorder: 'border-red-300',
     },
     purple: {
       container: 'border-purple-400 dark:border-purple-500 bg-gradient-to-br from-purple-100 via-purple-200 to-purple-300 dark:from-purple-800 dark:via-purple-700 dark:to-purple-600 shadow-purple-300/50 dark:shadow-purple-500/25',
+      containerLight: 'border-purple-400 bg-gradient-to-br from-purple-100/60 via-purple-100/40 to-purple-100/30 backdrop-blur-sm shadow-purple-300/30',
+      containerDark: 'border-purple-500 bg-gradient-to-br from-purple-800 via-purple-700 to-purple-600 shadow-purple-500/25',
       patternFrom: 'from-purple-200',
       patternTo: 'to-purple-300',
+      patternFromLight: 'from-purple-200/40',
+      patternToLight: 'to-purple-300/30',
       iconBg: 'bg-purple-600 dark:bg-purple-500',
+      iconBgLight: 'bg-purple-600/80',
+      iconBgDark: 'bg-purple-500',
+      badgeLightBg: 'bg-purple-100/60',
+      badgeLightText: 'text-purple-700',
+      badgeLightBorder: 'border-purple-300',
     },
   };
 
   // Load all leads for counting by stage (shared storage with Leads page)
   const allLeads = useMemo(() => {
-    try {
-      const saved = localStorage.getItem('leadsData');
-      if (!saved) return [];
-      const parsed = JSON.parse(saved);
-      const arr = Array.isArray(parsed) ? parsed : [];
-      const sel = (selectedEmployee || selectedManager || '').trim()
-      const inRange = (lead) => {
-        if (!dateFrom && !dateTo) return true
-        const baseStr = lead?.lastContact || lead?.createdAt
-        const d = new Date(baseStr)
-        if (isNaN(d)) return true
-        const day = new Date(d.getFullYear(), d.getMonth(), d.getDate())
-        if (dateFrom) {
-          const from = new Date(dateFrom)
-          from.setHours(0,0,0,0)
-          if (day < from) return false
-        }
-        if (dateTo) {
-          const to = new Date(dateTo)
-          to.setHours(0,0,0,0)
-          if (day > to) return false
-        }
-        return true
+    const parse = (key) => {
+      try {
+        const s = localStorage.getItem(key)
+        return s ? JSON.parse(s) : []
+      } catch {
+        return []
       }
-      return arr.filter(l => {
-        const matchesEmp = !sel || ((l.assignedTo || l.employee || '').trim() === sel)
-        return matchesEmp && inRange(l)
-      })
-    } catch (e) {
-      console.warn('Failed to parse leadsData from localStorage in Dashboard.', e?.message);
-      return [];
     }
+    const merged = [...parse('leadsData'), ...parse('leads')]
+    const byId = new Map()
+    merged.forEach((l) => { byId.set(l?.id ?? Math.random(), l) })
+    const arr = Array.from(byId.values())
+    const sel = (selectedEmployee || selectedManager || '').trim()
+    const inRange = (lead) => {
+      if (!dateFrom && !dateTo) return true
+      const baseStr = lead?.lastContact || lead?.createdAt
+      const d = new Date(baseStr)
+      if (isNaN(d)) return true
+      const day = new Date(d.getFullYear(), d.getMonth(), d.getDate())
+      if (dateFrom) {
+        const from = new Date(dateFrom)
+        from.setHours(0,0,0,0)
+        if (day < from) return false
+      }
+      if (dateTo) {
+        const to = new Date(dateTo)
+        to.setHours(0,0,0,0)
+        if (day > to) return false
+      }
+      return true
+    }
+    return arr.filter(l => {
+      const matchesEmp = !sel || ((l.assignedTo || l.employee || '').trim() === sel)
+      return matchesEmp && inRange(l)
+    })
   }, [refreshTrigger, selectedEmployee, selectedManager, dateFrom, dateTo]);
 
   // Listen for localStorage changes to refresh data
@@ -367,20 +410,27 @@ export const Dashboard = () => {
   ];
 
   return (
-     <div className={`app-layout ${i18n.language === 'ar' ? 'rtl' : 'ltr'}`}>
-       <Sidebar
-         isOpen={mobileSidebarOpen}
-         onClose={() => setMobileSidebarOpen(false)}
-       />
-       <div className={`content-container`}>
-         <Topbar
-           onMobileToggle={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-           mobileSidebarOpen={mobileSidebarOpen}
-         />
-      <main className="flex-1 p-4 bg-[var(--content-bg)] text-[var(--content-text)] overflow-x-auto overflow-y-auto sidebar-scrollbar">
-          <h1 className="page-title text-2xl font-bold text-primary mb-8">{t('Dashboard')}</h1>
+    <>
+      
+      
+          <div className="mt-4 mb-6">
+            <div className={`relative inline-flex items-center ${i18n.language === 'ar' ? 'flex-row-reverse' : ''} gap-2`}>
+              <span aria-hidden className="inline-block w-1.5 h-6 rounded bg-blue-500"></span>
+              <h1 className="page-title text-2xl font-bold text-primary">{t('Dashboard')}</h1>
+              <span
+                aria-hidden
+                className="absolute block h-[2px] rounded bg-gradient-to-r from-blue-500 via-purple-500 to-transparent"
+                style={{
+                  width: 'calc(100% + 8px)',
+                  left: i18n.language === 'ar' ? 'auto' : '-4px',
+                  right: i18n.language === 'ar' ? '-4px' : 'auto',
+                  bottom: '-6px'
+                }}
+              ></span>
+            </div>
+          </div>
           <section 
-            className="p-4 rounded-xl shadow-lg glass-panel w-full mb-8"
+            className="p-4 rounded-xl shadow-lg glass-panel filter-card w-full mb-8"
           >
             {/* Filter Header */}
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200 dark:border-gray-600">
@@ -390,12 +440,12 @@ export const Dashboard = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.707A1 1 0 013 7V4z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                <h3 className={`text-lg font-bold ${isLight ? 'text-black' : 'text-white'}`}>
                   {t('Filter Options')}
                 </h3>
               </div>
               {/* Reset Button - Moved to top right */}
-              <button onClick={() => { setSelectedManager(''); setSelectedEmployee(''); setDateFrom(''); setDateTo(''); }} className="flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+              <button onClick={() => { setSelectedManager(''); setSelectedEmployee(''); setDateFrom(''); setDateTo(''); }} className="btn-reset flex items-center gap-2 font-medium transform hover:scale-105 transition-all duration-200 focus:outline-none">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
@@ -407,7 +457,7 @@ export const Dashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Manager Filter */}
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white">
+                <label className={`flex items-center gap-2 text-sm font-medium ${isLight ? 'text-gray-900' : 'text-white'}`}>
                   <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
@@ -417,7 +467,7 @@ export const Dashboard = () => {
                   value={selectedManager}
                   onChange={setSelectedManager}
                   placeholder={t('Select Manager')}
-                  className="w-full"
+                  className="w-full lm-input"
                 >
                   <option value="Manager 1">Manager 1</option>
                   <option value="Manager 2">Manager 2</option>
@@ -427,8 +477,8 @@ export const Dashboard = () => {
 
               {/* Employees Filter */}
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white">
-                  <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <label className={`flex items-center gap-2 text-sm font-medium ${isLight ? 'text-gray-900' : 'text-white'}`}>
+                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                   {t('Employees')}
@@ -437,7 +487,7 @@ export const Dashboard = () => {
                   value={selectedEmployee}
                   onChange={setSelectedEmployee}
                   placeholder={t('Select Employee')}
-                  className="w-full"
+                  className="w-full lm-input"
                 >
                   <option value="Employee 1">Employee 1</option>
                   <option value="Employee 2">Employee 2</option>
@@ -447,8 +497,8 @@ export const Dashboard = () => {
 
               {/* Date From */}
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white">
-                  <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <label className={`flex items-center gap-2 text-sm font-medium ${isLight ? 'text-gray-900' : 'text-white'}`}>
+                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                   {t('From Date')}
@@ -461,14 +511,14 @@ export const Dashboard = () => {
                   lang={i18n.language === 'ar' ? 'ar-EG' : 'en-US'}
                   dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
                   placeholder={t('Date Input Placeholder')}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-500 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-medium focus:border-blue-500 focus:ring-1 focus:ring-blue-200 dark:focus:ring-blue-400 transition-all duration-200 hover:border-blue-400"
+                  className="lm-input w-full"
                 />
               </div>
 
               {/* Date To */}
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white">
-                  <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <label className={`flex items-center gap-2 text-sm font-medium ${isLight ? 'text-gray-900' : 'text-white'}`}>
+                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                   {t('To Date')}
@@ -481,7 +531,7 @@ export const Dashboard = () => {
                   lang={i18n.language === 'ar' ? 'ar-EG' : 'en-US'}
                   dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
                   placeholder={t('Date Input Placeholder')}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-500 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-medium focus:border-blue-500 focus:ring-1 focus:ring-blue-200 dark:focus:ring-blue-400 transition-all duration-200 hover:border-blue-400"
+                  className="lm-input w-full"
                 />
               </div>
             </div>
@@ -491,7 +541,7 @@ export const Dashboard = () => {
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-3">
               <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full"></div>
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">{t('Quick Numbers')}</h2>
+              <h2 className={`text-2xl font-bold ${isLight ? 'text-gray-900' : 'bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent'}`}>{t('Quick Numbers')}</h2>
             </div>
             {stageDefs.length > maxInitialStages ? (
               <button 
@@ -510,88 +560,117 @@ export const Dashboard = () => {
               </button>
             ) : null}
           </div>
-          <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16`}>
+          <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-16`}>
             {(() => {
-              let displayedStages = stageDefs;
-              const showAll = isDesktopQuick ? showAllDesktopQuick : showAllQuick;
-              if (!showAll) {
-                displayedStages = stageDefs.slice(0, maxInitialStages);
-              }
+              const newCount = allLeads.filter(l => (l.stage === 'new' || l.status === 'new')).length;
+              const duplicateCount = allLeads.filter(l => (l.isDuplicate || (l.duplicateStatus === 'duplicate'))).length;
+              const pendingCount = allLeads.filter(l => (l.stage === 'in-progress' || l.status === 'in-progress' || l.status === 'pending')).length;
+              const followUpCount = allLeads.filter(l => ((l.callType === 'follow-up') || (l.stage === 'follow-up') || (l.status === 'follow-up'))).length;
 
-              const allLeadsCard = (
+              const totalCard = (
                 <div
-                  key={'__all_leads__'}
-                  className={`relative overflow-hidden rounded-2xl border-2 border-blue-400 dark:border-blue-500 bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 dark:from-blue-800 dark:via-blue-700 dark:to-blue-600 p-4 shadow-blue-300/50 dark:shadow-blue-500/25 shadow-2xl hover:shadow-3xl transform hover:scale-[1.02] hover:-translate-y-1 transition-all duration-500 group`}
+                  key={'__fixed_total__'}
+                  className={`relative overflow-hidden rounded-2xl p-4 group ${
+                    isLight
+                      ? 'border-2 border-blue-400 bg-gradient-to-br from-blue-100/60 via-blue-100/40 to-blue-100/30 backdrop-blur-sm shadow-blue-300/30'
+                      : 'border-2 border-blue-500 bg-gradient-to-br from-blue-800 via-blue-700 to-blue-600 shadow-blue-500/25'
+                  } shadow-2xl hover:shadow-3xl transform hover:scale-[1.02] hover:-translate-y-1 transition-all duration-500`}
                 >
                   <div className="absolute inset-0 opacity-15">
-                    <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-200 to-blue-300 rounded-full transform translate-x-16 -translate-y-16 group-hover:scale-125 transition-transform duration-700`}></div>
-                    <div className={`absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-200 to-blue-300 rounded-full transform -translate-x-12 translate-y-12 group-hover:scale-110 transition-transform duration-500`}></div>
+                    <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${isLight ? 'from-blue-200/40 to-blue-300/30' : 'from-blue-200 to-blue-300'} rounded-full transform translate-x-16 -translate-y-16 group-hover:scale-125 transition-transform duration-700`}></div>
+                    <div className={`absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr ${isLight ? 'from-blue-200/40 to-blue-300/30' : 'from-blue-200 to-blue-300'} rounded-full transform -translate-x-12 translate-y-12 group-hover:scale-110 transition-transform duration-500`}></div>
                   </div>
                   <div className="relative z-20">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 pr-2">
-                        <span className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 block">{t('Total Leads')}</span>
-                        <div className="text-3xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">{allLeads.length}</div>
+                        <span className={`text-sm font-bold uppercase tracking-wider mb-2 block ${isLight ? 'text-gray-900' : 'text-gray-300'}`}>{t('Total Leads')}</span>
+                        <div className={`text-3xl font-black mb-2 tracking-tight ${isLight ? 'text-black' : 'text-white'}`}>{allLeads.length}</div>
                       </div>
-                      <div className={`flex items-center justify-center w-12 h-12 bg-blue-600 dark:bg-blue-500 rounded-2xl shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 border-2 border-white/30`}>
+                      <div className={`flex items-center justify-center w-12 h-12 ${isLight ? 'bg-blue-600/80' : 'bg-blue-500'} rounded-2xl shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 border-2 border-white/30`}>
                         <span className="text-4xl text-white">👥</span>
                       </div>
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400 font-semibold bg-gray-100/80 dark:bg-gray-700/80 px-3 py-2 rounded-xl backdrop-blur-sm border border-gray-200 dark:border-gray-600">{t('+100% of all system leads')}</div>
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
                 </div>
               );
 
-              const stageCards = displayedStages.map((stage, idx) => {
-                const isHex = isHexColor(stage.color);
-                const style = isHex ? null : (COLOR_STYLES[stage.color] || COLOR_STYLES.blue);
-                const containerStyle = isHex ? { borderColor: stage.color, background: `linear-gradient(to bottom right, ${withAlpha(stage.color, 0.16)}, ${withAlpha(stage.color, 0.32)})` } : undefined;
-                const patternStyle = isHex ? { background: `linear-gradient(to bottom right, ${withAlpha(stage.color, 0.22)}, ${withAlpha(stage.color, 0.36)})` } : undefined;
-                const iconStyle = isHex ? { backgroundColor: stage.color } : undefined;
-                const iconClass = isHex ? '' : style.iconBg;
-                const count = allLeads.filter(l => (l.stage || l.status || '').toLowerCase() === (stage.name || '').toLowerCase()).length;
-                const percent = allLeads.length > 0 ? Math.round((count / allLeads.length) * 100) : 0;
-
+              const fixedCards = [
+                {
+                  key: '__fixed_new__',
+                  title: t('New'),
+                  count: newCount,
+                  percent: allLeads.length > 0 ? Math.round((newCount / allLeads.length) * 100) : 0,
+                  icon: '✨',
+                  color: 'green',
+                  borderClass: 'border-green-400 dark:border-green-500',
+                },
+                {
+                  key: '__fixed_duplicate__',
+                  title: t('Duplicate'),
+                  count: duplicateCount,
+                  percent: allLeads.length > 0 ? Math.round((duplicateCount / allLeads.length) * 100) : 0,
+                  icon: '🔄',
+                  color: 'red',
+                  borderClass: 'border-red-400 dark:border-red-500',
+                },
+                {
+                  key: '__fixed_pending__',
+                  title: t('Pending'),
+                  count: pendingCount,
+                  percent: allLeads.length > 0 ? Math.round((pendingCount / allLeads.length) * 100) : 0,
+                  icon: '⏳',
+                  color: 'yellow',
+                  borderClass: 'border-yellow-400 dark:border-yellow-500',
+                },
+                {
+                  key: '__fixed_followup__',
+                  title: t('Follow-up'),
+                  count: followUpCount,
+                  percent: allLeads.length > 0 ? Math.round((followUpCount / allLeads.length) * 100) : 0,
+                  icon: '📞',
+                  color: 'purple',
+                  borderClass: 'border-purple-400 dark:border-purple-500',
+                },
+              ].map(({ key, title, count, percent, icon, color, borderClass }) => {
+                const style = COLOR_STYLES[color];
                 return (
-                  <div key={stage.name + idx} className={`relative overflow-hidden rounded-2xl border-2 p-4 shadow-2xl hover:shadow-3xl transform hover:scale-[1.02] hover:-translate-y-1 transition-all duration-500 group cursor-pointer ${!isHex ? style.container : ''}`} style={containerStyle}>
+                  <div
+                    key={key}
+                    className={`relative overflow-hidden rounded-2xl p-4 group ${isLight ? style.containerLight : style.containerDark} border-2 shadow-2xl hover:shadow-3xl transform hover:scale-[1.02] hover:-translate-y-1 transition-all duration-500`}
+                  >
                     <div className="absolute inset-0 opacity-15">
-                      {!isHex ? (
-                        <>
-                          <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${style.patternFrom} ${style.patternTo} rounded-full transform translate-x-16 -translate-y-16 group-hover:scale-125 transition-transform duration-700`}></div>
-                          <div className={`absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr ${style.patternFrom} ${style.patternTo} rounded-full transform -translate-x-12 translate-y-12 group-hover:scale-110 transition-transform duration-500`}></div>
-                        </>
-                      ) : (
-                        <>
-                          <div className={`absolute top-0 right-0 w-32 h-32 rounded-full transform translate-x-16 -translate-y-16 group-hover:scale-125 transition-transform duration-700`} style={patternStyle}></div>
-                          <div className={`absolute bottom-0 left-0 w-24 h-24 rounded-full transform -translate-x-12 translate-y-12 group-hover:scale-110 transition-transform duration-500`} style={patternStyle}></div>
-                        </>
-                      )}
+                      <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${isLight ? style.patternFromLight : style.patternFrom} ${isLight ? style.patternToLight : style.patternTo} rounded-full transform translate-x-16 -translate-y-16 group-hover:scale-125 transition-transform duration-700`}></div>
+                      <div className={`absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr ${isLight ? style.patternFromLight : style.patternFrom} ${isLight ? style.patternToLight : style.patternTo} rounded-full transform -translate-x-12 translate-y-12 group-hover:scale-110 transition-transform duration-500`}></div>
                     </div>
                     <div className="relative z-20">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1 pr-2">
-                          <span className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 block">{t(stage.name)}</span>
-                          <div className="text-3xl font-black text-gray-900 dark:text-white mb-1 tracking-tight">{count}</div>
-                          <div className="text-sm font-bold text-gray-700 dark:text-gray-300 bg-white/50 dark:bg-gray-700/50 inline-flex items-center gap-2 px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-600">
+                          <span className={`text-sm font-bold uppercase tracking-wider mb-2 block ${isLight ? 'text-gray-900' : 'text-gray-300'}`}>{title}</span>
+                          <div className={`text-3xl font-black mb-1 tracking-tight ${isLight ? 'text-black' : 'text-white'}`}>{count}</div>
+                          <div className={`${isLight ? 'text-base font-bold bg-[var(--lm-muted-surface)] text-[var(--lm-subtext)] inline-flex items-center gap-2 px-2 py-1 rounded-lg border border-[var(--lm-border)]' : 'text-base font-bold text-gray-700 dark:text-gray-300 bg-white/50 dark:bg-gray-700/50 inline-flex items-center gap-2 px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-600'}`}>
                             <span>٪</span>
                             <span>{percent}%</span>
                           </div>
                         </div>
-                        <div className={`flex items-center justify-center w-12 h-12 rounded-2xl shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 border-2 border-white/30 ${iconClass}`} style={iconStyle}>
-                          <span className="text-4xl text-white">{stage.icon || '📊'}</span>
+                        <div className={`flex items-center justify-center w-12 h-12 rounded-2xl shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 border-2 border-white/30 ${isLight ? style.iconBgLight : style.iconBgDark}`}>
+                          <span className="text-4xl text-white">{icon}</span>
                         </div>
                       </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400 font-semibold bg-gray-100/80 dark:bg-gray-700/80 px-3 py-2 rounded-xl backdrop-blur-sm border border-gray-200 dark:border-gray-600">
+                      <div className={`${
+                        isLight
+                      ? `text-base font-semibold px-3 py-2 rounded-xl border ${style.badgeLightBg} ${style.badgeLightText} ${style.badgeLightBorder}`
+                          : 'text-base text-gray-600 dark:text-gray-400 font-semibold bg-gray-100/80 dark:bg-gray-700/80 px-3 py-2 rounded-xl backdrop-blur-sm border border-gray-200 dark:border-gray-600'
+                      }`}>
                         {t('Stage share of total')}: {percent}%
                       </div>
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
-              </div>
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -skew-x-12 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
+                  </div>
                 );
               });
 
-              return [allLeadsCard, ...stageCards];
+              return [totalCard, ...fixedCards];
             })()}
           </div>
           <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-12 mt-8">
@@ -603,31 +682,31 @@ export const Dashboard = () => {
                 <div className="best-section-wrapper">
                   <div className={`flex items-center ${i18n.language === 'ar' ? 'flex-row-reverse' : ''} gap-2 mb-3`}>
                     <span aria-hidden className="inline-block w-1 h-5 rounded bg-blue-500"></span>
-                    <h3 className="text-lg font-semibold text-primary">{t('The Best')}</h3>
+                    <h3 className="text-xl font-semibold text-primary">{t('The Best')}</h3>
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('Your top agents for the number of actions.')}</p>
+                  <p className={`text-sm mb-4 ${isLight ? 'text-gray-700 font-medium' : 'text-gray-400'}`}>{t('Your top agents for the number of actions.')}</p>
                   
                   {(() => {
                     const [bestAgentFilter, setBestAgentFilter] = useState('all');
                     
                     const agentData = {
                       all: [
-                        { id: 1, name: t('Youssef Hemeda'), avatar: 'https://i.pravatar.cc/32?u=youssef', score: 3329, isCrowned: true },
+                        { id: 1, name: t('Youssef Hemeda'), avatar: 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\'><rect width=\'100%\' height=\'100%\' fill=\'%239ca3af\'/><text x=\'50%\' y=\'58%\' font-family=\'system-ui,Segoe UI,Arial\' font-size=\'18\' fill=\'white\' text-anchor=\'middle\'>Y</text></svg>', score: 3329, isCrowned: true },
                         { id: 2, name: t('Osama Sales'), avatar: '', score: 1968, isCrowned: false },
                         { id: 3, name: t('Engaz CRM Demo'), avatar: '', score: 1661, isCrowned: false }
                       ],
                       today: [
                         { id: 1, name: t('Osama Sales'), avatar: '', score: 245, isCrowned: true },
-                        { id: 2, name: t('Youssef Hemeda'), avatar: 'https://i.pravatar.cc/32?u=youssef', score: 187, isCrowned: false },
+                        { id: 2, name: t('Youssef Hemeda'), avatar: 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\'><rect width=\'100%\' height=\'100%\' fill=\'%239ca3af\'/><text x=\'50%\' y=\'58%\' font-family=\'system-ui,Segoe UI,Arial\' font-size=\'18\' fill=\'white\' text-anchor=\'middle\'>Y</text></svg>', score: 187, isCrowned: false },
                         { id: 3, name: t('Ahmed Ibrahim'), avatar: '', score: 142, isCrowned: false }
                       ],
                       weekly: [
-                        { id: 1, name: t('Youssef Hemeda'), avatar: 'https://i.pravatar.cc/32?u=youssef', score: 1245, isCrowned: true },
+                        { id: 1, name: t('Youssef Hemeda'), avatar: 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\'><rect width=\'100%\' height=\'100%\' fill=\'%239ca3af\'/><text x=\'50%\' y=\'58%\' font-family=\'system-ui,Segoe UI,Arial\' font-size=\'18\' fill=\'white\' text-anchor=\'middle\'>Y</text></svg>', score: 1245, isCrowned: true },
                         { id: 2, name: t('Engaz CRM Demo'), avatar: '', score: 876, isCrowned: false },
                         { id: 3, name: t('Osama Sales'), avatar: '', score: 654, isCrowned: false }
                       ],
                       monthly: [
-                        { id: 1, name: t('Youssef Hemeda'), avatar: 'https://i.pravatar.cc/32?u=youssef', score: 3329, isCrowned: true },
+                        { id: 1, name: t('Youssef Hemeda'), avatar: 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\'><rect width=\'100%\' height=\'100%\' fill=\'%239ca3af\'/><text x=\'50%\' y=\'58%\' font-family=\'system-ui,Segoe UI,Arial\' font-size=\'18\' fill=\'white\' text-anchor=\'middle\'>Y</text></svg>', score: 3329, isCrowned: true },
                         { id: 2, name: t('Osama Sales'), avatar: '', score: 1968, isCrowned: false },
                         { id: 3, name: t('Engaz CRM Demo'), avatar: '', score: 1661, isCrowned: false }
                       ]
@@ -638,7 +717,7 @@ export const Dashboard = () => {
 
                     return (
                       <>
-                        <div className="bg-yellow-100 dark:bg-yellow-800/30 p-3 rounded-lg flex items-center justify-between mb-4 border border-yellow-300 dark:border-yellow-700">
+                        <div className="bg-yellow-50 dark:bg-yellow-800/30 p-3 rounded-lg flex items-center justify-between mb-4 border border-white dark:border-yellow-700">
                           <div className="flex items-center gap-3 min-w-0 flex-1">
                             <div className="relative">
                               {topAgent.avatar ? (
@@ -653,8 +732,8 @@ export const Dashboard = () => {
                               </div>
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className="font-semibold text-gray-800 dark:text-gray-100 truncate">{topAgent.name}</p>
-                              <p className="text-sm text-gray-600 dark:text-gray-300">{topAgent.score.toLocaleString()} {t('actions')}</p>
+                              <p className="font-semibold text-slate-900 dark:text-gray-100 truncate">{topAgent.name}</p>
+                              <p className="text-sm font-semibold text-slate-900 dark:text-gray-300">{topAgent.score.toLocaleString()} {t('actions')}</p>
                             </div>
                           </div>
                           <div className="text-2xl">🏆</div>
@@ -683,7 +762,7 @@ export const Dashboard = () => {
                         
                         <div className="space-y-3">
                           {currentData.map((agent, index) => (
-                            <div key={agent.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            <div key={agent.id} className={`flex items-center gap-3 p-2 rounded-lg ${isLight ? 'bg-[var(--lm-muted-surface)] border border-[var(--lm-border)] hover:bg-[var(--lm-surface)]' : 'bg-gray-800 border border-gray-700 hover:bg-gray-700'} transition-colors`}>
                               <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-600 text-xs font-bold text-gray-700 dark:text-gray-300">
                                 {index + 1}
                               </div>
@@ -702,8 +781,8 @@ export const Dashboard = () => {
                                 )}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="font-medium text-gray-800 dark:text-gray-100 truncate text-sm">{agent.name}</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">{agent.score.toLocaleString()} {t('actions')}</p>
+                                <p className={`font-semibold truncate text-sm ${isLight ? 'text-slate-900' : 'text-white'}`}>{agent.name}</p>
+                                <p className={`text-xs ${isLight ? 'text-slate-700' : 'text-gray-300'}`}>{agent.score.toLocaleString()} {t('actions')}</p>
                               </div>
                             </div>
                           ))}
@@ -741,14 +820,14 @@ export const Dashboard = () => {
             </div>
 
             {/* Leads Status (second) */}
-            <div ref={leadsPanelRef} className="p-3 glass-panel rounded-lg shadow-md lg:col-span-3 h-full">
+            <div ref={leadsPanelRef} className="p-3 glass-panel rounded-lg shadow-md lg:col-span-3 h-full flex flex-col min-h-0">
               <div className={`flex items-center ${i18n.language === 'ar' ? 'flex-row-reverse' : ''} gap-2 mb-2`}>
                 <span aria-hidden className="inline-block w-1 h-4 rounded bg-blue-500"></span>
                 <h3 className="text-lg font-bold text-primary">{t('Leads Status')}</h3>
               </div>
 
               {/* Enhanced Leads Statistics */}
-              <div className="grid grid-cols-1 gap-2 mb-2">
+              <div className="flex-1 min-h-0 grid grid-rows-4 gap-2">
                 <LeadsStatsCard
                   title={t('Total Leads')}
                   value="16,766"
@@ -803,7 +882,7 @@ export const Dashboard = () => {
 
               {/* Top toolbar (chart type only) */}
               <div className="flex flex-wrap items-center gap-2 mb-3 justify-end">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+                <span className={`${isLight ? 'text-blue-700 font-semibold' : 'dark:text-gray-300'} text-sm`}>
                   {leadsChartType === 'bar'
                     ? (i18n.language === 'ar' ? 'رسم بياني عمودي' : 'Bar Chart')
                     : leadsChartType === 'stackedBar'
@@ -925,8 +1004,6 @@ export const Dashboard = () => {
           {/* Leads Trend Analysis Section removed per request */}
           
           
-        </main>
-      </div>
-    </div>
+    </>
   )
 }

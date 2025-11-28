@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import UMActionButtons from '../components/UMActionButtons'
 import AssignmentModal from '../components/AssignmentModal'
 import { useTranslation } from 'react-i18next'
-import SearchableSelect from '../components/SearchableSelect'
+import SearchableSelect from '@shared/components/SearchableSelect'
 
 const MOCK_DEPARTMENTS = [
   { id: 'd-3001', name: 'Customer Support', manager: 'Ibrahim Hassan', teamsCount: 3, employeesCount: 18, createdAt: '2025-08-10', status: 'Active' },

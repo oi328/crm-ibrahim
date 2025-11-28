@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import Layout from '../../../components/Layout'
-import { useAppState } from '../../../providers/AppStateProvider'
+import { useAppState } from '@shared/context/AppStateProvider'
 
 export default function PlansUpgrade() {
   const { t } = useTranslation()

@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import Layout from '../components/Layout'
-import SearchableSelect from '../components/SearchableSelect'
+import Layout from '@shared/layouts/Layout'
+import SearchableSelect from '@shared/components/SearchableSelect'
 import { DEPARTMENTS } from '../data/orgStructure'
 
 const ROLE_OPTIONS = ['Support', 'Technical', 'Sales', 'Custom']

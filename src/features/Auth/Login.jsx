@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppState } from '../providers/AppStateProvider';
+import { useAppState } from '@shared/context/AppStateProvider';
 
 export default function Login() {
   const navigate = useNavigate();

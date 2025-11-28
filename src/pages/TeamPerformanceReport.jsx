@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import { useTranslation } from 'react-i18next'
 import i18n from '../i18n'
 import * as XLSX from 'xlsx'
@@ -378,4 +378,4 @@ const TeamPerformanceReport = () => {
 }
 
 export default TeamPerformanceReport
-import SearchableSelect from '../components/SearchableSelect'
+import SearchableSelect from '@shared/components/SearchableSelect'

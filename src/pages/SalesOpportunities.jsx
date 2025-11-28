@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { api } from '../utils/api'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import { useNavigate } from 'react-router-dom'
 
 export default function SalesOpportunities() {

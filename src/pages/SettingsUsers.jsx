@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import UsersAndRoles from '../components/settings/UsersAndRoles'
 
 export default function SettingsUsers() {

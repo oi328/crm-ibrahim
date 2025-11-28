@@ -8,19 +8,25 @@ import {
   RiUserSettingsLine
 } from 'react-icons/ri'
 import { useState, useEffect, useRef } from 'react'
+import { useTheme } from '@shared/context/ThemeProvider'
 
 export default function ActiveUsersChart({ users = [] }) {
   const { t, i18n } = useTranslation()
   const lang = i18n.language || 'en'
+  const { theme } = useTheme()
+  const isLight = theme === 'light'
   const [refreshing, setRefreshing] = useState(false)
   const VISIBLE_USERS_COUNT = 3
   const ITEM_HEIGHT = 60
   const SCROLLBAR_CSS = `
-    .scrollbar-thin-blue { scrollbar-width: thin; scrollbar-color: #2563eb transparent; }
+    .scrollbar-thin-blue { scrollbar-width: thin; scrollbar-color: #94a3b8 transparent; }
     .scrollbar-thin-blue::-webkit-scrollbar { width: 8px; }
     .scrollbar-thin-blue::-webkit-scrollbar-track { background: transparent; }
-    .scrollbar-thin-blue::-webkit-scrollbar-thumb { background-color: #2563eb; border-radius: 9999px; }
-    .scrollbar-thin-blue:hover::-webkit-scrollbar-thumb { background-color: #1d4ed8; }
+    .scrollbar-thin-blue::-webkit-scrollbar-thumb { background-color: #94a3b8; border-radius: 9999px; }
+    .scrollbar-thin-blue:hover::-webkit-scrollbar-thumb { background-color: #64748b; }
+    .dark .scrollbar-thin-blue { scrollbar-color: #2563eb transparent; }
+    .dark .scrollbar-thin-blue::-webkit-scrollbar-thumb { background-color: #2563eb; }
+    .dark .scrollbar-thin-blue:hover::-webkit-scrollbar-thumb { background-color: #1d4ed8; }
   `
 
   const cardRef = useRef(null)
@@ -183,18 +189,18 @@ export default function ActiveUsersChart({ users = [] }) {
   return (
     <div ref={cardRef} className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-full flex flex-col">
       {/* Header */}
-      <div ref={headerRef} className="bg-gradient-to-r from-blue-500 to-purple-600 p-3 text-white flex-shrink-0">
+      <div ref={headerRef} className="bg-gradient-to-r from-blue-50 to-purple-100 p-3 text-[var(--content-text)] border-b border-gray-200 flex-shrink-0 dark:bg-gradient-to-r dark:from-blue-500 dark:to-purple-600 dark:text-white dark:border-transparent">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-white/20 rounded-lg">
+            <div className="p-2 bg-gray-100 rounded-lg dark:bg-white/20">
               <RiUserStarLine className="text-2xl" />
             </div>
             <div>
               <div className={`flex items-center ${lang === 'ar' ? 'flex-row-reverse' : ''} gap-2`}>
-                <span aria-hidden className="inline-block w-1 h-4 rounded bg-white/80"></span>
+                <span aria-hidden className="inline-block w-1 h-4 rounded bg-blue-400/70 dark:bg-white/80"></span>
                 <h3 className="text-lg font-bold">{t('Active Users')}</h3>
               </div>
-              <p className="text-blue-100 text-sm">
+              <p className="text-gray-500 dark:text-blue-100 text-sm">
                 {activeCount} {lang === 'ar' ? 'نشط من' : 'active of'} {totalCount} {lang === 'ar' ? 'مستخدمين' : 'users'}
               </p>
             </div>
@@ -202,7 +208,7 @@ export default function ActiveUsersChart({ users = [] }) {
           <div className="flex items-center gap-2">
             <button
               onClick={handleRefresh}
-              className={`p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-all duration-200 hover:scale-105 ${refreshing ? 'animate-spin' : ''}`}
+              className={`p-2 bg-gray-100 hover:bg-gray-200 dark:bg-white/20 dark:hover:bg-white/30 rounded-lg transition-all duration-200 hover:scale-105 ${refreshing ? 'animate-spin' : ''}`}
               title={t('Refresh')}
             >
               <RiRefreshLine className="text-lg" />
@@ -219,11 +225,11 @@ export default function ActiveUsersChart({ users = [] }) {
               {dataUsers.map((u, idx) => (
                 <div 
                   key={idx} 
-                  className="grid grid-cols-[auto,1fr,auto] items-center gap-2 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200/60 dark:border-gray-600/50"
+                  className={`grid grid-cols-[auto,1fr,auto] items-center gap-2 p-2 rounded-lg border ${isLight ? (u.active ? 'bg-emerald-50 border-white' : 'bg-red-50 border-white') : 'dark:bg-gray-700 dark:border-gray-600/50'}`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="relative">
-                      <div className="w-9 h-9 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg">
+                  <div className="relative">
+                      <div className="w-9 h-9 bg-gradient-to-br from-blue-200 to-purple-300 dark:from-blue-400 dark:to-purple-500 rounded-full flex items-center justify-center text-[var(--content-text)] dark:text-white text-sm font-bold shadow dark:shadow-lg">
                         {u.avatar || u.name.charAt(0)}
                       </div>
                       <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white dark:border-gray-700 ${u.active ? 'bg-emerald-500' : 'bg-red-500'}`}>
@@ -232,11 +238,11 @@ export default function ActiveUsersChart({ users = [] }) {
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-gray-800 dark:text-gray-200 truncate max-w-[14rem]">{u.name}</span>
+                        <span className={`font-semibold truncate max-w-[14rem] ${isLight ? (u.active ? 'text-emerald-900' : 'text-red-900') : 'dark:text-gray-200'}`}>{u.name}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                        <RiUserSettingsLine className="text-xs" />
-                        <span className="truncate max-w-[14rem]">{u.role}</span>
+                      <div className={`flex items-center gap-1 text-sm ${isLight ? (u.active ? 'text-emerald-800' : 'text-red-800') : 'dark:text-gray-400'}`}>
+                        <RiUserSettingsLine className={`text-xs ${isLight ? (u.active ? 'text-emerald-600' : 'text-red-600') : ''}`} />
+                        <span className="truncate max-w-[12rem]">{u.role}</span>
                       </div>
                     </div>
                   </div>
@@ -252,11 +258,11 @@ export default function ActiveUsersChart({ users = [] }) {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300 mt-0.5">
-                      <RiTimeLine className="text-xs" />
+                    <div className={`flex items-center gap-2 text-xs ${isLight ? (u.active ? 'text-emerald-800' : 'text-red-800') : 'dark:text-gray-300'} mt-0.5`}>
+                      <RiTimeLine className={`text-xs ${isLight ? (u.active ? 'text-emerald-600' : 'text-red-600') : ''}`} />
                       <span>{formatHM(u.lastSeen)}</span>
                     </div>
-                    <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
+                    <div className={`text-[11px] mt-0.5 ${isLight ? (u.active ? 'text-emerald-700' : 'text-red-700') : 'dark:text-gray-400'}`}>
                       {formatRelative(u.lastSeen)}
                     </div>
                   </div>
@@ -267,23 +273,23 @@ export default function ActiveUsersChart({ users = [] }) {
       </div>
 
       {/* Footer Stats */}
-      <div ref={footerRef} className="bg-gray-50 dark:bg-gray-700 px-3 py-2 border-t border-gray-200 dark:border-gray-600 flex-shrink-0">
+      <div ref={footerRef} className={`px-3 py-2 border-t flex-shrink-0 ${isLight ? 'bg-[var(--lm-muted-surface)] border-white' : 'dark:bg-gray-700 dark:border-gray-600'}`}>
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-emerald-500 rounded-full"></div>
-              <span className="text-gray-600 dark:text-gray-300">
+              <span className="text-black font-bold dark:text-gray-300">
                 {activeCount} {lang === 'ar' ? 'نشط' : 'Active'}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <span className="text-gray-600 dark:text-gray-300">
+              <span className="text-black font-bold dark:text-gray-300">
                 {totalCount - activeCount} {lang === 'ar' ? 'غير نشط' : 'Inactive'}
               </span>
             </div>
           </div>
-          <div className="text-gray-500 dark:text-gray-400">
+          <div className="text-black font-semibold dark:text-gray-400">
             {lang === 'ar' ? 'آخر تحديث:' : 'Last updated:'} {formatHM(new Date())}
           </div>
         </div>

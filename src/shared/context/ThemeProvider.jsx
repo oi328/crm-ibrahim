@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { palette, fonts } from '../theme.js'
+import { palette, fonts } from '../../theme.js'
 
 const ThemeContext = createContext({ theme: 'dark', setTheme: () => {} })
 

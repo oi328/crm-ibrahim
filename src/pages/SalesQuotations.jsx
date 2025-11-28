@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { api } from '../utils/api'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 
 export default function SalesQuotations() {
   const { t } = useTranslation()

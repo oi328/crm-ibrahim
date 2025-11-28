@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import { useTranslation } from 'react-i18next'
 import { FaBullseye, FaClipboardList, FaFileSignature, FaClipboardCheck, FaHandshake, FaTimesCircle } from 'react-icons/fa'
 
@@ -72,12 +72,12 @@ export default function SalesReport() {
   const remaining = Math.max(openChances - closedChances, 0)
 
   const tabs = [
-    { key: 'opportunities', label: t('Opportunities'), icon: FaBullseye },
-    { key: 'cils', label: t('Cils'), icon: FaClipboardList },
-    { key: 'eoi', label: t('EOI'), icon: FaFileSignature },
-    { key: 'reservation', label: t('Reservation'), icon: FaClipboardCheck },
-    { key: 'deals', label: t('Deals'), icon: FaHandshake },
-    { key: 'cancel_reasons', label: t('Cancel Reasons'), icon: FaTimesCircle },
+    { key: 'opportunities', label: t('Opportunities', 'Opportunities'), icon: FaBullseye },
+    { key: 'cils', label: t('Cils', 'Cils'), icon: FaClipboardList },
+    { key: 'eoi', label: t('EOI', 'EOI'), icon: FaFileSignature },
+    { key: 'reservation', label: t('Reservation', 'Reservation'), icon: FaClipboardCheck },
+    { key: 'deals', label: t('Deals', 'Deals'), icon: FaHandshake },
+    { key: 'cancel_reasons', label: t('Cancel Reasons', 'Cancel Reasons'), icon: FaTimesCircle },
   ]
 
   const tabColor = useMemo(() => {
@@ -225,12 +225,12 @@ export default function SalesReport() {
 
   const onExportReport = () => {
     const summary = [
-      { metric: t('Opened This Month'), value: openedThisMonth },
-      { metric: t('Closed This Month'), value: closedThisMonth },
-      { metric: t('Open Chances'), value: openChances },
-      { metric: t('Missed Chances'), value: missedChances },
-      { metric: t('Remaining'), value: remaining },
-      { metric: t('Closed Chances'), value: closedChances },
+      { metric: t('Opened This Month', 'Opened This Month'), value: openedThisMonth },
+      { metric: t('Closed This Month', 'Closed This Month'), value: closedThisMonth },
+      { metric: t('Open Chances', 'Open Chances'), value: openChances },
+      { metric: t('Missed Chances', 'Missed Chances'), value: missedChances },
+      { metric: t('Remaining', 'Remaining'), value: remaining },
+      { metric: t('Closed Chances', 'Closed Chances'), value: closedChances },
     ]
     downloadCSV('sales_report_summary.csv', toCSV(summary))
   }
@@ -246,12 +246,12 @@ export default function SalesReport() {
     switch (activeTab) {
       case 'opportunities':
         return [
-          { label: t('Opened This Month'), value: openedThisMonth, color: 'bg-blue-500' },
-          { label: t('Closed This Month'), value: closedThisMonth, color: 'bg-green-500' },
-          { label: t('Open Chances'), value: openChances, color: 'bg-indigo-500' },
-          { label: t('Missed Chances'), value: missedChances, color: 'bg-red-500' },
-          { label: t('Remaining'), value: remaining, color: 'bg-amber-500' },
-          { label: t('Closed Chances'), value: closedChances, color: 'bg-teal-500' },
+          { label: t('Opened This Month', 'Opened This Month'), value: openedThisMonth, color: 'bg-blue-500' },
+          { label: t('Closed This Month', 'Closed This Month'), value: closedThisMonth, color: 'bg-green-500' },
+          { label: t('Open Chances', 'Open Chances'), value: openChances, color: 'bg-indigo-500' },
+          { label: t('Missed Chances', 'Missed Chances'), value: missedChances, color: 'bg-red-500' },
+          { label: t('Remaining', 'Remaining'), value: remaining, color: 'bg-amber-500' },
+          { label: t('Closed Chances', 'Closed Chances'), value: closedChances, color: 'bg-teal-500' },
         ]
       case 'cils': {
         const total = arr.length
@@ -260,11 +260,11 @@ export default function SalesReport() {
         const developers = new Set(arr.map(r => r.developer)).size
         const agents = new Set(arr.map(r => r.agent)).size
         return [
-          { label: t('Total CILs') || 'Total CILs', value: total, color: 'bg-blue-500' },
-          { label: t('This Month') || 'This Month', value: thisMonth, color: 'bg-amber-600' },
-          { label: t('Projects') || 'Projects', value: projects, color: 'bg-violet-600' },
-          { label: t('Developers') || 'Developers', value: developers, color: 'bg-indigo-600' },
-          { label: t('Agents') || 'Agents', value: agents, color: 'bg-emerald-600' },
+          { label: t('Total CILs', 'Total CILs'), value: total, color: 'bg-blue-500' },
+          { label: t('This Month', 'This Month'), value: thisMonth, color: 'bg-amber-600' },
+          { label: t('Projects', 'Projects'), value: projects, color: 'bg-violet-600' },
+          { label: t('Developers', 'Developers'), value: developers, color: 'bg-indigo-600' },
+          { label: t('Agents', 'Agents'), value: agents, color: 'bg-emerald-600' },
         ]
       }
       case 'eoi': {
@@ -273,10 +273,10 @@ export default function SalesReport() {
         const projects = new Set(arr.map(r => r.project)).size
         const thisMonth = arr.filter(r => (r.date || '').startsWith(currentMonthStr)).length
         return [
-          { label: t('Total EOI') || 'Total EOI', value: total, color: 'bg-orange-500' },
-          { label: t('Interested') || 'Interested', value: interested, color: 'bg-emerald-600' },
-          { label: t('Projects') || 'Projects', value: projects, color: 'bg-violet-600' },
-          { label: t('This Month') || 'This Month', value: thisMonth, color: 'bg-amber-600' },
+          { label: t('Total EOI', 'Total EOI'), value: total, color: 'bg-orange-500' },
+          { label: t('Interested', 'Interested'), value: interested, color: 'bg-emerald-600' },
+          { label: t('Projects', 'Projects'), value: projects, color: 'bg-violet-600' },
+          { label: t('This Month', 'This Month'), value: thisMonth, color: 'bg-amber-600' },
         ]
       }
       case 'reservation': {
@@ -285,10 +285,10 @@ export default function SalesReport() {
         const cancelled = arr.filter(r => r.status === 'cancelled').length
         const thisMonth = arr.filter(r => (r.date || '').startsWith(currentMonthStr)).length
         return [
-          { label: t('Total Reservations') || 'Total Reservations', value: total, color: 'bg-purple-500' },
-          { label: t('Confirmed') || 'Confirmed', value: confirmed, color: 'bg-emerald-600' },
-          { label: t('Cancelled') || 'Cancelled', value: cancelled, color: 'bg-red-600' },
-          { label: t('This Month') || 'This Month', value: thisMonth, color: 'bg-amber-600' },
+          { label: t('Total Reservations', 'Total Reservations'), value: total, color: 'bg-purple-500' },
+          { label: t('Confirmed', 'Confirmed'), value: confirmed, color: 'bg-emerald-600' },
+          { label: t('Cancelled', 'Cancelled'), value: cancelled, color: 'bg-red-600' },
+          { label: t('This Month', 'This Month'), value: thisMonth, color: 'bg-amber-600' },
         ]
       }
       case 'deals': {
@@ -297,10 +297,10 @@ export default function SalesReport() {
         const lost = arr.filter(r => r.status === 'lost').length
         const wonThisMonth = arr.filter(r => r.status === 'won' && (r.date || '').startsWith(currentMonthStr)).length
         return [
-          { label: t('Total Deals') || 'Total Deals', value: total, color: 'bg-teal-500' },
-          { label: t('Won') || 'Won', value: won, color: 'bg-emerald-600' },
-          { label: t('Lost') || 'Lost', value: lost, color: 'bg-red-600' },
-          { label: t('Won This Month') || 'Won This Month', value: wonThisMonth, color: 'bg-blue-600' },
+          { label: t('Total Deals', 'Total Deals'), value: total, color: 'bg-teal-500' },
+          { label: t('Won', 'Won'), value: won, color: 'bg-emerald-600' },
+          { label: t('Lost', 'Lost'), value: lost, color: 'bg-red-600' },
+          { label: t('Won This Month', 'Won This Month'), value: wonThisMonth, color: 'bg-blue-600' },
         ]
       }
       case 'cancel_reasons': {
@@ -308,9 +308,9 @@ export default function SalesReport() {
         const topCount = arr.length ? Math.max(...arr.map(r => r.count || 0)) : 0
         const uniqueReasons = arr.length
         return [
-          { label: t('Total Cancellations') || 'Total Cancellations', value: totalCancelled, color: 'bg-red-600' },
-          { label: t('Top Reason Count') || 'Top Reason Count', value: topCount, color: 'bg-pink-600' },
-          { label: t('Unique Reasons') || 'Unique Reasons', value: uniqueReasons, color: 'bg-gray-600' },
+          { label: t('Total Cancellations', 'Total Cancellations'), value: totalCancelled, color: 'bg-red-600' },
+          { label: t('Top Reason Count', 'Top Reason Count'), value: topCount, color: 'bg-pink-600' },
+          { label: t('Unique Reasons', 'Unique Reasons'), value: uniqueReasons, color: 'bg-gray-600' },
         ]
       }
       default:
@@ -367,16 +367,16 @@ export default function SalesReport() {
                 <div className="flex flex-col">
                   <label className="text-sm text-[var(--muted-text)]">{t('Status')}</label>
                   <select value={opportunitiesStatus} onChange={e => setOpportunitiesStatus(e.target.value)} className="input">
-                    <option value="all">{t('All') || 'All'}</option>
-                    <option value="open">{t('Open') || 'Open'}</option>
-                    <option value="missed">{t('Missed') || 'Missed'}</option>
-                    <option value="closed">{t('Closed') || 'Closed'}</option>
+                    <option value="all">{t('All', 'All')}</option>
+                    <option value="open">{t('Open', 'Open')}</option>
+                    <option value="missed">{t('Missed', 'Missed')}</option>
+                    <option value="closed">{t('Closed', 'Closed')}</option>
                   </select>
                 </div>
                 <div className="flex flex-col">
                   <label className="text-sm text-[var(--muted-text)]">{t('Owner')}</label>
                   <select value={opportunitiesOwner} onChange={e => setOpportunitiesOwner(e.target.value)} className="input">
-                    <option value="all">{t('All') || 'All'}</option>
+                    <option value="all">{t('All', 'All')}</option>
                     {[...new Set(opportunities.map(o => o.owner))].map(o => (<option key={o} value={o}>{o}</option>))}
                   </select>
                 </div>
@@ -388,21 +388,21 @@ export default function SalesReport() {
                 <div className="flex flex-col">
                   <label className="text-sm text-[var(--muted-text)]">Project</label>
                   <select value={cilsProject} onChange={e => setCilsProject(e.target.value)} className="input">
-                    <option value="all">{t('All') || 'All'}</option>
+                    <option value="all">{t('All', 'All')}</option>
                     {[...new Set(cils.map(e => e.project))].map(p => (<option key={p} value={p}>{p}</option>))}
                   </select>
                 </div>
                 <div className="flex flex-col">
-                  <label className="text-sm text-[var(--muted-text)]">{t('Developer') || 'Developer'}</label>
+                  <label className="text-sm text-[var(--muted-text)]">{t('Developer', 'Developer')}</label>
                   <select value={cilsDeveloper} onChange={e => setCilsDeveloper(e.target.value)} className="input">
-                    <option value="all">{t('All') || 'All'}</option>
+                    <option value="all">{t('All', 'All')}</option>
                     {[...new Set(cils.map(e => e.developer))].map(d => (<option key={d} value={d}>{d}</option>))}
                   </select>
                 </div>
                 <div className="flex flex-col">
-                  <label className="text-sm text-[var(--muted-text)]">{t('Agent') || 'Agent'}</label>
+                  <label className="text-sm text-[var(--muted-text)]">{t('Agent', 'Agent')}</label>
                   <select value={cilsAgent} onChange={e => setCilsAgent(e.target.value)} className="input">
-                    <option value="all">{t('All') || 'All'}</option>
+                    <option value="all">{t('All', 'All')}</option>
                     {[...new Set(cils.map(e => e.agent))].map(a => (<option key={a} value={a}>{a}</option>))}
                   </select>
                 </div>
@@ -414,14 +414,14 @@ export default function SalesReport() {
                 <div className="flex flex-col">
                   <label className="text-sm text-[var(--muted-text)]">{t('Status')}</label>
                   <select value={eoiStatus} onChange={e => setEoiStatus(e.target.value)} className="input">
-                    <option value="all">{t('All') || 'All'}</option>
-                    <option value="interested">{t('Interested') || 'Interested'}</option>
+                    <option value="all">{t('All', 'All')}</option>
+                    <option value="interested">{t('Interested', 'Interested')}</option>
                   </select>
                 </div>
                 <div className="flex flex-col">
                   <label className="text-sm text-[var(--muted-text)]">Project</label>
                   <select value={eoiProject} onChange={e => setEoiProject(e.target.value)} className="input">
-                    <option value="all">{t('All') || 'All'}</option>
+                    <option value="all">{t('All', 'All')}</option>
                     {[...new Set(eoi.map(e => e.project))].map(p => (<option key={p} value={p}>{p}</option>))}
                   </select>
                 </div>
@@ -432,9 +432,9 @@ export default function SalesReport() {
               <div className="flex flex-col">
                 <label className="text-sm text-[var(--muted-text)]">{t('Status')}</label>
                 <select value={reservationStatus} onChange={e => setReservationStatus(e.target.value)} className="input">
-                  <option value="all">{t('All') || 'All'}</option>
-                  <option value="confirmed">{t('Confirmed') || 'Confirmed'}</option>
-                  <option value="cancelled">{t('Cancelled') || 'Cancelled'}</option>
+                  <option value="all">{t('All', 'All')}</option>
+                  <option value="confirmed">{t('Confirmed', 'Confirmed')}</option>
+                  <option value="cancelled">{t('Cancelled', 'Cancelled')}</option>
                 </select>
               </div>
             )}
@@ -443,9 +443,9 @@ export default function SalesReport() {
               <div className="flex flex-col">
                 <label className="text-sm text-[var(--muted-text)]">{t('Status')}</label>
                 <select value={dealsStatus} onChange={e => setDealsStatus(e.target.value)} className="input">
-                  <option value="all">{t('All') || 'All'}</option>
-                  <option value="won">{t('Won') || 'Won'}</option>
-                  <option value="lost">{t('Lost') || 'Lost'}</option>
+                  <option value="all">{t('All', 'All')}</option>
+                  <option value="won">{t('Won', 'Won')}</option>
+                  <option value="lost">{t('Lost', 'Lost')}</option>
                 </select>
               </div>
             )}
@@ -453,7 +453,7 @@ export default function SalesReport() {
             {activeTab === 'cancel_reasons' && (
               <div className="flex flex-col">
                 <label className="text-sm text-[var(--muted-text)]">{t('Reason')}</label>
-                <input type="text" value={cancelReason} onChange={e => setCancelReason(e.target.value)} className="input" placeholder={t('Search') || 'Search'} />
+                <input type="text" value={cancelReason} onChange={e => setCancelReason(e.target.value)} className="input" placeholder={t('Search', 'Search')} />
               </div>
             )}
 
@@ -506,19 +506,19 @@ export default function SalesReport() {
 
         {activeTab === 'cils' && (
           <div className="card glass-card p-4">
-            <h3 className="text-sm font-medium mb-3">{t('Add CIL') || 'Add CIL'}</h3>
+            <h3 className="text-sm font-medium mb-3">{t('Add CIL', 'Add CIL')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <input className="input" placeholder={t('Client') || 'Client'} value={cilForm.client} onChange={e => setCilForm({ ...cilForm, client: e.target.value })} />
-              <input className="input" placeholder={t('Phone') || 'Phone'} value={cilForm.phone} onChange={e => setCilForm({ ...cilForm, phone: e.target.value })} />
-              <input className="input" placeholder={t('Email') || 'Email'} value={cilForm.email} onChange={e => setCilForm({ ...cilForm, email: e.target.value })} />
+              <input className="input" placeholder={t('Client', 'Client')} value={cilForm.client} onChange={e => setCilForm({ ...cilForm, client: e.target.value })} />
+              <input className="input" placeholder={t('Phone', 'Phone')} value={cilForm.phone} onChange={e => setCilForm({ ...cilForm, phone: e.target.value })} />
+              <input className="input" placeholder={t('Email', 'Email')} value={cilForm.email} onChange={e => setCilForm({ ...cilForm, email: e.target.value })} />
               <input className="input" placeholder="Project" value={cilForm.project} onChange={e => setCilForm({ ...cilForm, project: e.target.value })} />
-              <input className="input" placeholder={t('Developer') || 'Developer'} value={cilForm.developer} onChange={e => setCilForm({ ...cilForm, developer: e.target.value })} />
-              <input className="input" placeholder={t('Agent') || 'Agent'} value={cilForm.agent} onChange={e => setCilForm({ ...cilForm, agent: e.target.value })} />
+              <input className="input" placeholder={t('Developer', 'Developer')} value={cilForm.developer} onChange={e => setCilForm({ ...cilForm, developer: e.target.value })} />
+              <input className="input" placeholder={t('Agent', 'Agent')} value={cilForm.agent} onChange={e => setCilForm({ ...cilForm, agent: e.target.value })} />
               <input type="date" className="input" value={cilForm.date} onChange={e => setCilForm({ ...cilForm, date: e.target.value })} />
             </div>
             <div className="mt-3">
               <button onClick={onAddCil} className="inline-flex items-center gap-2 px-3 py-2 rounded-md border btn-glass">
-                {t('Add') || 'Add'}
+                {t('Add', 'Add')}
               </button>
             </div>
           </div>
@@ -546,13 +546,13 @@ export default function SalesReport() {
                   )}
                   {activeTab === 'cils' && (
                     <>
-                      <th>{t('Client') || 'Client'}</th>
-                      <th>{t('Phone') || 'Phone'}</th>
-                      <th>{t('Email') || 'Email'}</th>
+                      <th>{t('Client', 'Client')}</th>
+                      <th>{t('Phone', 'Phone')}</th>
+                      <th>{t('Email', 'Email')}</th>
                       <th>Project</th>
-                      <th>{t('Developer') || 'Developer'}</th>
-                      <th>{t('Agent') || 'Agent'}</th>
-                      <th>{t('Date') || 'Date'}</th>
+                      <th>{t('Developer', 'Developer')}</th>
+                      <th>{t('Agent', 'Agent')}</th>
+                      <th>{t('Date', 'Date')}</th>
                     </>
                   )}
                   {activeTab === 'eoi' && (
@@ -581,8 +581,8 @@ export default function SalesReport() {
                   )}
                   {activeTab === 'cancel_reasons' && (
                     <>
-                      <th>{t('Reason') || 'Reason'}</th>
-                      <th>{t('Count') || 'Count'}</th>
+                      <th>{t('Reason', 'Reason')}</th>
+                      <th>{t('Count', 'Count')}</th>
                     </>
                   )}
                 </tr>

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import ProfileSettingsPanel from '../components/settings/ProfileSettingsPanel'
 
 export default function SettingsProfile() {

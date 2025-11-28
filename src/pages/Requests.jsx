@@ -1,11 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { FaSearch, FaFilter, FaTimes, FaCalendarAlt, FaFileExcel, FaFilePdf } from 'react-icons/fa';
-import Layout from '../components/Layout';
 import RequestCard from '../components/RequestCard';
 import RequestsSummaryPanel from '../components/RequestsSummaryPanel';
 import ImportRequestsModal from '../components/ImportRequestsModal';
 import CreateRequestModal from '../components/CreateRequestModal';
-import { useTheme } from '../providers/ThemeProvider';
+import { useTheme } from '@shared/context/ThemeProvider';
 
 const sampleRequests = [
   { id: 1001, customerName: 'Alice Johnson', propertyUnit: 'Palm Residency A-12', status: 'Pending', priority: 'High', type: 'Inquiry', createdAt: '2025-10-02', updatedAt: '2025-10-05', assignedTo: 'John Doe', description: 'Interested in 2BHK, need pricing details.' },
@@ -139,7 +138,6 @@ export default function Requests() {
   const dir = isRTL ? 'rtl' : 'ltr';
 
   return (
-    <Layout>
     <div dir={dir} className="p-4 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -363,6 +361,5 @@ export default function Requests() {
         isRTL={isRTL}
       />
     </div>
-    </Layout>
   );
 }

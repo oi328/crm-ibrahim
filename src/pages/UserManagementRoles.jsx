@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import UMActionButtons from '../components/UMActionButtons';
-import Layout from '../components/Layout';
+import Layout from '@shared/layouts/Layout';
 
 const mockRoles = [
   { name: 'Admin', users: 3, createdAt: '2025-01-01', updatedAt: '2025-11-10' },

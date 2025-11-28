@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import SearchableSelect from '../components/SearchableSelect';
-import Layout from '../components/Layout';
+import SearchableSelect from '@shared/components/SearchableSelect';
+import Layout from '@shared/layouts/Layout';
 
 const mockAccess = [
   { user: 'Ibrahim', login: '2025-11-18 10:24', logout: '2025-11-18 18:04', ip: '192.168.1.12', location: 'Cairo', device: 'Windows PC', browser: 'Chrome' },

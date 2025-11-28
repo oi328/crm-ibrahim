@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import { useTranslation } from 'react-i18next'
-import SearchableSelect from '../components/SearchableSelect'
+import SearchableSelect from '@shared/components/SearchableSelect'
 import { getTeamsForDept } from '../data/orgStructure'
 
 const MOCK_MANAGERS = [
@@ -83,7 +83,7 @@ export default function UserManagementDepartmentForm() {
   const handleSubmit = (e) => {
     e.preventDefault()
     const payload = { name, code, description, status, managerId, teamIds: selectedTeamIds, permissions: rolePermissions }
-    console.log('Save Department:', payload)
+    
     alert(mode === 'edit' ? (isArabic ? 'تم تحديث القسم' : 'Department updated') : (isArabic ? 'تم حفظ القسم بنجاح' : 'Department saved'))
     try { localStorage.removeItem('editDept') } catch {}
     navigate('/user-management/departments')

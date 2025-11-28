@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useMemo, useState, useCallback, useEffect } from 'react'
 import { api } from '@utils/api'
 import { login as svcLogin, getProfile } from '@services/auth'
-import { captureDeviceInfo, saveDeviceForUser } from '../utils/device'
+import { captureDeviceInfo, saveDeviceForUser } from '@utils/device'
 
 const AppStateContext = createContext(null)
 

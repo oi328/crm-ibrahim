@@ -92,29 +92,29 @@ export default function NotificationItem({ data, onToggleRead, onArchive, onUnar
             <div className="flex items-center gap-2">
               <h3 className="font-medium truncate">{data?.title || ''}</h3>
               {data?.archived && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300">{t('Archived') || 'Archived'}</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300">{t('Archived', 'Archived')}</span>
               )}
               {!data?.read && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-600 text-white">{t('New') || 'New'}</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-600 text-white">{t('New', 'New')}</span>
               )}
             </div>
             <p className="text-sm opacity-80 truncate">{data?.body || ''}</p>
             <div className="text-xs opacity-60 mt-0.5">{timeAgo(data?.createdAt)} • {t(data?.source) || data?.source}</div>
           </div>
           <div className="flex items-center gap-1">
-            <button onClick={() => setOpen(v => !v)} className="btn btn-xs btn-ghost" aria-expanded={open} title={open ? (t('Collapse')||'Collapse') : (t('Expand')||'Expand')}>
+            <button onClick={() => setOpen(v => !v)} className="btn btn-xs btn-ghost text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" aria-expanded={open} title={open ? t('Collapse', 'Collapse') : t('Expand', 'Expand')}>
               <svg className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M6 9l6 6 6-6"/></svg>
             </button>
-            <button onClick={onToggleRead} className="btn btn-xs" title={data?.read ? (t('Mark as unread')||'Mark as unread') : (t('Mark as read')||'Mark as read')}>
-              {data?.read ? (t('Unread')||'Unread') : (t('Read')||'Read')}
+            <button onClick={onToggleRead} className="btn btn-xs" title={data?.read ? t('Mark as unread', 'Mark as unread') : t('Mark as read', 'Mark as read')}>
+              {data?.read ? t('Unread', 'Unread') : t('Read', 'Read')}
             </button>
             {!data?.archived ? (
-              <button onClick={onArchive} className="btn btn-xs btn-outline" title={t('Archive')||'Archive'}>
-                {t('Archive') || 'Archive'}
+              <button onClick={onArchive} className="btn btn-xs btn-outline" title={t('Archive', 'Archive')}>
+                {t('Archive', 'Archive')}
               </button>
             ) : (
-              <button onClick={onUnarchive} className="btn btn-xs btn-outline" title={t('Unarchive')||'Unarchive'}>
-                {t('Unarchive') || 'Unarchive'}
+              <button onClick={onUnarchive} className="btn btn-xs btn-outline" title={t('Unarchive', 'Unarchive')}>
+                {t('Unarchive', 'Unarchive')}
               </button>
             )}
           </div>

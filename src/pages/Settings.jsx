@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import { motion, AnimatePresence } from 'framer-motion'
 import { User, Building, Users, Bell, CreditCard, Package, Settings as SettingsIcon, Shield } from 'lucide-react'
 import ProfileSettings from '../components/settings/ProfileSettings'

@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import EnhancedLeadDetailsModal from './EnhancedLeadDetailsModal';
+import { useTheme } from '@shared/context/ThemeProvider';
+import EnhancedLeadDetailsModal from '@shared/components/EnhancedLeadDetailsModal';
 
 export const Comments = ({ employee, dateFrom, dateTo }) => {
   const { t, i18n } = useTranslation();
   const [selectedLead, setSelectedLead] = useState(null);
   const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
   const SCROLLBAR_CSS = `
     .scrollbar-thin-blue { scrollbar-width: thin; scrollbar-color: #2563eb transparent; }
     .scrollbar-thin-blue::-webkit-scrollbar { width: 8px; }
@@ -136,15 +139,19 @@ export const Comments = ({ employee, dateFrom, dateTo }) => {
   ))
 
   const getPriorityColor = (priority) => {
+    if (isLight) {
+      // في اللايت مود: خلفية فاتحة غير بيضاء وحد أبيض كما طلبت
+      return 'border-white bg-[var(--lm-muted-surface)]';
+    }
     switch (priority) {
       case 'high':
-        return 'border-red-300 bg-red-50 dark:bg-red-900/20 dark:border-red-700';
+        return 'dark:bg-red-900/20 dark:border-red-700';
       case 'medium':
-        return 'border-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-700';
+        return 'dark:bg-yellow-900/20 dark:border-yellow-700';
       case 'low':
-        return 'border-green-300 bg-green-50 dark:bg-green-900/20 dark:border-green-700';
+        return 'dark:bg-green-900/20 dark:border-green-700';
       default:
-        return 'border-gray-300 bg-gray-50 dark:bg-gray-800 dark:border-gray-600';
+        return 'dark:bg-gray-800 dark:border-gray-600';
     }
   };
 
@@ -223,25 +230,25 @@ export const Comments = ({ employee, dateFrom, dateTo }) => {
             
             <div className="space-y-2 mb-2">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                <span className={`text-xs font-medium ${isLight ? 'text-gray-700' : 'text-gray-400'}`}>
                   {t('Employee')}:
                 </span>
-                <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                <span className={`text-sm font-medium ${isLight ? 'text-gray-900' : 'text-gray-200'}`}>
                   {comment.employeeName}
                 </span>
               </div>
               
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                <span className={`text-xs font-medium ${isLight ? 'text-gray-700' : 'text-gray-400'}`}>
                   {t('Lead')}:
                 </span>
-                <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                <span className={`text-sm font-medium ${isLight ? 'text-gray-900' : 'text-gray-200'}`}>
                   {comment.leadName}
                 </span>
               </div>
             </div>
             
-            <div className="mt-2 p-2 bg-white dark:bg-gray-700 rounded text-sm text-gray-700 dark:text-gray-300">
+            <div className="mt-2 p-2 bg-[var(--lm-surface)] dark:bg-gray-700 rounded text-sm text-gray-700 dark:text-gray-300">
               {comment.comment}
             </div>
             

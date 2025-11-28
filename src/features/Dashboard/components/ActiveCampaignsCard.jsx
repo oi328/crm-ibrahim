@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { PieChart } from './PieChart'
+import { PieChart } from '@shared/components/PieChart'
+import { useTheme } from '@shared/context/ThemeProvider'
 
 export default function ActiveCampaignsCard({ segments, employee, dateFrom, dateTo }) {
   const { t, i18n } = useTranslation()
   const [showPaused, setShowPaused] = useState(true)
   const lang = i18n.language || 'en'
   const isRTL = lang === 'ar'
+  const { theme } = useTheme()
+  const isLight = theme === 'light'
 
   const campaigns = [
     { name: lang === 'ar' ? 'حملة الصيف' : 'Summer Promo', status: 'onTrack', owner: 'Osama Sales', lastActivity: '2025-01-10', openRate: 32, clickRate: 4.1, conversionRate: 5.2 },
@@ -70,9 +73,14 @@ export default function ActiveCampaignsCard({ segments, employee, dateFrom, date
   }
 
   const statusBadgeClass = (s) => {
-    if (s === 'onTrack') return 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
-    if (s === 'atRisk') return 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
-    return 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+    if (isLight) {
+      if (s === 'onTrack') return 'bg-emerald-200 text-emerald-800 border border-emerald-300'
+      if (s === 'atRisk') return 'bg-amber-200 text-amber-800 border border-amber-300'
+      return 'bg-red-200 text-red-800 border border-red-300'
+    }
+    if (s === 'onTrack') return 'bg-emerald-900/30 text-emerald-300'
+    if (s === 'atRisk') return 'bg-amber-900/30 text-amber-300'
+    return 'bg-red-900/30 text-red-300'
   }
 
   const fmtDate = (s) => {
@@ -103,24 +111,24 @@ export default function ActiveCampaignsCard({ segments, employee, dateFrom, date
       <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
         <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} gap-2`}>
           <span aria-hidden className="inline-block w-1 h-4 rounded bg-blue-500"></span>
-          <h3 className="text-lg md:text-xl font-bold text-gray-800 dark:text-gray-100">{t('Active Campaigns')}</h3>
+          <h3 className={`${isLight ? 'text-black' : 'dark:text-gray-100'} text-lg md:text-xl font-bold`}>{t('Active Campaigns')}</h3>
         </div>
-        <span className="text-xs text-gray-500 dark:text-blue-200">{periodLabel}</span>
+        <span className={`${isLight ? 'text-blue-700 font-bold' : 'dark:text-blue-200'} text-sm`}>{periodLabel}</span>
       </div>
 
       {/* Performance metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-        <div className="p-3 rounded-lg bg-gray-100 dark:bg-blue-900">
-          <div className="text-xs text-gray-600 dark:text-gray-300">{t('Avg. Open Rate')}</div>
-          <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">{avgOpenRate}%</div>
+        <div className={`${isLight ? 'p-4 rounded-xl bg-[var(--lm-muted-surface)] border border-[var(--lm-border)] shadow-md' : 'p-3 rounded-lg dark:bg-blue-900'}`}>
+          <div className={isLight ? 'text-sm font-medium text-black' : 'text-xs text-gray-600 dark:text-gray-300'}>{t('Avg. Open Rate')}</div>
+          <div className={isLight ? 'text-2xl font-bold text-black' : 'text-lg font-semibold dark:text-gray-100'}>{avgOpenRate}%</div>
         </div>
-        <div className="p-3 rounded-lg bg-gray-100 dark:bg-blue-900">
-          <div className="text-xs text-gray-600 dark:text-gray-300">{t('Avg. Click Rate')}</div>
-          <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">{avgClickRate}%</div>
+        <div className={`${isLight ? 'p-4 rounded-xl bg-[var(--lm-muted-surface)] border border-[var(--lm-border)] shadow-md' : 'p-3 rounded-lg dark:bg-blue-900'}`}>
+          <div className={isLight ? 'text-sm font-medium text-black' : 'text-xs text-gray-600 dark:text-gray-300'}>{t('Avg. Click Rate')}</div>
+          <div className={isLight ? 'text-2xl font-bold text-black' : 'text-lg font-semibold dark:text-gray-100'}>{avgClickRate}%</div>
         </div>
-        <div className="p-3 rounded-lg bg-gray-100 dark:bg-blue-900">
-          <div className="text-xs text-gray-600 dark:text-gray-300">{t('Conversion Rate')}</div>
-          <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">{avgConversionRate}%</div>
+        <div className={`${isLight ? 'p-4 rounded-xl bg-[var(--lm-muted-surface)] border border-[var(--lm-border)] shadow-md' : 'p-3 rounded-lg dark:bg-blue-900'}`}>
+          <div className={isLight ? 'text-sm font-medium text-black' : 'text-xs text-gray-600 dark:text-gray-300'}>{t('Conversion Rate')}</div>
+          <div className={isLight ? 'text-2xl font-bold text-black' : 'text-lg font-semibold dark:text-gray-100'}>{avgConversionRate}%</div>
         </div>
       </div>
 
@@ -136,11 +144,11 @@ export default function ActiveCampaignsCard({ segments, employee, dateFrom, date
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-2">
-              <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100">{t('Active Campaigns Overview')}</h4>
+              <h4 className={`${isLight ? 'text-black' : 'dark:text-gray-100'} text-sm font-semibold`}>{t('Active Campaigns Overview')}</h4>
               <button
                 type="button"
                 onClick={() => setShowPaused(v => !v)}
-                className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-blue-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-blue-800"
+                className={`${isLight ? 'btn-reset text-xs px-2 py-1' : 'text-xs px-2 py-1 rounded border border-blue-700 text-gray-200 hover:bg-blue-800'}`}
               >
                 {showPaused ? t('Hide Paused') : t('Show Paused')}
               </button>
@@ -149,8 +157,8 @@ export default function ActiveCampaignsCard({ segments, employee, dateFrom, date
               {displaySegments.map((seg, idx) => (
                 <div key={idx} className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-full" style={{ backgroundColor: seg.color }} />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">{seg.label}</span>
-                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{seg.value}</span>
+                  <span className={`${isLight ? 'text-sm text-black' : 'text-sm dark:text-gray-300'}`}>{seg.label}</span>
+                  <span className={`${isLight ? 'text-sm font-medium text-black' : 'text-sm font-medium dark:text-gray-100'}`}>{seg.value}</span>
                 </div>
               ))}
             </div>
@@ -158,22 +166,22 @@ export default function ActiveCampaignsCard({ segments, employee, dateFrom, date
         </div>
 
         <div className="w-full">
-          <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mt-3">{t('Top Campaigns')}</h4>
+          <h4 className={`${isLight ? 'text-black' : 'dark:text-gray-100'} text-sm font-semibold mt-3`}>{t('Top Campaigns')}</h4>
           <style>{SCROLLBAR_CSS}</style>
           <div className="flex flex-row flex-nowrap gap-3 w-full items-stretch overflow-x-auto overflow-y-hidden pr-1 snap-x snap-mandatory scrollbar-thin-blue">
             {filteredCampaigns.map((c, idx) => (
-              <div key={idx} className="flex flex-col p-3 rounded-xl border border-gray-200 dark:border-blue-700 bg-transparent dark:bg-transparent shadow-sm hover:shadow-md transition-shadow duration-200 h-full min-h-[120px] flex-shrink-0 w-fit max-w-[200px] md:max-w-[220px] snap-start">
+              <div key={idx} className={`${isLight ? 'flex flex-col p-3 rounded-xl bg-white border border-[var(--lm-border)] shadow-sm hover:shadow-md' : 'flex flex-col p-3 rounded-xl border dark:border-blue-700 bg-transparent dark:bg-transparent shadow-sm hover:shadow-md'} transition-shadow duration-200 h-full min-h-[120px] flex-shrink-0 w-fit max-w-[200px] md:max-w-[220px] snap-start`}>
                 <div className="flex flex-col items-start gap-1 min-w-0">
                   <div className="inline-flex items-center gap-2 min-w-0">
                     <span className={`inline-block w-3 h-3 rounded-full ${statusColor(c.status)}`} />
-                    <span className="text-sm font-medium text-gray-800 dark:text-gray-200 whitespace-normal break-words">{c.name}</span>
-                  </div>
-                  <span className={`text-[10px] md:text-xs px-2 py-0.5 rounded-full font-medium ${statusBadgeClass(c.status)}`}>{statusLabel(c.status)}</span>
+                  <span className={`${isLight ? 'text-sm font-medium text-gray-900' : 'text-sm font-medium dark:text-gray-200'} whitespace-normal break-words`}>{c.name}</span>
                 </div>
-                <div className="mt-2 flex flex-col gap-1 text-xs md:text-sm text-[var(--muted-text)]">
-                  <div>{t('Open Rate')}: {c.openRate}%</div>
-                  <div>{t('Click Rate')}: {c.clickRate}%</div>
-                  <div>{t('Conversion Rate')}: {c.conversionRate}%</div>
+                <span className={`text-[10px] md:text-xs px-2 py-0.5 rounded-full font-medium ${statusBadgeClass(c.status)}`}>{statusLabel(c.status)}</span>
+              </div>
+                <div className={`${isLight ? 'mt-2 flex flex-col gap-1 text-xs md:text-sm text-gray-800' : 'mt-2 flex flex-col gap-1 text-xs md:text-sm text-[var(--muted-text)]'}`}>
+                  <div className={isLight ? 'text-black' : ''}>{t('Open Rate')}: {c.openRate}%</div>
+                  <div className={isLight ? 'text-black' : ''}>{t('Click Rate')}: {c.clickRate}%</div>
+                  <div className={isLight ? 'text-black' : ''}>{t('Conversion Rate')}: {c.conversionRate}%</div>
                 </div>
               </div>
             ))}

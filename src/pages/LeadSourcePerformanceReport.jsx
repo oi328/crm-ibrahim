@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 import { useTranslation } from 'react-i18next'
 import AdvancedDateFilter from '../components/AdvancedDateFilter'
 import LeadSourcePerformanceChart from '../components/LeadSourcePerformanceChart'
-import SearchableSelect from '../components/SearchableSelect'
+import SearchableSelect from '@shared/components/SearchableSelect'
 
 export default function LeadsPerformance() {
   const { t } = useTranslation()

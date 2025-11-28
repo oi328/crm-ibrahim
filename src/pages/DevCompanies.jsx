@@ -1,5 +1,5 @@
 import React from 'react'
-import Layout from '../components/Layout'
+import Layout from '@shared/layouts/Layout'
 
 export default function DevCompanies() {
   return (
