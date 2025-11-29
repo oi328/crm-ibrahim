@@ -31,7 +31,7 @@ const IconButton = ({ children, label, className, onClick, showLabel = true }) =
   </button>
 )
 
-function WelcomeSection({ isLight, onMobileToggle, mobileSidebarOpen, text }) {
+function WelcomeSection({ isLight, text }) {
   const [isDesktop, setIsDesktop] = useState(false)
   useEffect(() => {
     const update = () => setIsDesktop(window.matchMedia('(min-width: 768px)').matches)
@@ -41,29 +41,7 @@ function WelcomeSection({ isLight, onMobileToggle, mobileSidebarOpen, text }) {
   }, [])
   return (
     <div className="flex items-center gap-3 max-[800px]:gap-2 max-[480px]:gap-1 max-[320px]:gap-1 pl-0 ml-0" style={{ paddingInlineStart: 0, marginInlineStart: 0 }}>
-      {!isDesktop && (
-        <button
-          type="button"
-          onClick={() => { if (typeof onMobileToggle === 'function') { onMobileToggle() } }}
-          className={`mobile-sidebar-toggle inline-flex md:hidden items-center justify-center p-1.5 rounded-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            isLight 
-              ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' 
-              : 'text-gray-300 hover:text-white hover:bg-gray-700'
-          }`}
-          aria-label={mobileSidebarOpen ? 'Close menu' : 'Open menu'}
-        >
-          {mobileSidebarOpen ? (
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 text-red-500">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 transition-transform duration-300">
-              <path d="M3 12h18M3 6h18M3 18h18" />
-            </svg>
-          )}
-        </button>
-      )}
+      
       <span className={`text-sm max-[480px]:text-xs font-semibold whitespace-nowrap flex-shrink-0 min-w-fit max-w-[40vw] truncate ${isLight ? 'text-gray-800' : 'text-gray-300'}`}>{text}</span>
     </div>
   )
@@ -177,14 +155,31 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
   return (
     <>
     <header 
-      className={`main-header nova-topbar fixed top-0 z-50 border-b ${headerTone}`}>
-      <div className="header-inner w-full h-16 max-[320px]:h-14 flex items-center justify-between px-2 max-[480px]:px-1">
-        <WelcomeSection
-          isLight={isLight}
-          onMobileToggle={onMobileToggle}
-          mobileSidebarOpen={mobileSidebarOpen}
-          text={t('welcome_super_admin', 'Welcome, Super Admin!')}
-        />
+      className={`main-header nova-topbar fixed top-0 z-[120] border-b ${headerTone}`}>
+      <div className="header-inner relative w-full h-16 max-[320px]:h-14 flex items-center justify-between px-2 max-[480px]:px-1">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => { if (typeof onMobileToggle === 'function') { onMobileToggle() } }}
+            className={`md:hidden ${headerBtnBase} ${headerBtnTone} p-1.5`}
+            aria-label={mobileSidebarOpen ? 'Close menu' : 'Open menu'}
+          >
+            {mobileSidebarOpen ? (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 text-red-500">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
+                <path d="M3 12h18M3 6h18M3 18h18" />
+              </svg>
+            )}
+          </button>
+          <WelcomeSection
+            isLight={isLight}
+            text={t('welcome_super_admin', 'Welcome, Super Admin!')}
+          />
+        </div>
 
         {/* Right: actions */}
         <div className={`flex items-center gap-2 max-[768px]:gap-1.5 max-[480px]:gap-1`}>

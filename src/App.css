@@ -6,6 +6,12 @@
   text-align: initial;
 }
 
+.content-container {
+  overflow-x: hidden;
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
 /* Utility overrides for the demo */
 .logo { display: none; }
 .read-the-docs { display: none; }
@@ -67,18 +73,7 @@
     left: auto !important;
   }
 
-  /* 2. Content Container Margin */
-  [dir='rtl'] #app-sidebar:not(.sidebar-expanded) ~ .content-container {
-    margin-right: 240px !important;
-    margin-left: 0 !important;
-    width: calc(100% - 240px) !important;
-  }
-
-  [dir='rtl'] #app-sidebar.sidebar-expanded ~ .content-container {
-    margin-right: 240px !important;
-    margin-left: 0 !important;
-    width: calc(100% - 240px) !important;
-  }
+  /* Desktop: rely on Layout padding for content offset */
 
 
   /* 4. Sidebar expand/collapse button */
