@@ -50,7 +50,7 @@ export default function Layout({ children }) {
 
       {/* Content area (hidden on mobile when sidebar open) */}
       <div
-        className={`content-container relative z-[10] pt-16 min-h-screen w-full ${isRtl ? 'md:pr-[240px]' : 'md:pl-[240px]'} ${isMobileSidebarOpen && isMobileView ? 'hidden md:block' : ''}`}
+        className={`content-container relative z-[10] pt-16 min-h-screen w-full `}
       >
          {/* Main content */}
          <main className="flex-1 overflow-auto sidebar-scrollbar pt-2 sm:pt-3 lg:pt-4 px-3 sm:px-4 lg:px-6 pb-4 mt-0 ml-0">

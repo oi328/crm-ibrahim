@@ -69,6 +69,7 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
   const searchRef = useRef(null)
   const notificationsRef = useRef(null)
   const languageRef = useRef(null)
+  const profileRef = useRef(null)
 
   const handleSearch = () => {
     console.log('Search:', { query: searchQuery, filter: searchType })
@@ -126,6 +127,9 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
       if (isLanguageOpen && languageRef.current && !languageRef.current.contains(e.target)) {
         setIsLanguageOpen(false)
       }
+      if (profilePreviewOpen && profileRef.current && !profileRef.current.contains(e.target)) {
+        setProfilePreviewOpen(false)
+      }
     }
     document.addEventListener('mousedown', onDocClick)
     document.addEventListener('touchstart', onDocClick)
@@ -133,7 +137,7 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
       document.removeEventListener('mousedown', onDocClick)
       document.removeEventListener('touchstart', onDocClick)
     }
-  }, [isSearchDropdownOpen, isNotificationsOpen, isLanguageOpen])
+  }, [isSearchDropdownOpen, isNotificationsOpen, isLanguageOpen, profilePreviewOpen])
 
   // Header buttons unified styles with glass morphism effects
   const headerBtnBase = 'inline-flex items-center justify-center p-2 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500';
@@ -215,7 +219,7 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
             </IconButton>
           </div>
 
-          {/* Theme toggle should be the first icon next to Search */}
+          {/* Theme toggle */}
           <div className="max-[768px]:hidden">
             <IconButton label={t('Theme')} className={`${headerBtnBase} ${headerBtnTone}`} onClick={toggleTheme}>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5 max-[480px]:w-4 max-[480px]:h-4">
@@ -224,6 +228,8 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
               </svg>
             </IconButton>
           </div>
+
+          
 
           <div className="max-[768px]:hidden">
             <IconButton label={t('Tasks')} className={`${headerBtnBase} ${headerBtnTone}`} onClick={() => navigate('/tasks')}>
@@ -268,9 +274,11 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
             )}
           </div>
 
+          
+
 
           {/* Profile dropdown */}
-          <div className="relative">
+          <div className="relative" ref={profileRef}>
             <button 
               onClick={() => setProfilePreviewOpen(!profilePreviewOpen)}
               className={`flex items-center gap-2 px-3 py-2 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isLight 
@@ -283,8 +291,8 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
               </div>
             </button>
             {profilePreviewOpen && (
-              <div className={`dropdown-panel absolute top-12 ${isRTL ? 'left-0' : 'right-0'} w-72 max-w-[92vw] backdrop-blur-md ${isLight ? 'bg-white/90' : 'bg-gray-900/90'} border ${isLight ? 'border-white/30' : 'border-gray-600/30'} rounded-xl shadow-2xl z-50`} role="menu" aria-label={t('Profile menu')}>
-                <div className={`absolute -top-2 ${isRTL ? 'left-6' : 'right-6'} w-3 h-3 backdrop-blur-md ${isLight ? 'bg-white/90' : 'bg-gray-900/90'} border-t border-l ${isLight ? 'border-white/30' : 'border-gray-600/30'} rotate-45`}></div>
+              <div className={`dropdown-panel absolute top-12 ${isRTL ? 'left-0' : 'right-0'} w-72 max-w-[92vw] ${isLight ? 'bg-white border border-gray-200' : 'bg-gray-900 border border-gray-700'} rounded-xl shadow-2xl z-50`} role="menu" aria-label={t('Profile menu')}>
+                <div className={`absolute -top-2 ${isRTL ? 'left-6' : 'right-6'} w-3 h-3 ${isLight ? 'bg-white border-t border-l border-gray-200' : 'bg-gray-900 border-t border-l border-gray-700'} rotate-45`}></div>
 
                 <div className="px-4 py-3 flex items-center gap-3">
                   <img src={AVATAR_PLACEHOLDER} alt="User" className="w-10 h-10 rounded-full" />
@@ -332,23 +340,21 @@ export default function Topbar({ onMobileToggle, mobileSidebarOpen, isSidebarExp
                 <div className="h-px bg-[var(--divider)]"></div>
 
                 <button
-                  onClick={() => { setProfilePreviewOpen(false); setIsLanguageOpen(true) }}
+                  onClick={() => { setProfilePreviewOpen(false); navigate('/settings/profile') }}
                   className="w-full flex items-center gap-3 px-4 py-2 text-sm text-[var(--content-text)] hover:bg-[var(--table-row-hover)] transition-colors"
                   role="menuitem"
                 >
-                  <span className="w-5 h-5 inline-flex items-center justify-center">🌐</span>
-                  <span className="flex-1">{t('Language')}</span>
-                  <span className="text-xs text-[var(--muted-text)]">{i18n.language === 'ar' ? 'العربية' : 'English'}</span>
+                  <span className="w-5 h-5 inline-flex items-center justify-center">🖼️</span>
+                  <span className="flex-1">{t('Change Profile Picture')}</span>
                 </button>
 
                 <button
-                  onClick={() => { toggleTheme(); setProfilePreviewOpen(false) }}
+                  onClick={() => { setProfilePreviewOpen(false); navigate('/settings/system/security') }}
                   className="w-full flex items-center gap-3 px-4 py-2 text-sm text-[var(--content-text)] hover:bg-[var(--table-row-hover)] transition-colors"
                   role="menuitem"
                 >
-                  <span className="w-5 h-5 inline-flex items-center justify-center">🌓</span>
-                  <span className="flex-1">{t('Theme')}</span>
-                  <span className="text-xs text-[var(--muted-text)]">{isLight ? 'light' : 'dark'}</span>
+                  <span className="w-5 h-5 inline-flex items-center justify-center">🔑</span>
+                  <span className="flex-1">{t('Change Password')}</span>
                 </button>
 
                 <div className="h-px bg-[var(--divider)]"></div>

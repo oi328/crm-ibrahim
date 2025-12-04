@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import Layout from '@shared/layouts/Layout'
 import { useTranslation } from 'react-i18next'
 import SearchableSelect from '@shared/components/SearchableSelect'
-import { getTeamsForDept } from '../data/orgStructure'
+import { getTeamsForDept } from '../../data/orgStructure'
 
 const MOCK_MANAGERS = [
   { id: 'u-1003', fullName: 'Mohamed Salem', role: 'Manager' },

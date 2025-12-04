@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import UMActionButtons from '../components/UMActionButtons';
-import AssignmentModal from '../components/AssignmentModal';
+import UMActionButtons from '../../components/UMActionButtons';
+import AssignmentModal from '../../components/AssignmentModal';
 import { ClipboardCheck, Handshake, Ticket } from 'lucide-react';
-import Layout from '@shared/layouts/Layout';
+import Layout from '@components/Layout';
 import SearchableSelect from '@shared/components/SearchableSelect';
-import { DEPARTMENTS } from '../data/orgStructure'
+import { DEPARTMENTS } from '../../data/orgStructure'
 import { useTranslation } from 'react-i18next';
 // Removed file-saver dependency; using Blob + link for export
 
@@ -229,16 +229,59 @@ export default function UserManagementUsers() {
 
   return (
     <Layout title="User Management — Users">
-      <div className="container mx-auto px-4 py-4">
+      <div className="w-full max-w-none px-0 py-0">
         <div className="glass-panel rounded-xl px-4 py-3 mb-4 flex items-center justify-between">
           <h1 className="text-xl font-semibold text-primary">Users</h1>
-          <div className="flex items-center gap-2">
-            <button className="btn btn-ghost" onClick={exportUsersToCSV}>Export Excel</button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <label className="btn btn-ghost cursor-pointer">
+              Import Users
+              <input type="file" accept=".csv,text/csv" className="hidden" onChange={(e)=>{
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                  try {
+                    const text = String(reader.result || '');
+                    const lines = text.split(/\r?\n/).filter(Boolean);
+                    const header = lines[0].split(',').map(h=>h.trim().replace(/"/g,''));
+                    const idx = (name) => header.findIndex(h => h.toLowerCase() === name.toLowerCase());
+                    const idIdx = idx('id');
+                    const nameIdx = idx('full name');
+                    const emailIdx = idx('email');
+                    const phoneIdx = idx('phone');
+                    const roleIdx = idx('role');
+                    const statusIdx = idx('status');
+                    const teamIdx = idx('team');
+                    const createdIdx = idx('created at');
+                    const next = lines.slice(1).map(l => {
+                      const cols = l.split(',').map(c=>c.replace(/^\"|\"$/g,''));
+                      return {
+                        id: cols[idIdx] || `u-${Date.now()}`,
+                        fullName: cols[nameIdx] || '',
+                        email: cols[emailIdx] || '',
+                        phone: cols[phoneIdx] || '',
+                        role: cols[roleIdx] || 'Viewer',
+                        status: cols[statusIdx] || 'Active',
+                        team: cols[teamIdx] || '',
+                        createdAt: cols[createdIdx] || '',
+                      };
+                    }).filter(u => u.fullName && u.email);
+                    setUsers(prev => [...prev, ...next]);
+                    alert(`Imported ${next.length} users`);
+                  } catch(err) {
+                    console.error(err);
+                    alert('Failed to import CSV');
+                  }
+                };
+                reader.readAsText(file);
+              }} />
+            </label>
+            <button className="btn" onClick={exportUsersToCSV}>Export Excel</button>
             <Link to="/user-management/users/new" className="btn btn-primary">Add New User</Link>
           </div>
         </div>
 
-        <div className="glass-panel rounded-xl p-3 mb-4">
+        <div className="glass-panel rounded-xl p-3 mb-4 w-full">
           <div className="grid grid-cols-1 md:grid-cols-7 gap-3">
             <div>
               <label className="label"><span className="label-text">{isArabic ? 'بحث' : 'Search'}</span></label>
@@ -322,7 +365,7 @@ export default function UserManagementUsers() {
           </div>
         )}
 
-        <div className="glass-panel rounded-xl overflow-x-auto">
+        <div className="glass-panel rounded-xl overflow-x-auto w-full">
           <table className="nova-table w-full">
             <thead>
               <tr className="thead-soft">

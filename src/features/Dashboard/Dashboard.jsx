@@ -193,7 +193,7 @@ export const Dashboard = () => {
   const COLOR_STYLES = {
     blue: {
       container: 'border-blue-400 dark:border-blue-500 bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 dark:from-blue-800 dark:via-blue-700 dark:to-blue-600 shadow-blue-300/50 dark:shadow-blue-500/25',
-      containerLight: 'border-blue-400 bg-gradient-to-br from-blue-100/60 via-blue-100/40 to-blue-100/30 backdrop-blur-sm shadow-blue-300/30',
+      containerLight: 'border-blue-400 bg-gradient-to-br from-blue-100/85 via-blue-100/75 to-blue-100/65 backdrop-blur-sm shadow-blue-300/30',
       containerDark: 'border-blue-500 bg-gradient-to-br from-blue-800 via-blue-700 to-blue-600 shadow-blue-500/25',
       patternFrom: 'from-blue-200',
       patternTo: 'to-blue-300',
@@ -205,7 +205,7 @@ export const Dashboard = () => {
     },
     green: {
       container: 'border-green-400 dark:border-green-500 bg-gradient-to-br from-green-100 via-green-200 to-green-300 dark:from-green-800 dark:via-green-700 dark:to-green-600 shadow-green-300/50 dark:shadow-green-500/25',
-      containerLight: 'border-green-400 bg-gradient-to-br from-green-100/60 via-green-100/40 to-green-100/30 backdrop-blur-sm shadow-green-300/30',
+      containerLight: 'border-green-400 bg-gradient-to-br from-green-100/85 via-green-100/75 to-green-100/65 backdrop-blur-sm shadow-green-300/30',
       containerDark: 'border-green-500 bg-gradient-to-br from-green-800 via-green-700 to-green-600 shadow-green-500/25',
       patternFrom: 'from-green-200',
       patternTo: 'to-green-300',
@@ -220,7 +220,7 @@ export const Dashboard = () => {
     },
     yellow: {
       container: 'border-yellow-400 dark:border-yellow-500 bg-gradient-to-br from-yellow-100 via-yellow-200 to-yellow-300 dark:from-yellow-800 dark:via-yellow-700 dark:to-yellow-600 shadow-yellow-300/50 dark:shadow-yellow-500/25',
-      containerLight: 'border-yellow-400 bg-gradient-to-br from-yellow-100/60 via-yellow-100/40 to-yellow-100/30 backdrop-blur-sm shadow-yellow-300/30',
+      containerLight: 'border-yellow-400 bg-gradient-to-br from-yellow-100/85 via-yellow-100/75 to-yellow-100/65 backdrop-blur-sm shadow-yellow-300/30',
       containerDark: 'border-yellow-500 bg-gradient-to-br from-yellow-800 via-yellow-700 to-yellow-600 shadow-yellow-500/25',
       patternFrom: 'from-yellow-200',
       patternTo: 'to-yellow-300',
@@ -235,7 +235,7 @@ export const Dashboard = () => {
     },
     red: {
       container: 'border-red-400 dark:border-red-500 bg-gradient-to-br from-red-100 via-red-200 to-red-300 dark:from-red-800 dark:via-red-700 dark:to-red-600 shadow-red-300/50 dark:shadow-red-500/25',
-      containerLight: 'border-red-400 bg-gradient-to-br from-red-100/60 via-red-100/40 to-red-100/30 backdrop-blur-sm shadow-red-300/30',
+      containerLight: 'border-red-400 bg-gradient-to-br from-red-100/85 via-red-100/75 to-red-100/65 backdrop-blur-sm shadow-red-300/30',
       containerDark: 'border-red-500 bg-gradient-to-br from-red-800 via-red-700 to-red-600 shadow-red-500/25',
       patternFrom: 'from-red-200',
       patternTo: 'to-red-300',
@@ -250,7 +250,7 @@ export const Dashboard = () => {
     },
     purple: {
       container: 'border-purple-400 dark:border-purple-500 bg-gradient-to-br from-purple-100 via-purple-200 to-purple-300 dark:from-purple-800 dark:via-purple-700 dark:to-purple-600 shadow-purple-300/50 dark:shadow-purple-500/25',
-      containerLight: 'border-purple-400 bg-gradient-to-br from-purple-100/60 via-purple-100/40 to-purple-100/30 backdrop-blur-sm shadow-purple-300/30',
+      containerLight: 'border-purple-400 bg-gradient-to-br from-purple-100/85 via-purple-100/75 to-purple-100/65 backdrop-blur-sm shadow-purple-300/30',
       containerDark: 'border-purple-500 bg-gradient-to-br from-purple-800 via-purple-700 to-purple-600 shadow-purple-500/25',
       patternFrom: 'from-purple-200',
       patternTo: 'to-purple-300',
@@ -430,10 +430,10 @@ export const Dashboard = () => {
             </div>
           </div>
           <section 
-            className="p-4 rounded-xl shadow-lg glass-panel filter-card w-full mb-8"
+            className="p-3 rounded-lg shadow-md glass-panel filter-card w-full mb-6"
           >
             {/* Filter Header */}
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200 dark:border-gray-600">
+            <div className="flex items-center justify-between mb-2 pb-2 border-b border-gray-200 dark:border-gray-600">
               <div className="flex items-center gap-3">
                 <div className="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-lg">
                   <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -445,7 +445,7 @@ export const Dashboard = () => {
                 </h3>
               </div>
               {/* Reset Button - Moved to top right */}
-              <button onClick={() => { setSelectedManager(''); setSelectedEmployee(''); setDateFrom(''); setDateTo(''); }} className="btn-reset flex items-center gap-2 font-medium transform hover:scale-105 transition-all duration-200 focus:outline-none">
+              <button onClick={() => { setSelectedManager(''); setSelectedEmployee(''); setDateFrom(''); setDateTo(''); }} className="btn-reset flex items-center gap-2 text-xs px-2 py-1 font-medium transform hover:scale-105 transition-all duration-200 focus:outline-none">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
@@ -454,7 +454,7 @@ export const Dashboard = () => {
             </div>
 
             {/* Filter Controls */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
               {/* Manager Filter */}
               <div className="space-y-2">
                 <label className={`flex items-center gap-2 text-sm font-medium ${isLight ? 'text-gray-900' : 'text-white'}`}>
@@ -467,7 +467,7 @@ export const Dashboard = () => {
                   value={selectedManager}
                   onChange={setSelectedManager}
                   placeholder={t('Select Manager')}
-                  className="w-full lm-input"
+                  className="lm-input w-56"
                 >
                   <option value="Manager 1">Manager 1</option>
                   <option value="Manager 2">Manager 2</option>
@@ -487,7 +487,7 @@ export const Dashboard = () => {
                   value={selectedEmployee}
                   onChange={setSelectedEmployee}
                   placeholder={t('Select Employee')}
-                  className="w-full lm-input"
+                  className="lm-input w-56"
                 >
                   <option value="Employee 1">Employee 1</option>
                   <option value="Employee 2">Employee 2</option>
@@ -511,7 +511,7 @@ export const Dashboard = () => {
                   lang={i18n.language === 'ar' ? 'ar-EG' : 'en-US'}
                   dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
                   placeholder={t('Date Input Placeholder')}
-                  className="lm-input w-full"
+                  className="lm-input w-56"
                 />
               </div>
 
@@ -531,7 +531,7 @@ export const Dashboard = () => {
                   lang={i18n.language === 'ar' ? 'ar-EG' : 'en-US'}
                   dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
                   placeholder={t('Date Input Placeholder')}
-                  className="lm-input w-full"
+                  className="lm-input w-56"
                 />
               </div>
             </div>
@@ -572,7 +572,7 @@ export const Dashboard = () => {
                   key={'__fixed_total__'}
                   className={`relative overflow-hidden rounded-2xl p-4 group ${
                     isLight
-                      ? 'border-2 border-blue-400 bg-gradient-to-br from-blue-100/60 via-blue-100/40 to-blue-100/30 backdrop-blur-sm shadow-blue-300/30'
+                      ? 'border-2 border-blue-400 bg-gradient-to-br from-blue-100/85 via-blue-100/75 to-blue-100/65 backdrop-blur-sm shadow-blue-300/30'
                       : 'border-2 border-blue-500 bg-gradient-to-br from-blue-800 via-blue-700 to-blue-600 shadow-blue-500/25'
                   } shadow-2xl hover:shadow-3xl transform hover:scale-[1.02] hover:-translate-y-1 transition-all duration-500`}
                 >

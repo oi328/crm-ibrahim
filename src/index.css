@@ -1210,8 +1210,8 @@ body {
   width: calc(100% - var(--sidebar-desktop-width)) !important;
   transition: left 200ms ease, width 200ms ease;
   padding-top: 56px; /* يعادل ارتفاع الهيدر لتجنب التداخل */
-  padding-left: 0.5rem;
-  padding-bottom: 1.5rem;
+  padding-left: 0;
+  padding-bottom: 1rem;
 }
 
 /* RTL support: المحتوى يتزاح يمينًا عند RTL */
@@ -1222,7 +1222,7 @@ body {
   margin-left: 0 !important;
   width: calc(100% - var(--sidebar-desktop-width)) !important;
   transition: right 200ms ease, width 200ms ease;
-  padding-right: 0.5rem;
+  padding-right: 0;
 }
 
 /* Adjust top offset for very small screens where header is shorter */
@@ -2340,4 +2340,19 @@ body {
 /* Hide any duplicate sidebars rendered inside pages when Layout already provides one */
 #app-sidebar ~ #app-sidebar {
   display: none !important;
+}
+.lm-input {
+  font-size: 0.75rem;
+  padding: 0.375rem 0.5rem;
+  height: 2rem;
+}
+
+.btn-reset {
+  font-size: 0.75rem;
+  padding: 0.375rem 0.5rem;
+  height: 2rem;
+}
+
+.filter-card {
+  padding: 0.75rem;
 }

@@ -100,6 +100,12 @@ import UpgradePlan from '../pages/UpgradePlan'
 import Welcome from '../pages/Welcome'
 import Pricing from '../pages/Pricing'
 import Layout from '../components/Layout'
+import UserManagementUsers from '../features/Users/Users'
+import UserManagementUserCreate from '../features/Users/UserForm'
+import UserManagementActivityLogs from '../pages/UserManagementActivityLogs'
+import UserManagementAccessLogs from '../pages/UserManagementAccessLogs'
+import UserManagementRoles from '../pages/UserManagementRoles'
+import UserManagementRoleEdit from '../pages/UserManagementRoleEdit'
 
 function ProtectedModuleRoute({ moduleKey }) { return <Outlet /> }
 function SubscriptionGuard() { return <Outlet /> }
@@ -222,6 +228,14 @@ export default function AppRouter() {
               <Route path="/settings/operations/rent" element={<RentConfiguration />} />
               <Route path="/settings/operations/cil" element={<CILSettings />} />
             </Route>
+
+            {/* User Management */}
+            <Route path="/user-management/users" element={<UserManagementUsers />} />
+            <Route path="/user-management/users/new" element={<UserManagementUserCreate />} />
+            <Route path="/user-management/activity-logs" element={<UserManagementActivityLogs />} />
+            <Route path="/user-management/access-logs" element={<UserManagementAccessLogs />} />
+            <Route path="/user-management/roles" element={<UserManagementRoles />} />
+            <Route path="/user-management/roles/:name" element={<UserManagementRoleEdit />} />
 
             <Route path="/inventory/products" element={<Products />} />
             <Route path="/inventory/items" element={<Items />} />

@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Layout from '@shared/layouts/Layout'
-import UMActionButtons from '../components/UMActionButtons'
-import AssignmentModal from '../components/AssignmentModal'
+import UMActionButtons from '../../components/UMActionButtons'
+import AssignmentModal from '../../components/AssignmentModal'
 import { useTranslation } from 'react-i18next'
 import SearchableSelect from '@shared/components/SearchableSelect'
 
